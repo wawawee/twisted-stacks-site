@@ -93,9 +93,32 @@
         flex-wrap: wrap;
       }
 
+      .nav-start {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+
       .nav a {
         text-decoration: none;
         color: var(--muted);
+      }
+
+      .showroom-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border: 1px solid rgba(234, 179, 8, 0.45);
+        background: rgba(234, 179, 8, 0.1);
+        color: #fde68a !important;
+        letter-spacing: 0.12em;
+      }
+
+      .showroom-back:hover {
+        border-color: rgba(234, 179, 8, 0.75);
+        color: #fef08a !important;
       }
 
       .nav strong {
@@ -422,8 +445,11 @@
   <body class="lang-sv">
     <header>
       <nav class="shell nav" aria-label="SkatteRevision navigation">
-        <a href="/">TwistedStacks</a>
-        <strong>SkatteRevision</strong>
+        <div class="nav-start">
+          <a href="/" class="showroom-back i18n-sv">← Showroom</a>
+          <a href="/" class="showroom-back i18n-en">← Showroom</a>
+          <strong>SkatteRevision</strong>
+        </div>
         <div class="nav-links">
           <div class="lang-switch" role="group" aria-label="Language">
             <button type="button" data-lang="sv" class="is-active">SV</button>

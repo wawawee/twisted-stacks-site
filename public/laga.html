@@ -81,9 +81,32 @@
         text-transform: uppercase;
       }
 
+      .nav-start {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+
       .nav a {
         text-decoration: none;
         color: var(--muted);
+      }
+
+      .showroom-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border: 1px solid rgba(234, 179, 8, 0.45);
+        background: rgba(234, 179, 8, 0.1);
+        color: #fde68a !important;
+        letter-spacing: 0.12em;
+      }
+
+      .showroom-back:hover {
+        border-color: rgba(234, 179, 8, 0.75);
+        color: #fef08a !important;
       }
 
       .nav strong {
@@ -384,8 +407,10 @@
   <body>
     <header>
       <nav class="shell nav" aria-label="LAGA navigation">
-        <a href="/">TwistedStacks</a>
-        <strong>LAGA</strong>
+        <div class="nav-start">
+          <a href="/" class="showroom-back">← Showroom</a>
+          <strong>LAGA</strong>
+        </div>
         <a href="mailto:dev@twistedstacks.com?subject=LAGA%20workflow%20lab">Kontakt</a>
       </nav>
     </header>

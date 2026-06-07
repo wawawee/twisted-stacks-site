@@ -247,7 +247,7 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
   },
   {
     id: "system_anslag",
-    name: "ANSLAG",
+    name: "TWISTED+Anslag",
     version: "public grant demo / SITK",
     status: "SHIPPED",
     tagline: "Discover grants. Draft applications. Free, and allowed to be slow.",
