@@ -300,6 +300,7 @@ export default function App() {
   const [endAction, setEndAction] = useState<"next" | "retry" | "champion" | null>(null);
   const endActionRef = useRef(endAction);
   endActionRef.current = endAction;
+  const [retryPromptActive, setRetryPromptActive] = useState(false);
   const [retryCountdown, setRetryCountdown] = useState(10);
   const retryTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const showEasterEggRef = useRef<(open: boolean) => void>(() => {});
@@ -333,12 +334,15 @@ export default function App() {
     fetchRemoteScores(SCOREBOARD_LIMIT)
       .then((remoteScores) => {
         if (cancelled) return;
-        setLeaderboardMode("global");
-        if (remoteScores.length === 0) return;
+        if (remoteScores.length === 0) {
+          setLeaderboardMode("local");
+          return;
+        }
         const nextScores = rankScoreboard([...remoteScores, ...highScoresRef.current]);
         persistScoreboard(nextScores);
         highScoresRef.current = nextScores;
         setHighScores(nextScores);
+        setLeaderboardMode("global");
       })
       .catch((error) => {
         setLeaderboardMode("local");
@@ -359,17 +363,19 @@ export default function App() {
 
   const requestRetryYes = () => {
     clearRetryTimer();
+    setRetryPromptActive(false);
     endActionRequestRef.current = "retry";
   };
 
   const requestAcceptAiWins = () => {
     clearRetryTimer();
+    setRetryPromptActive(false);
     setEndAction(null);
     endActionRequestRef.current = "level1";
   };
 
   useEffect(() => {
-    if (!showGame || endAction !== "retry") {
+    if (!showGame || endAction !== "retry" || !retryPromptActive) {
       clearRetryTimer();
       setRetryCountdown(10);
       return undefined;
@@ -383,6 +389,7 @@ export default function App() {
       setRetryCountdown(left);
       if (left <= 0) {
         clearRetryTimer();
+        setRetryPromptActive(false);
         setEndAction(null);
         window.setTimeout(() => {
           endActionRequestRef.current = "level1";
@@ -393,11 +400,11 @@ export default function App() {
     return () => {
       clearRetryTimer();
     };
-  }, [endAction, showGame]);
+  }, [endAction, retryPromptActive, showGame]);
 
   const startTwistedPongg = () => {
     setShowGame(true);
-    if (endAction) {
+    if (endAction && endAction !== "retry") {
       endActionRequestRef.current = endAction === "champion" ? "retry" : endAction;
     }
   };
@@ -900,6 +907,13 @@ export default function App() {
 
     const ball: BallState = createBallState(COLOR_WHITE);
 
+    function removeMesh(mesh: THREE.Mesh, disposeMaterial = false) {
+      scene.remove(mesh);
+      if (!disposeMaterial) return;
+      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      materials.forEach((material) => material.dispose());
+    }
+
     function launchBall(speed: number) {
       resetBallMotion(ball);
       ballMesh.position.set(0, 0, 0);
@@ -913,7 +927,7 @@ export default function App() {
     }
 
     function clearCountdownMeshes() {
-      countdownMeshes.forEach((mesh) => scene.remove(mesh));
+      countdownMeshes.forEach((mesh) => removeMesh(mesh, mesh.userData.disposeMaterial === true));
       countdownMeshes = [];
     }
 
@@ -1078,6 +1092,7 @@ export default function App() {
               const by = startY - r * (brickH + gap) - brickH / 2;
               const mesh = new THREE.Mesh(getBrickGeometry(brickW, brickH), mat);
               mesh.position.set(bx, by, depth);
+              mesh.userData.disposeMaterial = true;
               scene.add(mesh);
               countdownMeshes.push(mesh);
             }
@@ -1153,7 +1168,7 @@ export default function App() {
 
     function clearCenterMotif() {
       centerMotifBricks.forEach((brick) => {
-        if (brick.mesh) scene.remove(brick.mesh);
+        if (brick.mesh) removeMesh(brick.mesh, true);
       });
       centerMotifBricks = [];
       motifMirrorSign = 1;
@@ -2469,6 +2484,7 @@ export default function App() {
         endActionRequestRef.current = null;
         endOutcome = null;
         setEndAction(null);
+        setRetryPromptActive(false);
         winFlashActive = false;
         paintDripAccumulator = 0;
         pendingNextLevelAt = 0;
@@ -2513,6 +2529,7 @@ export default function App() {
         endActionRequestRef.current = null;
         endOutcome = null;
         setEndAction(null);
+        setRetryPromptActive(false);
         winFlashActive = false;
         paintDripAccumulator = 0;
         if (action === "next") {
@@ -2950,6 +2967,7 @@ export default function App() {
             endOutcome = "ai";
             paintDripAccumulator = 0;
             submitScoreCandidate(playerPoints, currentLevel, "lost");
+            setRetryPromptActive(true);
             setEndAction("retry");
             renderEndTypography(["AI", "WINS"], COLOR_LOSS_RED);
             spawnPaintDrips(18);
@@ -2959,6 +2977,7 @@ export default function App() {
             currentState = GameState.END_SCREEN;
             setGameState(GameState.END_SCREEN);
             endOutcome = "player";
+            setRetryPromptActive(false);
             if (currentLevel >= MAX_LEVEL) {
               playerWinLines = ["STACK", "MASTER"];
               submitScoreCandidate(playerPoints, currentLevel, "champion");
@@ -3197,7 +3216,7 @@ export default function App() {
           requestRetryYes();
           return;
         }
-        if (e.key.toLowerCase() === "n") {
+        if (e.key.toLowerCase() === "n" || e.key === "0") {
           requestAcceptAiWins();
           return;
         }
@@ -3277,9 +3296,9 @@ export default function App() {
       // Deep geometry and material release to avoid GPU leaks
       bricks.forEach((b) => { if (b.mesh) scene.remove(b.mesh); });
       scoreBricks.forEach((sb) => { if (sb.mesh) scene.remove(sb.mesh); });
-      centerMotifBricks.forEach((brick) => { if (brick.mesh) scene.remove(brick.mesh); });
+      centerMotifBricks.forEach((brick) => { if (brick.mesh) removeMesh(brick.mesh, true); });
       endBricks.forEach((eb) => { if (eb.mesh) scene.remove(eb.mesh); });
-      countdownMeshes.forEach((mesh) => scene.remove(mesh));
+      countdownMeshes.forEach((mesh) => removeMesh(mesh, mesh.userData.disposeMaterial === true));
       particles.forEach((p) => { if (p.mesh) scene.remove(p.mesh); });
       monsterShots.forEach((shot) => scene.remove(shot.mesh));
       playerShots.forEach((shot) => scene.remove(shot.mesh));
@@ -3551,7 +3570,7 @@ export default function App() {
         </div>
       )}
 
-      {endAction && (
+      {(endAction && (endAction !== "retry" || (showGame && retryPromptActive))) && (
         <div className="absolute bottom-8 left-1/2 z-40 flex -translate-x-1/2 items-center gap-3 pointer-events-auto">
           {!showGame ? (
             <button
