@@ -337,6 +337,7 @@ export default function App() {
   const [selectedProjectId, setSelectedProjectId] = useState<string>("system_skatterevision");
   const [showShowroomModal, setShowShowroomModal] = useState(false);
   const [showGame, setShowGame] = useState(false);
+  const showGameRef = useRef(showGame);
   const [highScores, setHighScores] = useState<ScoreEntry[]>(loadScoreboard);
   const [leaderboardMode, setLeaderboardMode] = useState<"local" | "global">(
     isRemoteLeaderboardConfigured() ? "global" : "local",
@@ -344,7 +345,7 @@ export default function App() {
   const [scoreCandidate, setScoreCandidate] = useState<ScoreCandidate | null>(null);
   const [playerInitials, setPlayerInitials] = useState("");
 
-  const rigStateRef = useRef<"normal" | "autopilot">("normal");
+  const rigStateRef = useRef<"normal" | "autopilot">("autopilot");
   const highScoresRef = useRef(highScores);
   highScoresRef.current = highScores;
 
@@ -580,10 +581,9 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (showEasterEgg) {
-      rigStateRef.current = "autopilot";
-    }
-  }, [showEasterEgg]);
+    showGameRef.current = showGame;
+    rigStateRef.current = showEasterEgg || !showGame ? "autopilot" : "normal";
+  }, [showGame, showEasterEgg]);
 
   // Keep track of interaction state for parallax tilt
   const interactionRef = useRef({
@@ -741,7 +741,12 @@ export default function App() {
       }
     }
 
+    function audioAllowed() {
+      return showGameRef.current;
+    }
+
     function ensureAudio() {
+      if (!audioAllowed()) return null;
       const AudioCtor = window.AudioContext || (window as any).webkitAudioContext;
       if (!AudioCtor) return null;
       if (!audioCtx) audioCtx = new AudioCtor();
@@ -757,6 +762,7 @@ export default function App() {
       gainValue = 0.045,
       type: OscillatorType = "triangle",
     ) {
+      if (!audioAllowed()) return;
       const ctx = ensureAudio();
       if (!ctx) return;
 
@@ -833,7 +839,7 @@ export default function App() {
     }
 
     function updateMusicLoop(timeNow: number) {
-      if (!audioCtx || currentState !== GameState.GAMEPLAY) return;
+      if (!audioAllowed() || !audioCtx || currentState !== GameState.GAMEPLAY) return;
       const tick = computeMusicTick(
         timeNow,
         nextMusicTickAt,
@@ -3545,6 +3551,7 @@ export default function App() {
           </section>
 
           <section className="showroom-note">
+            <p>Pongg runs quietly behind the page as a visual backdrop. Click Play Pongg for sound and full control.</p>
             <p>Click any project card to open its info page, live demo, or repo link.</p>
             <p>
               Runnable demos live on their own subdomains. Info-only pages and PDFs can stay on the main site — see
