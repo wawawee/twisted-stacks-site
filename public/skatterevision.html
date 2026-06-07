@@ -6,7 +6,7 @@
     <title>SkatteRevision - TwistedStacks</title>
     <meta
       name="description"
-      content="SkatteRevision is an audit-grade lead intelligence and dossier engine for retroactive Swedish tax recovery research."
+      content="SkatteRevision helps Swedish tax and audit partners find retroactive recovery leads by signee, accounting firm, region, and track — not random org-number lookup."
     />
     <style>
       :root {
@@ -19,8 +19,7 @@
         --panel-strong: rgba(28, 28, 32, 0.92);
         --gold: #eab308;
         --cyan: #22d3ee;
-        --green: #34d399;
-        --red: #fb7185;
+        --rose: #fb7185;
       }
 
       * {
@@ -50,6 +49,11 @@
           "Segoe UI",
           sans-serif;
         line-height: 1.5;
+      }
+
+      body.lang-en .i18n-sv,
+      body.lang-sv .i18n-en {
+        display: none !important;
       }
 
       a {
@@ -82,6 +86,13 @@
         text-transform: uppercase;
       }
 
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+
       .nav a {
         text-decoration: none;
         color: var(--muted);
@@ -90,6 +101,28 @@
       .nav strong {
         color: var(--gold);
         font-weight: 600;
+      }
+
+      .lang-switch {
+        display: inline-flex;
+        border: 1px solid var(--line);
+        background: rgba(5, 5, 5, 0.55);
+      }
+
+      .lang-switch button {
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        font: inherit;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 8px 10px;
+        cursor: pointer;
+      }
+
+      .lang-switch button.is-active {
+        color: var(--gold);
+        background: rgba(234, 179, 8, 0.1);
       }
 
       .hero {
@@ -120,8 +153,8 @@
       h1 {
         margin-top: 18px;
         max-width: 920px;
-        font-size: clamp(52px, 9vw, 112px);
-        line-height: 0.88;
+        font-size: clamp(44px, 8vw, 96px);
+        line-height: 0.9;
         letter-spacing: 0;
       }
 
@@ -198,8 +231,8 @@
         display: block;
         margin-top: 10px;
         color: var(--ink);
-        font-size: 24px;
-        line-height: 1.05;
+        font-size: 22px;
+        line-height: 1.08;
       }
 
       section {
@@ -260,7 +293,7 @@
 
       .flow {
         display: grid;
-        grid-template-columns: repeat(5, minmax(0, 1fr));
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 10px;
         margin-top: 32px;
       }
@@ -298,37 +331,46 @@
         padding: clamp(24px, 4vw, 42px);
       }
 
-      .band p {
+      .band.moat {
+        border-color: rgba(251, 113, 133, 0.28);
+        background:
+          linear-gradient(90deg, rgba(251, 113, 133, 0.1), rgba(34, 211, 238, 0.08)),
+          rgba(12, 12, 14, 0.92);
+      }
+
+      .band p,
+      .band ul {
         max-width: 900px;
         margin-top: 14px;
         color: rgba(244, 244, 245, 0.76);
         font-size: 18px;
       }
 
-      .split {
-        display: grid;
-        grid-template-columns: 0.82fr 1.18fr;
-        gap: clamp(22px, 4vw, 48px);
-        align-items: start;
-        margin-top: 32px;
+      .band ul {
+        padding-left: 20px;
       }
 
-      .list {
+      .band li + li {
+        margin-top: 8px;
+      }
+
+      .not-list {
         display: grid;
         gap: 10px;
+        margin-top: 18px;
       }
 
-      .item {
-        border: 1px solid var(--line);
+      .not-list .item {
+        border: 1px solid rgba(251, 113, 133, 0.22);
         background: rgba(5, 5, 5, 0.42);
         padding: 14px 16px;
       }
 
-      .item strong {
-        color: var(--ink);
+      .not-list .item strong {
+        color: var(--rose);
       }
 
-      .item p {
+      .not-list .item p {
         margin-top: 5px;
         color: var(--muted);
       }
@@ -345,18 +387,13 @@
         .hero,
         .grid,
         .grid.two,
-        .flow,
-        .split {
+        .flow {
           grid-template-columns: 1fr;
         }
 
         .hero {
           min-height: auto;
           padding-top: 44px;
-        }
-
-        .flow {
-          gap: 12px;
         }
       }
 
@@ -382,50 +419,76 @@
       }
     </style>
   </head>
-  <body>
+  <body class="lang-sv">
     <header>
       <nav class="shell nav" aria-label="SkatteRevision navigation">
         <a href="/">TwistedStacks</a>
         <strong>SkatteRevision</strong>
-        <a href="mailto:dev@twistedstacks.com?subject=SkatteRevision%20demo">Boka demo</a>
+        <div class="nav-links">
+          <div class="lang-switch" role="group" aria-label="Language">
+            <button type="button" data-lang="sv" class="is-active">SV</button>
+            <button type="button" data-lang="en">EN</button>
+          </div>
+          <a href="mailto:dev@twistedstacks.com?subject=SkatteRevision%20demo" class="i18n-sv">Boka demo</a>
+          <a href="mailto:dev@twistedstacks.com?subject=SkatteRevision%20demo" class="i18n-en">Book demo</a>
+        </div>
       </nav>
     </header>
 
     <main>
       <section class="shell hero">
         <div>
-          <div class="kicker">Audit-grade lead intelligence / local demo</div>
-          <h1>Retroaktiv skattepotential, sourcad för granskning.</h1>
-          <p class="lede">
-            SkatteRevision analyserar historiska svenska bolagsdata, iXBRL-årsredovisningar, domänregler och
-            myndighetssignaler för att hitta återbetalningscase som revisionsbyråer annars måste gräva fram manuellt.
+          <div class="kicker i18n-sv">Lead intelligence för svenska rådgivare</div>
+          <div class="kicker i18n-en">Lead intelligence for Swedish advisors</div>
+          <h1 class="i18n-sv">Hitta rätt retroaktiva case — inte slumpmässiga bolag.</h1>
+          <h1 class="i18n-en">Find the right retroactive cases — not random companies.</h1>
+          <p class="lede i18n-sv">
+            SkatteRevision hjälper revisions- och skatterådgivare prioritera mandat där historisk data, domänregler och
+            spårbara signaler faktiskt kan bära ett retroaktivt ärende. Endast en liten andel svenska bolag har relevant
+            potential — därför börjar vi med hur ni hittar leads, inte med orgnummer-sök.
+          </p>
+          <p class="lede i18n-en">
+            SkatteRevision helps audit and tax advisors prioritize mandates where historical data, domain rules, and
+            traceable signals can actually support a retroactive case. Only a small share of Swedish companies have
+            relevant potential — so we start with how you find leads, not org-number lookup.
           </p>
           <div class="hero-actions">
-            <a class="btn" href="mailto:dev@twistedstacks.com?subject=SkatteRevision%20demo">Boka lokal demo</a>
+            <a class="btn i18n-sv" href="mailto:dev@twistedstacks.com?subject=SkatteRevision%20demo">Boka demo</a>
+            <a class="btn i18n-en" href="mailto:dev@twistedstacks.com?subject=SkatteRevision%20demo">Book demo</a>
             <a class="btn secondary" href="/assets/skatterevision-teaser.pdf">PDF</a>
-            <a class="btn secondary" href="/">Back to showroom</a>
+            <a class="btn secondary i18n-sv" href="/">Till showroom</a>
+            <a class="btn secondary i18n-en" href="/">Back to showroom</a>
           </div>
         </div>
 
-        <aside class="instrument" aria-label="SkatteRevision system summary">
+        <aside class="instrument" aria-label="SkatteRevision summary">
           <div class="screen">
-            <div class="eyebrow">System snapshot</div>
+            <div class="eyebrow i18n-sv">Översikt</div>
+            <div class="eyebrow i18n-en">Overview</div>
             <div class="signal-grid">
               <div class="metric">
-                <span>Primary use</span>
-                <strong>Lead + dossier engine</strong>
+                <span class="i18n-sv">Primärt fokus</span>
+                <span class="i18n-en">Primary focus</span>
+                <strong class="i18n-sv">Lead discovery</strong>
+                <strong class="i18n-en">Lead discovery</strong>
               </div>
               <div class="metric">
-                <span>Time horizon</span>
-                <strong>2019-2025</strong>
+                <span class="i18n-sv">Sökaxlar</span>
+                <span class="i18n-en">Search axes</span>
+                <strong class="i18n-sv">Signee · byrå · region</strong>
+                <strong class="i18n-en">Signee · firm · region</strong>
               </div>
               <div class="metric">
-                <span>Runtime</span>
-                <strong>Local Mac / iMac data vault</strong>
+                <span class="i18n-sv">Målgrupp</span>
+                <span class="i18n-en">Audience</span>
+                <strong class="i18n-sv">Svenska rådgivare</strong>
+                <strong class="i18n-en">Swedish advisors</strong>
               </div>
               <div class="metric">
-                <span>Delivery</span>
-                <strong>Partner-ready evidence packs</strong>
+                <span class="i18n-sv">Leverans</span>
+                <span class="i18n-en">Delivery</span>
+                <strong class="i18n-sv">Sourcade dossiers</strong>
+                <strong class="i18n-en">Sourced dossiers</strong>
               </div>
             </div>
           </div>
@@ -434,33 +497,142 @@
 
       <section>
         <div class="shell">
-          <h2>What it is, and what it is not.</h2>
-          <p class="section-lede">
-            SkatteRevision is not a public SaaS product and not a replacement for authorized tax advice. It is a
-            research and decision-support system that complements accountants, auditors, tax lawyers, and grant-backed
-            innovation partners.
+          <div class="band moat">
+            <div class="eyebrow i18n-sv">Kärnposition — läs detta först</div>
+            <div class="eyebrow i18n-en">Core positioning — read this first</div>
+            <h2 class="i18n-sv">Vår moat är att hitta leads — inte att söka orgnummer i bulk.</h2>
+            <h2 class="i18n-en">Our moat is finding leads — not bulk org-number search.</h2>
+            <p class="i18n-sv">
+              SkatteRevision är byggt för partners som redan arbetar med svenska bolag och behöver veta <em>var</em> nästa
+              retroaktiva ärende sannolikt finns. Det är fel produktlöfte att lova bred bolagssökning: bara en liten andel
+              har faktisk retroaktiv potential per spår.
+            </p>
+            <p class="i18n-en">
+              SkatteRevision is built for partners already working with Swedish companies who need to know <em>where</em> the
+              next retroactive case likely exists. Promising broad company search is the wrong product promise: only a small
+              share have real retroactive potential per track.
+            </p>
+            <ul class="i18n-sv">
+              <li><strong>Firmatecknare / signee</strong> — hitta mandatkluster kopplade till personer ni redan förstår</li>
+              <li><strong>Redovisningsbyrå</strong> — följ byråns kundbas och historik där ni har relation</li>
+              <li><strong>Geografiskt område</strong> — prioritera kommuner, regioner eller industriella kluster</li>
+              <li><strong>Spårfilter</strong> — FoU, energi, leasing, fastighet med rätt evidenskrav från start</li>
+            </ul>
+            <ul class="i18n-en">
+              <li><strong>Signee / company representative</strong> — find mandate clusters tied to people you already understand</li>
+              <li><strong>Accounting firm</strong> — follow a firm's client base and history where you have a relationship</li>
+              <li><strong>Geographic area</strong> — prioritize municipalities, regions, or industrial clusters</li>
+              <li><strong>Track filters</strong> — R&D, energy, leasing, property with the right evidence bar from day one</li>
+            </ul>
+            <div class="not-list">
+              <div class="item">
+                <strong class="i18n-sv">Inte vår moat</strong>
+                <strong class="i18n-en">Not our moat</strong>
+                <p class="i18n-sv">
+                  Slumpmässig orgnummer-sökning, "skriv in vilket bolag som helst", eller demo som börjar med ett enskilt
+                  publikt bolag utan rådgivarkontext.
+                </p>
+                <p class="i18n-en">
+                  Random org-number lookup, "type any company", or demos that start with a single public company without
+                  advisor context.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="shell">
+          <h2 class="i18n-sv">Vad det är — och inte är.</h2>
+          <h2 class="i18n-en">What it is — and what it is not.</h2>
+          <p class="section-lede i18n-sv">
+            SkatteRevision är inte en publik SaaS och inte skatterådgivning. Det är beslutsstöd för kvalificerade
+            revisorer, skatterådgivare och jurister som behöver prioritera rätt mandat med sourcad underlag.
+          </p>
+          <p class="section-lede i18n-en">
+            SkatteRevision is not a public SaaS and not tax advice. It is decision support for qualified auditors, tax
+            advisors, and lawyers who need to prioritize the right mandates with sourced material.
           </p>
           <div class="grid">
             <article class="card">
-              <h3>Lead intelligence</h3>
-              <p>
-                The system scans historical company signals to find where tax recovery work might be worth a human
-                professional's time.
+              <h3 class="i18n-sv">Lead intelligence</h3>
+              <h3 class="i18n-en">Lead intelligence</h3>
+              <p class="i18n-sv">
+                Prioritera var retroaktivt arbete är värt en mänsklig professionells tid — utifrån byrå, signee, geografi
+                och spår, inte bredd-sök på alla bolag.
+              </p>
+              <p class="i18n-en">
+                Prioritize where retroactive work is worth a qualified professional's time — via firm, signee, geography,
+                and track, not breadth-search across every company.
               </p>
             </article>
             <article class="card">
-              <h3>Evidence-first dossiers</h3>
-              <p>
-                Outputs are designed as sourced workpapers: what was found, what legal basis applies, what is missing,
-                and why the next step is justified.
+              <h3 class="i18n-sv">Evidens först</h3>
+              <h3 class="i18n-en">Evidence first</h3>
+              <p class="i18n-sv">
+                Leveranser är arbetsunderlag med källor: vad som hittades, vilken rättslig grund som kan gälla, vad som
+                saknas, och varför nästa steg är motiverat.
+              </p>
+              <p class="i18n-en">
+                Outputs are sourced workpapers: what was found, which legal basis may apply, what is missing, and why the
+                next step is justified.
               </p>
             </article>
             <article class="card">
-              <h3>Private operational demo</h3>
-              <p>
-                The full system stays local because the data vault is large and valuable. Serious demos run directly
-                from the development machine.
+              <h3 class="i18n-sv">Partnerstyrt</h3>
+              <h3 class="i18n-en">Partner-led</h3>
+              <p class="i18n-sv">
+                Byrån behåller kundrelation och professionellt ställningstagande. TwistedStacks levererar discovery,
+                prioritering och dossierförberedelse — inte slutlig deklaration.
               </p>
+              <p class="i18n-en">
+                The firm keeps the client relationship and professional sign-off. TwistedStacks supplies discovery,
+                prioritization, and dossier prep — not a final tax filing.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="shell">
+          <h2 class="i18n-sv">Så hittar partners leads.</h2>
+          <h2 class="i18n-en">How partners find leads.</h2>
+          <p class="section-lede i18n-sv">
+            Ett seriöst arbetsflöde börjar med rådgivarens kontext — inte med att mata in ett orgnummer i ett sökfält.
+          </p>
+          <p class="section-lede i18n-en">
+            A serious workflow starts from the advisor's context — not by typing an org number into a search box.
+          </p>
+          <div class="flow" aria-label="Lead discovery workflow">
+            <article class="step">
+              <span>01</span>
+              <strong class="i18n-sv">Välj axel</strong>
+              <strong class="i18n-en">Choose axis</strong>
+              <p class="i18n-sv">Signee, redovisningsbyrå, geografi eller befintlig kundportfölj.</p>
+              <p class="i18n-en">Signee, accounting firm, geography, or an existing client portfolio.</p>
+            </article>
+            <article class="step">
+              <span>02</span>
+              <strong class="i18n-sv">Filtrera spår</strong>
+              <strong class="i18n-en">Filter track</strong>
+              <p class="i18n-sv">FoU, energi, leasing eller fastighet — med rätt retroaktivt fönster och evidenskrav.</p>
+              <p class="i18n-en">R&D, energy, leasing, or property — with the right retroactive window and evidence bar.</p>
+            </article>
+            <article class="step">
+              <span>03</span>
+              <strong class="i18n-sv">Prioritera</strong>
+              <strong class="i18n-en">Prioritize</strong>
+              <p class="i18n-sv">Ranka kandidater med riskgate, datakvalitet och saknad-information som stoppar svaga case tidigt.</p>
+              <p class="i18n-en">Rank candidates with risk gates, data quality, and missing-data stops for weak cases early.</p>
+            </article>
+            <article class="step">
+              <span>04</span>
+              <strong class="i18n-sv">Dossier &amp; handoff</strong>
+              <strong class="i18n-en">Dossier &amp; handoff</strong>
+              <p class="i18n-sv">Bara starka case blir partnerklara underlag: källor, checklistor och nästa intervjufrågor.</p>
+              <p class="i18n-en">Only strong cases become partner-ready packs: sources, checklists, and next interview prompts.</p>
             </article>
           </div>
         </div>
@@ -469,11 +641,17 @@
       <section>
         <div class="shell">
           <div class="band">
-            <div class="eyebrow">Positioning</div>
-            <h2>We look backward. Most tools look forward.</h2>
-            <p>
-              Company databases usually sell current status. SkatteRevision works backward across fiscal years to find
-              missed positions, changed interpretations, hidden operational signals, and under-reviewed deductions.
+            <div class="eyebrow i18n-sv">Tidsriktning</div>
+            <div class="eyebrow i18n-en">Time direction</div>
+            <h2 class="i18n-sv">Vi tittar bakåt. De flesta verktyg tittar framåt.</h2>
+            <h2 class="i18n-en">We look backward. Most tools look forward.</h2>
+            <p class="i18n-sv">
+              Bolagsdatabaser säljer ofta nuläge. SkatteRevision arbetar över historiska räkenskapsår för att hitta
+              undergranskade positioner — men bara där leadaxeln redan gör mandatet relevant.
+            </p>
+            <p class="i18n-en">
+              Company databases usually sell current status. SkatteRevision works across historical fiscal years to find
+              under-reviewed positions — but only where the lead axis already makes the mandate relevant.
             </p>
           </div>
         </div>
@@ -481,81 +659,114 @@
 
       <section>
         <div class="shell">
-          <h2>The four commercial recovery tracks.</h2>
-          <p class="section-lede">
+          <h2 class="i18n-sv">Fyra kommersiella återbetalningsspår.</h2>
+          <h2 class="i18n-en">Four commercial recovery tracks.</h2>
+          <p class="section-lede i18n-sv">
+            Varje spår har olika evidenskrav, riskgate och behov av professionell handoff.
+          </p>
+          <p class="section-lede i18n-en">
             Each track has different evidence requirements, risk gates, and professional handoff needs.
           </p>
           <div class="grid">
             <article class="card">
-              <h3>FoU tax relief</h3>
-              <p>
-                Finds companies where R&D-like work appears in historical reporting but may not have been converted into
-                available payroll tax relief.
+              <h3 class="i18n-sv">FoU-personalavgifter</h3>
+              <h3 class="i18n-en">R&D payroll tax relief</h3>
+              <p class="i18n-sv">
+                Spår där FoU-liknande arbete syns historiskt men kanske inte omvandlats till tillgänglig relief.
               </p>
-              <ul>
+              <p class="i18n-en">
+                Tracks where R&D-like work appears historically but may not have been converted into available relief.
+              </p>
+              <ul class="i18n-sv">
+                <li>Utvecklingskostnader och immateriella tillgångar</li>
+                <li>Patent- och teknikpersonalsignaler</li>
+                <li>Sex års retroaktivt fönster</li>
+              </ul>
+              <ul class="i18n-en">
                 <li>Development costs and intangible assets</li>
                 <li>Patent and technical staff signals</li>
-                <li>Six-year retroactive review window</li>
+                <li>Six-year retroactive window</li>
               </ul>
             </article>
             <article class="card">
-              <h3>Industrial energy tax</h3>
-              <p>
-                Identifies manufacturing and process industries where electricity use, permits, and case law may support
-                recovery work.
+              <h3 class="i18n-sv">Industriell energiskatt</h3>
+              <h3 class="i18n-en">Industrial energy tax</h3>
+              <p class="i18n-sv">
+                Tillverkning och processindustri där elanvändning, tillstånd och praxis kan stödja återbetalningsarbete.
               </p>
-              <ul>
+              <p class="i18n-en">
+                Manufacturing and process industries where electricity use, permits, and case law may support recovery work.
+              </p>
+              <ul class="i18n-sv">
+                <li>SNI och processklassning</li>
+                <li>SMP- och miljörapportsignaler</li>
+                <li>Tre års retroaktivt fönster</li>
+              </ul>
+              <ul class="i18n-en">
                 <li>SNI and process classification</li>
                 <li>SMP and environmental-report signals</li>
-                <li>Three-year retroactive review window</li>
+                <li>Three-year retroactive window</li>
               </ul>
             </article>
             <article class="card">
-              <h3>Leasing VAT</h3>
-              <p>
-                Reviews vehicle and operating lease patterns for possible VAT recovery signals that require contract and
-                usage verification.
+              <h3 class="i18n-sv">Leasingmoms</h3>
+              <h3 class="i18n-en">Leasing VAT</h3>
+              <p class="i18n-sv">
+                Fordons- och driftleasingmönster där momsåtervinning kan kräva kontrakt- och användningsverifiering.
               </p>
-              <ul>
+              <p class="i18n-en">
+                Vehicle and operating lease patterns where VAT recovery may require contract and usage verification.
+              </p>
+              <ul class="i18n-sv">
+                <li>K3-leasing i rapportering</li>
+                <li>Fordonsregister och användning</li>
+                <li>Mänsklig kontraktsgranskning</li>
+              </ul>
+              <ul class="i18n-en">
                 <li>K3 lease disclosures</li>
-                <li>Vehicle registry enrichment</li>
-                <li>Human contract review handoff</li>
+                <li>Vehicle registry and usage</li>
+                <li>Human contract review</li>
               </ul>
             </article>
             <article class="card">
-              <h3>Property VAT adjustment</h3>
-              <p>
-                Searches for investment and property-use patterns where the 10-year adjustment mechanism may matter.
+              <h3 class="i18n-sv">Fastighetsmomsjustering</h3>
+              <h3 class="i18n-en">Property VAT adjustment</h3>
+              <p class="i18n-sv">
+                Investerings- och fastighetsmönster där tioårsregeln kan bli relevant.
               </p>
-              <ul>
+              <p class="i18n-en">
+                Investment and property patterns where the ten-year adjustment rule may matter.
+              </p>
+              <ul class="i18n-sv">
+                <li>Tillgångs- och investeringshistorik</li>
+                <li>Beskattad vs undantagen omsättning</li>
+                <li>Bygglov och fastighetssignaler</li>
+              </ul>
+              <ul class="i18n-en">
                 <li>Asset and investment history</li>
-                <li>Taxable versus exempt revenue split</li>
+                <li>Taxable vs exempt revenue split</li>
                 <li>Building permit and property signals</li>
               </ul>
             </article>
             <article class="card">
-              <h3>Risk and stop gates</h3>
-              <p>
-                Weak cases are stopped early. The system treats missing data as a sourcing task, not as permission to
-                invent a number.
+              <h3 class="i18n-sv">Risk och stop gates</h3>
+              <h3 class="i18n-en">Risk and stop gates</h3>
+              <p class="i18n-sv">
+                Svaga case stoppas tidigt. Saknad data är en sourcing-uppgift — inte tillåtelse att hitta på siffror.
               </p>
-              <ul>
-                <li>Bankruptcy and enforcement checks</li>
-                <li>Data-quality scoring</li>
-                <li>Red-team challenge before output</li>
-              </ul>
+              <p class="i18n-en">
+                Weak cases stop early. Missing data is a sourcing task — not permission to invent numbers.
+              </p>
             </article>
             <article class="card">
-              <h3>Partner handoff</h3>
-              <p>
-                The best output is not a final tax filing. It is a partner-ready dossier that lets a qualified advisor
-                decide whether to proceed.
+              <h3 class="i18n-sv">Partner-handoff</h3>
+              <h3 class="i18n-en">Partner handoff</h3>
+              <p class="i18n-sv">
+                Bästa output är inte färdig deklaration utan dossier som låter kvalificerad rådgivare besluta om nästa steg.
               </p>
-              <ul>
-                <li>Evidence manifest</li>
-                <li>Missing-data checklist</li>
-                <li>Client interview prompts</li>
-              </ul>
+              <p class="i18n-en">
+                The best output is not a finished filing but a dossier that lets a qualified advisor decide the next step.
+              </p>
             </article>
           </div>
         </div>
@@ -563,116 +774,32 @@
 
       <section>
         <div class="shell">
-          <h2>Pipeline from data vault to dossier.</h2>
-          <div class="flow" aria-label="SkatteRevision pipeline">
-            <div class="step">
-              <span>01</span>
-              <strong>Ingest</strong>
-              <p>Historical annual reports, iXBRL, registry snapshots, and local cache layers are normalized.</p>
-            </div>
-            <div class="step">
-              <span>02</span>
-              <strong>Index</strong>
-              <p>SQLite and vector stores make historical company signals queryable before any expensive research.</p>
-            </div>
-            <div class="step">
-              <span>03</span>
-              <strong>Route</strong>
-              <p>Hermes maps SNI and financial signals to the relevant specialist agents.</p>
-            </div>
-            <div class="step">
-              <span>04</span>
-              <strong>Challenge</strong>
-              <p>Risk-agent and Kritikern look for reasons the case should be killed or escalated.</p>
-            </div>
-            <div class="step">
-              <span>05</span>
-              <strong>Dossier</strong>
-              <p>Only high-quality cases become professional workpaper-style reports.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <div class="shell">
-          <h2>The system has real machinery behind the pitch.</h2>
-          <div class="split">
-            <div>
-              <p class="section-lede">
-                The current codebase is a local, polyglot research platform rather than a clean product repository. That
-                is acceptable at this stage because the sellable asset is the data, the lead intelligence, and the
-                repeatable workflow.
-              </p>
-            </div>
-            <div class="list">
-              <div class="item">
-                <strong>Extraction layer</strong>
-                <p>Python iXBRL parsers, corruption handling, Swedish taxonomy mapping, and bulk processing scripts.</p>
-              </div>
-              <div class="item">
-                <strong>Index layer</strong>
-                <p>Local SQLite databases and vector indexes for fast historical lookup before web research.</p>
-              </div>
-              <div class="item">
-                <strong>Orchestration layer</strong>
-                <p>Express API, HermesOrchestrator, Azure AI Foundry routing, rate limiting, and agent prompts.</p>
-              </div>
-              <div class="item">
-                <strong>Evidence layer</strong>
-                <p>Core protocol, data-source hierarchy, insufficient-data handling, conflict checks, and PDF dossiers.</p>
-              </div>
-              <div class="item">
-                <strong>Operator layer</strong>
-                <p>Dashboard panels for leads, telemetry, knowledge, scoring, reports, scripts, and local data inspection.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <div class="shell">
-          <h2>Why this is valuable to a partner.</h2>
+          <h2 class="i18n-sv">Varför det är värdefullt för en partner.</h2>
+          <h2 class="i18n-en">Why this is valuable to a partner.</h2>
           <div class="grid two">
             <article class="card">
-              <h3>For a revision or tax advisory firm</h3>
-              <p>
-                SkatteRevision can act as a second-look engine over existing and target-client portfolios. The firm
-                keeps the client relationship and professional sign-off; TwistedStacks supplies the discovery and
-                evidence-prep layer.
+              <h3 class="i18n-sv">För revisions- eller skattebyrå</h3>
+              <h3 class="i18n-en">For audit or tax advisory firms</h3>
+              <p class="i18n-sv">
+                SkatteRevision fungerar som ett second-look-lager över befintliga och målade mandat — med leadaxlar som
+                byrå, signee och geografi i centrum.
+              </p>
+              <p class="i18n-en">
+                SkatteRevision acts as a second-look layer over existing and target mandates — with lead axes centered on
+                firm, signee, and geography.
               </p>
             </article>
             <article class="card">
-              <h3>For an employer or innovation funder</h3>
-              <p>
-                The system demonstrates applied AI in a concrete, revenue-linked domain: data engineering, legal
-                reasoning, local-first infrastructure, agent orchestration, and professional workflow design.
+              <h3 class="i18n-sv">För innovation och samarbete</h3>
+              <h3 class="i18n-en">For innovation partnerships</h3>
+              <p class="i18n-sv">
+                Konkret tillämpad AI i en intäktsnära domän: prioritering, evidens, domänregler och professionella
+                arbetsflöden — utan felaktigt löfte om bred orgnummer-sökning.
               </p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <div class="shell">
-          <h2>Demo format.</h2>
-          <p class="section-lede">
-            A serious demo should not upload the data vault. It should run locally and show the workflow against a
-            sanitized or partner-approved company case.
-          </p>
-          <div class="grid">
-            <article class="card">
-              <h3>1. Pick a case</h3>
-              <p>Use a sanitized sample, a public company, or a partner-provided org number.</p>
-            </article>
-            <article class="card">
-              <h3>2. Show the chain</h3>
-              <p>Walk from local data lookup to agent routing, risk challenge, missing-data flags, and evidence notes.</p>
-            </article>
-            <article class="card">
-              <h3>3. Discuss handoff</h3>
-              <p>End with what a qualified advisor would need next: client interview, accounting files, contracts, or FOIA.</p>
+              <p class="i18n-en">
+                Applied AI in a revenue-linked domain: prioritization, evidence, domain rules, and professional workflows —
+                without the wrong promise of broad org-number search.
+              </p>
             </article>
           </div>
         </div>
@@ -680,10 +807,43 @@
     </main>
 
     <footer>
-      <div class="shell">
-        SkatteRevision is a TwistedStacks research system. It provides decision support and sourced intelligence, not
-        legal, audit, or tax advice. Contact: dev@twistedstacks.com
+      <div class="shell i18n-sv">
+        SkatteRevision är ett TwistedStacks-beslutsstöd. Det ersätter inte skatterådgivning, revision eller juridik.
+        Kontakt: dev@twistedstacks.com
+      </div>
+      <div class="shell i18n-en">
+        SkatteRevision is a TwistedStacks decision-support system. It is not tax, audit, or legal advice. Contact:
+        dev@twistedstacks.com
       </div>
     </footer>
+
+    <script>
+      (function () {
+        var storageKey = "twistedstacks.skatterevision.lang";
+        var buttons = document.querySelectorAll("[data-lang]");
+        var saved = localStorage.getItem(storageKey);
+
+        function setLang(lang) {
+          var next = lang === "en" ? "en" : "sv";
+          document.body.classList.remove("lang-sv", "lang-en");
+          document.body.classList.add(next === "en" ? "lang-en" : "lang-sv");
+          document.documentElement.lang = next;
+          buttons.forEach(function (button) {
+            button.classList.toggle("is-active", button.getAttribute("data-lang") === next);
+          });
+          localStorage.setItem(storageKey, next);
+        }
+
+        buttons.forEach(function (button) {
+          button.addEventListener("click", function () {
+            setLang(button.getAttribute("data-lang"));
+          });
+        });
+
+        if (saved === "en" || saved === "sv") {
+          setLang(saved);
+        }
+      })();
+    </script>
   </body>
 </html>

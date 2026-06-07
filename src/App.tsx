@@ -181,8 +181,9 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
     name: "SkatteRevision",
     version: "working product / private demo",
     status: "PRODUCTION",
-    tagline: "Audit-grade retroactive tax recovery intelligence.",
-    description: "A working UI for finding historical repayment signals across company data, iXBRL, legal context, risk checks, and sourced dossiers for accountants and tax advisors.",
+    tagline: "Lead discovery for retroactive Swedish tax recovery — not org-number lookup.",
+    description:
+      "Helps audit and tax partners prioritize mandates via signee, accounting firm, geography, and track filters. Only a small share of companies qualify — the moat is finding the right leads, then building sourced dossiers.",
     techStack: ["TypeScript", "iXBRL", "AI Agents", "Dossiers"],
     telemetry: [
       { label: "MODE", value: "DOSSIERS" },
