@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LAGA - TwistedStacks</title>
+    <meta
+      name="description"
+      content="LAGA is an experimental Swedish legal workflow lab: media ingestion, MLX transcription, contradiction analysis, and OpenRouter-assisted review."
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #050505;
+        --ink: #f4f4f5;
+        --muted: #a1a1aa;
+        --line: rgba(244, 244, 245, 0.13);
+        --panel: rgba(18, 18, 20, 0.84);
+        --panel-strong: rgba(28, 28, 32, 0.92);
+        --gold: #eab308;
+        --cyan: #22d3ee;
+        --rose: #fb7185;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        background: var(--bg);
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          linear-gradient(180deg, rgba(5, 5, 5, 0.6), #050505 34rem),
+          radial-gradient(circle at 12% 10%, rgba(251, 113, 133, 0.1), transparent 24rem),
+          radial-gradient(circle at 82% 18%, rgba(34, 211, 238, 0.1), transparent 22rem),
+          #050505;
+        color: var(--ink);
+        font-family:
+          Space Grotesk,
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        line-height: 1.5;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .shell {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid var(--line);
+        background: rgba(5, 5, 5, 0.82);
+        backdrop-filter: blur(16px);
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        min-height: 64px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .nav a {
+        text-decoration: none;
+        color: var(--muted);
+      }
+
+      .nav strong {
+        color: var(--rose);
+        font-weight: 600;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        min-height: calc(100vh - 64px);
+        padding: 58px 0 72px;
+      }
+
+      .kicker,
+      .eyebrow {
+        color: var(--cyan);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        margin-top: 18px;
+        max-width: 920px;
+        font-size: clamp(52px, 9vw, 112px);
+        line-height: 0.88;
+        letter-spacing: 0;
+      }
+
+      .lede {
+        max-width: 780px;
+        margin-top: 28px;
+        color: rgba(244, 244, 245, 0.82);
+        font-size: clamp(18px, 2vw, 23px);
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 34px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 0 18px;
+        border: 1px solid rgba(251, 113, 133, 0.42);
+        background: rgba(251, 113, 133, 0.1);
+        color: #fecdd3;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-decoration: none;
+        text-transform: uppercase;
+      }
+
+      .btn.secondary {
+        border-color: rgba(244, 244, 245, 0.18);
+        background: rgba(244, 244, 245, 0.06);
+        color: var(--ink);
+      }
+
+      .instrument {
+        border: 1px solid var(--line);
+        background: var(--panel);
+        box-shadow: 0 26px 80px rgba(0, 0, 0, 0.38);
+      }
+
+      .screen {
+        padding: 22px;
+      }
+
+      .signal-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .metric {
+        min-height: 112px;
+        border: 1px solid var(--line);
+        background: rgba(5, 5, 5, 0.48);
+        padding: 14px;
+      }
+
+      .metric span {
+        display: block;
+        color: var(--muted);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .metric strong {
+        display: block;
+        margin-top: 10px;
+        color: var(--ink);
+        font-size: 24px;
+        line-height: 1.05;
+      }
+
+      section {
+        padding: 72px 0;
+        border-top: 1px solid var(--line);
+      }
+
+      h2 {
+        max-width: 820px;
+        font-size: clamp(32px, 5vw, 58px);
+        line-height: 0.95;
+      }
+
+      .section-lede {
+        max-width: 820px;
+        margin-top: 18px;
+        color: rgba(244, 244, 245, 0.74);
+        font-size: 18px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 32px;
+      }
+
+      .grid.two {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .card {
+        min-height: 210px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        padding: 22px;
+      }
+
+      .card h3 {
+        font-size: 22px;
+        line-height: 1.08;
+      }
+
+      .card p {
+        margin-top: 12px;
+        color: rgba(244, 244, 245, 0.7);
+      }
+
+      .card ul {
+        margin: 14px 0 0;
+        padding-left: 18px;
+        color: rgba(244, 244, 245, 0.72);
+      }
+
+      .card li + li {
+        margin-top: 7px;
+      }
+
+      .flow {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 32px;
+      }
+
+      .step {
+        border: 1px solid var(--line);
+        background: var(--panel-strong);
+        padding: 16px;
+        min-height: 148px;
+      }
+
+      .step span {
+        color: var(--gold);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 11px;
+      }
+
+      .step strong {
+        display: block;
+        margin-top: 12px;
+        font-size: 18px;
+      }
+
+      .step p {
+        margin-top: 10px;
+        color: rgba(244, 244, 245, 0.66);
+        font-size: 14px;
+      }
+
+      .band {
+        border: 1px solid rgba(251, 113, 133, 0.22);
+        background:
+          linear-gradient(90deg, rgba(251, 113, 133, 0.08), rgba(34, 211, 238, 0.08)),
+          rgba(12, 12, 14, 0.9);
+        padding: clamp(24px, 4vw, 42px);
+      }
+
+      .band p {
+        max-width: 900px;
+        margin-top: 14px;
+        color: rgba(244, 244, 245, 0.76);
+        font-size: 18px;
+      }
+
+      .split {
+        display: grid;
+        grid-template-columns: 0.82fr 1.18fr;
+        gap: clamp(22px, 4vw, 48px);
+        align-items: start;
+        margin-top: 32px;
+      }
+
+      .list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .item {
+        border: 1px solid var(--line);
+        background: rgba(5, 5, 5, 0.42);
+        padding: 14px 16px;
+      }
+
+      .item strong {
+        color: var(--ink);
+      }
+
+      .item p {
+        margin-top: 5px;
+        color: var(--muted);
+      }
+
+      footer {
+        border-top: 1px solid var(--line);
+        padding: 38px 0 52px;
+        color: var(--muted);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+      }
+
+      @media (max-width: 920px) {
+        .hero,
+        .grid,
+        .grid.two,
+        .flow,
+        .split {
+          grid-template-columns: 1fr;
+        }
+
+        .hero {
+          min-height: auto;
+          padding-top: 44px;
+        }
+
+        .flow {
+          gap: 12px;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .shell {
+          width: min(100% - 24px, 1180px);
+        }
+
+        .signal-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .nav {
+          align-items: flex-start;
+          flex-direction: column;
+          justify-content: center;
+          padding: 12px 0;
+        }
+
+        section {
+          padding: 54px 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav class="shell nav" aria-label="LAGA navigation">
+        <a href="/">TwistedStacks</a>
+        <strong>LAGA</strong>
+        <a href="mailto:dev@twistedstacks.com?subject=LAGA%20workflow%20lab">Kontakt</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="shell hero">
+        <div>
+          <div class="kicker">Legal workflow lab / paused, info only</div>
+          <h1>Juridisk media till analys, med källor och motsägelser i fokus.</h1>
+          <p class="lede">
+            LAGA är ett experimentellt svenskt legal-AI-labb: ljud och video in, transkribering, analys, och
+            kontradiktionsgranskning ut. Tanken är att ge advokater, ombud och forskningsgrupper ett privat
+            arbetsflöde — inte en generisk chatbot.
+          </p>
+          <div class="hero-actions">
+            <a class="btn" href="mailto:dev@twistedstacks.com?subject=LAGA%20workflow%20lab">Fråga om labbet</a>
+            <a
+              class="btn secondary"
+              href="https://github.com/wawawee/LAGA-REBOOT"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Arkiv-repo
+            </a>
+            <a class="btn secondary" href="/">Back to showroom</a>
+          </div>
+        </div>
+
+        <aside class="instrument" aria-label="LAGA system summary">
+          <div class="screen">
+            <div class="eyebrow">System snapshot</div>
+            <div class="signal-grid">
+              <div class="metric">
+                <span>Primary use</span>
+                <strong>Legal workflow modeler</strong>
+              </div>
+              <div class="metric">
+                <span>Public demo</span>
+                <strong>Not live right now</strong>
+              </div>
+              <div class="metric">
+                <span>Latest macOS build</span>
+                <strong>Private iMac copy</strong>
+              </div>
+              <div class="metric">
+                <span>Showroom status</span>
+                <strong>Info page only</strong>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section>
+        <div class="shell">
+          <h2>What it is, and what it is not.</h2>
+          <p class="section-lede">
+            LAGA is not a public SaaS product, not legal advice, and not currently running as an online demo. It is a
+            research and workflow system for turning messy legal media into structured review material.
+          </p>
+          <div class="grid">
+            <article class="card">
+              <h3>Workflow-first</h3>
+              <p>
+                Cases move through explicit nodes — ingest, transcribe, analyze, evaluate — instead of one opaque prompt
+                chain.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Contradiction-aware</h3>
+              <p>
+                Built to surface intra-speaker and inter-speaker inconsistencies in hearings, interviews, and long-form
+                testimony.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Private by default</h3>
+              <p>
+                Local MLX transcription and artifact storage were central to the design. Sensitive material should not
+                need to leave the machine unless you choose it.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="shell">
+          <h2>The MVP graph.</h2>
+          <p class="section-lede">
+            The web lab shipped a four-node React Flow pipeline with a run monitor. This is the core idea even when the
+            surrounding shell changes.
+          </p>
+          <div class="flow" aria-label="LAGA MVP pipeline">
+            <article class="step">
+              <span>01</span>
+              <strong>Media</strong>
+              <p>Label or upload audio/video. Artifacts land in a run folder for traceability.</p>
+            </article>
+            <article class="step">
+              <span>02</span>
+              <strong>Transcribe</strong>
+              <p>Swedish speech-to-text via MLX locally, with OpenRouter fallback when needed.</p>
+            </article>
+            <article class="step">
+              <span>03</span>
+              <strong>Analyze</strong>
+              <p>Summaries, issue spotting, and structured notes over the transcript.</p>
+            </article>
+            <article class="step">
+              <span>04</span>
+              <strong>Eval</strong>
+              <p>Contradiction panel for intra-speaker and inter-speaker conflicts.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="shell">
+          <div class="band">
+            <div class="eyebrow">Current availability</div>
+            <h2>Paused lab, not forgotten.</h2>
+            <p>
+              LAGA has not been run in production for a while. The latest macOS Swift shell lives on a private iMac and
+              is not publicly deployable. For now this page is the showroom source of truth: what the system was built
+              for, how the graph works, and how to reach TwistedStacks if you want to discuss a future revival.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="shell">
+          <h2>Two tracks, one workflow model.</h2>
+          <p class="section-lede">
+            The project always had a split between a browser-based orchestrator and a native macOS experience around the
+            same workflow JSON.
+          </p>
+          <div class="split">
+            <div class="list">
+              <div class="item">
+                <strong>Web lab (Vite + React Flow)</strong>
+                <p>Visual graph editor, run monitor, OpenRouter gateway, local API on Hono.</p>
+              </div>
+              <div class="item">
+                <strong>macOS shell (Swift)</strong>
+                <p>Native wrapper for the same workflow idea. Latest build is offline on the dev iMac.</p>
+              </div>
+              <div class="item">
+                <strong>Archive repo</strong>
+                <p>
+                  <a href="https://github.com/wawawee/LAGA-REBOOT" target="_blank" rel="noreferrer"
+                    >wawawee/LAGA-REBOOT</a
+                  >
+                  documents the paused web MVP.
+                </p>
+              </div>
+            </div>
+            <div class="grid two">
+              <article class="card">
+                <h3>Stack</h3>
+                <ul>
+                  <li>Vite + React Flow for the graph UI</li>
+                  <li>Hono API orchestrator</li>
+                  <li>OpenRouter for text and multimodal review</li>
+                  <li>MLX / mlx-whisper path for Swedish transcription</li>
+                  <li>Run artifacts under `data/` for auditability</li>
+                </ul>
+              </article>
+              <article class="card">
+                <h3>Planned next nodes</h3>
+                <ul>
+                  <li>Legal RAG with source IDs</li>
+                  <li>Richer contradiction taxonomy</li>
+                  <li>macOS shell synced to the same workflow JSON</li>
+                  <li>Partner-approved demo cases instead of public uploads</li>
+                </ul>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="shell">
+          <h2>Good fit for.</h2>
+          <p class="section-lede">
+            LAGA was aimed at teams that already work with source material and need help structuring it — not at casual
+            prompt users.
+          </p>
+          <div class="grid">
+            <article class="card">
+              <h3>Hearings and interviews</h3>
+              <p>Long Swedish audio where timeline, speaker turns, and contradictions matter.</p>
+            </article>
+            <article class="card">
+              <h3>Case prep</h3>
+              <p>Turn raw media into reviewable notes before a human lawyer signs the strategy.</p>
+            </article>
+            <article class="card">
+              <h3>Research groups</h3>
+              <p>Prototype legal-AI workflows with local transcription and explicit evidence trails.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="shell">
+          <h2>If you want to talk about it.</h2>
+          <p class="section-lede">
+            There is no live public demo today. Serious conversations should start with the use case, the sensitivity of
+            the material, and whether a private revival makes sense.
+          </p>
+          <div class="grid two">
+            <article class="card">
+              <h3>Reasonable ask</h3>
+              <ul>
+                <li>What media type and language?</li>
+                <li>Local-only or hybrid cloud review?</li>
+                <li>Who needs contradiction reporting?</li>
+                <li>What professional sign-off is required?</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Contact</h3>
+              <p>
+                Email
+                <a href="mailto:dev@twistedstacks.com?subject=LAGA%20workflow%20lab">dev@twistedstacks.com</a>
+                with subject <strong>LAGA workflow lab</strong>. TwistedStacks can discuss a future private demo if the
+                iMac build or web lab is brought back online.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="shell">
+        LAGA is a TwistedStacks research system. It provides workflow and analysis support, not legal advice. Contact:
+        dev@twistedstacks.com
+      </div>
+    </footer>
+  </body>
+</html>

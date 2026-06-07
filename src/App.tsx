@@ -163,7 +163,7 @@ export interface ShowroomProject {
   version: string;
   tagline: string;
   description: string;
-  status: "SHIPPED" | "PRODUCTION" | "DEPRECATED" | "ACTIVE DEMO";
+  status: "SHIPPED" | "PRODUCTION" | "DEPRECATED" | "ACTIVE DEMO" | "LAB / PAUSED";
   techStack: string[];
   telemetry: { label: string; value: string }[];
   href?: string;
@@ -196,18 +196,20 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
   {
     id: "system_laga",
     name: "LAGA",
-    version: "workflow modeler / macOS path",
-    status: "ACTIVE DEMO",
-    tagline: "Legal workflow, transcription, contradiction analysis, and RAG.",
-    description: "A legal workflow lab for media-to-analysis pipelines, Swedish transcription, source tracking, and local/private AI workflows.",
-    techStack: ["Vite", "React Flow", "MLX", "OpenRouter"],
+    version: "legal workflow / paused lab",
+    status: "LAB / PAUSED",
+    tagline: "Swedish legal media to structured review — workflow, not chat.",
+    description:
+      "Experimental legal-AI lab: React Flow graph, MLX transcription, contradiction analysis, and OpenRouter review. No live public demo right now; latest macOS build stays on a private iMac.",
+    techStack: ["React Flow", "MLX", "OpenRouter", "Swift"],
     telemetry: [
       { label: "NODES", value: "4 MVP" },
-      { label: "MODEL", value: "LOCAL+API" },
-      { label: "STATUS", value: "LOCAL" }
+      { label: "DEMO", value: "INFO ONLY" },
+      { label: "STATUS", value: "PAUSED" }
     ],
-    href: "https://github.com/wawawee/LAGA-REBOOT",
-    actionLabel: "Repo"
+    href: "/laga.html",
+    actionLabel: "Deep View",
+    contactMessage: "Hej Per,\n\nJag vill veta mer om LAGA workflow-labbet och om det kan bli relevant för vårt case.\n\n"
   },
   {
     id: "system_relay",

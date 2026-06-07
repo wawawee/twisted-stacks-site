@@ -8,6 +8,7 @@ Playable Vite/React/Three.js front door for [twistedstacks.com](https://twisteds
 | --- | --- | --- |
 | Main showroom + game | [twistedstacks.com](https://www.twistedstacks.com) | This repo (`twisted-pongg` on Vercel) |
 | Info-only HTML/PDF | [skatterevision.twistedstacks.com](https://skatterevision.twistedstacks.com) | `public/skatterevision.html` via host rewrite in `middleware.ts` + `vercel.json` |
+| Info-only project page | [twistedstacks.com/laga.html](https://www.twistedstacks.com/laga.html) | `public/laga.html` on the main showroom site |
 | Runnable demo/app | [anslag.twistedstacks.com](https://anslag.twistedstacks.com) | Separate Vercel project: [wawawee/AnslagSITK](https://github.com/wawawee/AnslagSITK) |
 | Client site | [silversmeden.twistedstacks.com](https://silversmeden.twistedstacks.com) | Separate Vercel project |
 
