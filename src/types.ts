@@ -19,6 +19,9 @@ export interface Brick {
   hitsMax: number;
   hitsLeft: number;
   isScoreBrick?: boolean;
+  isCenterMotif?: boolean;
+  motifLocalX?: number;
+  motifLocalY?: number;
   isMonster?: boolean;
   scoreOwner?: "player" | "ai";
   // Visual states: 'active', 'damaged1', 'damaged2', 'dead'

@@ -295,7 +295,8 @@ html, body, #root {
   text-transform: uppercase;
 }
 
-.showroom-hero h1 {
+.showroom-hero h1,
+.showroom-hero-title {
   max-width: 920px;
   margin: 0;
   color: rgba(250, 250, 250, 0.97);
@@ -303,6 +304,16 @@ html, body, #root {
   line-height: 0.88;
   letter-spacing: 0;
   text-transform: uppercase;
+}
+
+.showroom-hero-title {
+  display: grid;
+  gap: 0.08em;
+}
+
+.showroom-hero-twist {
+  color: rgba(234, 179, 8, 0.96);
+  text-shadow: 0 0 28px rgba(168, 85, 247, 0.22);
 }
 
 .showroom-lede {
@@ -528,11 +539,29 @@ html, body, #root {
 }
 
 .pongg-scoreboard-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   margin-bottom: 7px;
   color: rgba(234, 179, 8, 0.9);
   font-size: 9px;
   letter-spacing: 0.24em;
   text-transform: uppercase;
+}
+
+.pongg-scoreboard-badge {
+  color: rgba(113, 113, 122, 0.95);
+  font-size: 7px;
+  letter-spacing: 0.18em;
+}
+
+.pongg-scoreboard-badge.is-global {
+  color: rgba(103, 232, 249, 0.85);
+}
+
+.pongg-scoreboard-badge.is-local {
+  color: rgba(161, 161, 170, 0.8);
 }
 
 .pongg-scoreboard ol {
@@ -563,6 +592,80 @@ html, body, #root {
   color: rgba(113, 113, 122, 0.9);
   font-size: 9px;
   letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.retry-prompt-dock {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  min-width: min(320px, calc(100vw - 32px));
+  padding: 14px 18px 12px;
+  border: 1px solid rgba(82, 82, 91, 0.82);
+  background: rgba(5, 5, 5, 0.78);
+  backdrop-filter: blur(12px);
+}
+
+.retry-prompt-title {
+  color: rgba(250, 250, 250, 0.92);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.retry-prompt-countdown {
+  color: rgba(234, 179, 8, 0.96);
+  font-family: var(--font-mono);
+  font-size: clamp(42px, 8vw, 64px);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 24px rgba(168, 85, 247, 0.28);
+}
+
+.retry-prompt-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.retry-prompt-btn {
+  min-width: 88px;
+  padding: 8px 16px;
+  border: 1px solid rgba(82, 82, 91, 0.85);
+  background: rgba(24, 24, 27, 0.72);
+  color: rgba(244, 244, 245, 0.92);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.retry-prompt-yes {
+  border-color: rgba(34, 197, 94, 0.42);
+  color: rgba(134, 239, 172, 0.95);
+}
+
+.retry-prompt-yes:hover {
+  border-color: rgba(74, 222, 128, 0.72);
+  background: rgba(22, 101, 52, 0.22);
+}
+
+.retry-prompt-loss {
+  border-color: rgba(239, 68, 68, 0.42);
+  color: rgba(252, 165, 165, 0.95);
+}
+
+.retry-prompt-loss:hover {
+  border-color: rgba(248, 113, 113, 0.72);
+  background: rgba(127, 29, 29, 0.22);
+}
+
+.retry-prompt-hint {
+  color: rgba(161, 161, 170, 0.78);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 

@@ -18,6 +18,21 @@ npm run lint
 npm run build
 ```
 
+## Supabase leaderboard
+
+The browser app uses Supabase directly for the public Twisted Pongg leaderboard, with `localStorage` fallback.
+
+Required Vite env vars:
+
+```bash
+VITE_SUPABASE_URL=https://oeppjpbaafjsowecyjho.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_FMyVbwnJdeP0iuL5DY1P0Q_zFYwmggo
+```
+
+Run [supabase/leaderboard.sql](./supabase/leaderboard.sql) once in the Supabase SQL Editor.
+
+Do not expose the Supabase secret/service role key in Vite. Only `VITE_` variables are bundled into the browser.
+
 ## Deploy (Vercel)
 
 - Repo: [wawawee/twisted-stacks-site](https://github.com/wawawee/twisted-stacks-site) (public)
@@ -31,6 +46,7 @@ No API keys in the app. Contact: `mailto:hello@twistedstacks.com`.
 
 - [docs/twisted-pongg.md](./docs/twisted-pongg.md) — one-pager (loop, modes, audio, camera)
 - [docs/twisted-pongg-game-research.md](./docs/twisted-pongg-game-research.md) — market research
+- [docs/twisted-pongg-direction-notes.md](./docs/twisted-pongg-direction-notes.md) — product direction and collaboration notes
 
 ## Parallel work
 

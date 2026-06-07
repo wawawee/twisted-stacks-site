@@ -12,7 +12,74 @@ import {
   CHAMPION_STORAGE_KEY,
   getLevelProfile,
 } from "./levels";
+import {
+  fetchRemoteScores,
+  isRemoteLeaderboardConfigured,
+  submitRemoteScore,
+  type ScoreEntry,
+} from "./leaderboard";
 import { BRICK_PIXEL_GAP, BRICK_PIXEL_SIZE } from "./brickPixel";
+import {
+  applyCornerComboBoost,
+  applyNaturalRacketDeflection,
+  applyRacketImpulse,
+  advanceBall,
+  bounceVelocityOffRacket,
+  cornerComboIntensity,
+  createBallState,
+  decayBallGlint,
+  getGlintOpacity,
+  getGlintScale,
+  integrateBallCurve,
+  isPanicSave,
+  normalizeBallSpeed,
+  randomLaunchVelocity,
+  resetBallMotion,
+  resolveBrickBallCollision,
+  ricochetIntroBounds,
+  type BallState,
+} from "./ballPhysics";
+import { computeCameraTilt } from "./cameraTilt";
+import { clamp } from "./math";
+import { computeMusicTick } from "./gameplayMusic";
+import {
+  computeAiTargetOffset,
+  computeAiTrackingParams,
+  computeGameplaySpeed,
+  computeLevelStartSpeed,
+  computePointMultiplier,
+} from "./gameplaySpeed";
+import {
+  buildMonsterBrickCells,
+  computeMonsterBlockSize,
+  getLevelMonsterSpawns,
+  getMonsterBrickGridPosition,
+  getMonsterPulseScale,
+  getMonsterShotRacketHit,
+  getMonsterVariant,
+  getMonsterWobble,
+  type MonsterVariant,
+  getNextMonsterShotDelay,
+  isMonsterShotOutOfBounds,
+  parseMonsterBrickGrid,
+  shouldMonsterExplode,
+} from "./monsters";
+import {
+  buildMotifBrickSpecs,
+  computeMotifRotation,
+  getMotifBrickWorldPosition,
+  getMotifLayoutSpec,
+  getMotifMirrorBurstTilt,
+  shouldTriggerMotifMirrorFlip,
+} from "./centerMotif";
+import {
+  getLevelIntroColor,
+  getLevelIntroLines,
+  LEVEL_INTRO_DURATION_MS,
+  levelIntroOverlayOpacity,
+  levelIntroWeirdOffset,
+} from "./levelIntro";
+import { monsterShotAngle, monsterShotSpeed } from "./monsterShots";
 
 // Theme Palette Configuration
 const COLOR_BLACK = 0x050505;       // Pure near-black background
@@ -29,78 +96,8 @@ const HARMONIC_SCALE = [196.0, 220.0, 246.94, 293.66, 329.63, 392.0, 440.0, 493.
 const SCOREBOARD_STORAGE_KEY = "twisted_pongg_scoreboard_v1";
 const SCOREBOARD_LIMIT = 5;
 const PLAYER_NAME_LIMIT = 6;
-const MATCH_LIVES = 5;
-const CURVE_SPIN_MAX = 0.4;
-const CURVE_SPIN_DECAY = 3.4;
-const CURVE_FORCE = 0.44;
-const CURVE_HIT_GAIN = 0.2;
-// Labyrinth-knob caps (~24° max on final level — never edge-on slit)
-const TILT_PITCH_MAX = 0.2;
-const TILT_YAW_MAX = 0.18;
-const TILT_ROLL_MAX = 0.16;
-const TILT_NINE_PITCH_MAX = 0.42;
-const TILT_NINE_YAW_MAX = 0.38;
-const TILT_NINE_ROLL_MAX = 0.36;
-
-interface MonsterVariant {
-  codename: string;
-  pattern: string[];
-  bodyColor: number;
-  bodyHits: number;
-}
-
-const MONSTER_VARIANTS: MonsterVariant[] = [
-  {
-    codename: "BLOB",
-    pattern: ["..XXX..", ".XXXXX.", "XXEXEXX", ".XXXXX.", "..XXX.."],
-    bodyColor: 0x7f1d1d,
-    bodyHits: 1,
-  },
-  {
-    codename: "SPIKE",
-    pattern: ["...X...", "..XXX..", ".XXXXX.", "XXEXEXX", ".XX.XX.", "..XXX.."],
-    bodyColor: 0x991b1b,
-    bodyHits: 1,
-  },
-  {
-    codename: "BUG",
-    pattern: [".XXXXX.", "XXXXXXX", "XEXEEXX", "XXXXXXX", ".X.X.X."],
-    bodyColor: 0x6b1420,
-    bodyHits: 1,
-  },
-  {
-    codename: "GHOST",
-    pattern: [".XXXXXXX.", "XXXXXXXXX", "XXE.X.EXX", "XXXXXXXXX", "..XXXXX..", "...XXX..."],
-    bodyColor: 0x450a0a,
-    bodyHits: 1,
-  },
-];
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, value));
-}
-
-function clampCameraTilt(
-  pitch: number,
-  yaw: number,
-  roll: number,
-  pitchMax: number,
-  yawMax: number,
-  rollMax: number,
-): [number, number, number] {
-  return [
-    clamp(pitch, -pitchMax, pitchMax),
-    clamp(yaw, -yawMax, yawMax),
-    clamp(roll, -rollMax, rollMax),
-  ];
-}
-
-interface ScoreEntry {
-  name: string;
-  score: number;
-  level: number;
-  date: string;
-}
+const MATCH_LIVES = 3;
+const AI_RACKET_SHOT_SCORE = 1;
 
 interface ScoreCandidate {
   score: number;
@@ -122,24 +119,28 @@ function loadScoreboard(): ScoreEntry[] {
     if (!raw) return [];
     const parsed = JSON.parse(raw) as ScoreEntry[];
     if (!Array.isArray(parsed)) return [];
-    return parsed
-      .filter((entry) => entry && typeof entry.name === "string" && Number.isFinite(entry.score))
-      .map((entry) => ({
-        name: normalizePlayerName(entry.name) || "PLAYER",
-        score: Math.max(0, Math.round(entry.score)),
-        level: Math.max(1, Math.min(MAX_LEVEL, Math.round(entry.level || 1))),
-        date: typeof entry.date === "string" ? entry.date : new Date().toISOString(),
-      }))
-      .sort((a, b) => b.score - a.score || b.level - a.level)
-      .slice(0, SCOREBOARD_LIMIT);
+    return rankScoreboard(parsed.filter((entry) => entry && typeof entry.name === "string" && Number.isFinite(entry.score)));
   } catch {
     return [];
   }
 }
 
+function rankScoreboard(entries: ScoreEntry[]) {
+  return entries
+    .map((entry) => ({
+      name: normalizePlayerName(entry.name) || "PLAYER",
+      score: Math.max(0, Math.round(entry.score)),
+      level: Math.max(1, Math.min(MAX_LEVEL, Math.round(entry.level || 1))),
+      date: typeof entry.date === "string" ? entry.date : new Date().toISOString(),
+    }))
+    .filter((entry) => entry.score > 0)
+    .sort((a, b) => b.score - a.score || b.level - a.level || a.date.localeCompare(b.date))
+    .slice(0, SCOREBOARD_LIMIT);
+}
+
 function persistScoreboard(entries: ScoreEntry[]) {
   try {
-    localStorage.setItem(SCOREBOARD_STORAGE_KEY, JSON.stringify(entries.slice(0, SCOREBOARD_LIMIT)));
+    localStorage.setItem(SCOREBOARD_STORAGE_KEY, JSON.stringify(rankScoreboard(entries)));
   } catch {
     /* ignore quota / private mode */
   }
@@ -294,9 +295,13 @@ export default function App() {
   const mountRef = useRef<HTMLDivElement>(null);
   const [gameState, setGameState] = useState<GameState>(GameState.INTRO_TWISTEDSTACKS);
   const transitionRef = useRef<((state: GameState) => void) | null>(null);
-  const endActionRequestRef = useRef<"next" | "retry" | "champion" | null>(null);
+  const endActionRequestRef = useRef<"next" | "retry" | "champion" | "level1" | null>(null);
   const devLevelRequestRef = useRef<number | null>(null);
   const [endAction, setEndAction] = useState<"next" | "retry" | "champion" | null>(null);
+  const endActionRef = useRef(endAction);
+  endActionRef.current = endAction;
+  const [retryCountdown, setRetryCountdown] = useState(10);
+  const retryTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const showEasterEggRef = useRef<(open: boolean) => void>(() => {});
   const [showEasterEgg, setShowEasterEgg] = useState(false);
   showEasterEggRef.current = setShowEasterEgg;
@@ -310,12 +315,85 @@ export default function App() {
   const [showShowroomModal, setShowShowroomModal] = useState(false);
   const [showGame, setShowGame] = useState(false);
   const [highScores, setHighScores] = useState<ScoreEntry[]>(loadScoreboard);
+  const [leaderboardMode, setLeaderboardMode] = useState<"local" | "global">(
+    isRemoteLeaderboardConfigured() ? "global" : "local",
+  );
   const [scoreCandidate, setScoreCandidate] = useState<ScoreCandidate | null>(null);
   const [playerInitials, setPlayerInitials] = useState("");
 
   const rigStateRef = useRef<"normal" | "autopilot">("normal");
   const highScoresRef = useRef(highScores);
   highScoresRef.current = highScores;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!isRemoteLeaderboardConfigured()) return undefined;
+
+    fetchRemoteScores(SCOREBOARD_LIMIT)
+      .then((remoteScores) => {
+        if (cancelled) return;
+        setLeaderboardMode("global");
+        if (remoteScores.length === 0) return;
+        const nextScores = rankScoreboard([...remoteScores, ...highScoresRef.current]);
+        persistScoreboard(nextScores);
+        highScoresRef.current = nextScores;
+        setHighScores(nextScores);
+      })
+      .catch((error) => {
+        setLeaderboardMode("local");
+        console.warn("Remote leaderboard unavailable; using local scores.", error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const clearRetryTimer = () => {
+    if (retryTimerRef.current) {
+      clearInterval(retryTimerRef.current);
+      retryTimerRef.current = null;
+    }
+  };
+
+  const requestRetryYes = () => {
+    clearRetryTimer();
+    endActionRequestRef.current = "retry";
+  };
+
+  const requestAcceptAiWins = () => {
+    clearRetryTimer();
+    setEndAction(null);
+    endActionRequestRef.current = "level1";
+  };
+
+  useEffect(() => {
+    if (!showGame || endAction !== "retry") {
+      clearRetryTimer();
+      setRetryCountdown(10);
+      return undefined;
+    }
+
+    setRetryCountdown(10);
+    const started = performance.now();
+    clearRetryTimer();
+    retryTimerRef.current = setInterval(() => {
+      const left = Math.max(0, Math.ceil((10000 - (performance.now() - started)) / 1000));
+      setRetryCountdown(left);
+      if (left <= 0) {
+        clearRetryTimer();
+        setEndAction(null);
+        window.setTimeout(() => {
+          endActionRequestRef.current = "level1";
+        }, 750);
+      }
+    }, 200);
+
+    return () => {
+      clearRetryTimer();
+    };
+  }, [endAction, showGame]);
 
   const startTwistedPongg = () => {
     setShowGame(true);
@@ -333,25 +411,42 @@ export default function App() {
     setScoreCandidate({ score: Math.round(score), level, outcome });
   };
 
-  const saveScoreCandidate = () => {
+  const saveScoreCandidate = async () => {
     if (!scoreCandidate) return;
     const name = normalizePlayerName(playerInitials) || "PLAYER";
-    const nextScores = [
+    const submission = {
+      name,
+      score: scoreCandidate.score,
+      level: scoreCandidate.level,
+      outcome: scoreCandidate.outcome,
+    };
+    const nextScores = rankScoreboard([
       ...highScoresRef.current,
       {
-        name,
-        score: scoreCandidate.score,
-        level: scoreCandidate.level,
+        name: submission.name,
+        score: submission.score,
+        level: submission.level,
         date: new Date().toISOString(),
       },
-    ]
-      .sort((a, b) => b.score - a.score || b.level - a.level)
-      .slice(0, SCOREBOARD_LIMIT);
+    ]);
     persistScoreboard(nextScores);
     highScoresRef.current = nextScores;
     setHighScores(nextScores);
     setScoreCandidate(null);
     setPlayerInitials("");
+
+    try {
+      const remoteScores = await submitRemoteScore(submission, SCOREBOARD_LIMIT);
+      if (remoteScores.length === 0) return;
+      const syncedScores = rankScoreboard(remoteScores);
+      persistScoreboard(syncedScores);
+      highScoresRef.current = syncedScores;
+      setHighScores(syncedScores);
+      setLeaderboardMode("global");
+    } catch (error) {
+      setLeaderboardMode("local");
+      console.warn("Could not submit remote leaderboard score; kept local score.", error);
+    }
   };
 
   // Difficulty: hold D for compact picker; default hardcore arcade boot
@@ -487,6 +582,14 @@ export default function App() {
     let scoreBricks: Brick[] = [];
     let endBricks: Brick[] = []; // Bricks for end typographic card
     let countdownMeshes: THREE.Mesh[] = [];
+    let countdownStepMs = 350;
+    let levelIntroActive = false;
+    let levelIntroStartedAt = 0;
+    let levelIntroOverlayMesh: THREE.Mesh | null = null;
+    let centerMotifBricks: Brick[] = [];
+    let motifMirrorSign = 1;
+    let motifMirrorBurstUntil = 0;
+    let motifLastFlipAt = 0;
     let particles: Particle[] = [];
     let monsters: Array<{
       id: string;
@@ -661,7 +764,7 @@ export default function App() {
     }
 
     function updatePointMultiplier() {
-      pointMultiplier = Math.max(1, Math.floor(1 + (currentSpeed - baseSpeed) / 180 + (currentLevel - 1) * 0.35));
+      pointMultiplier = computePointMultiplier(baseSpeed, currentSpeed, currentLevel);
     }
 
     function addPlayerPoints(points: number) {
@@ -680,20 +783,23 @@ export default function App() {
     }
 
     function updateMusicLoop(timeNow: number) {
-      if (!audioCtx || currentState !== GameState.GAMEPLAY || timeNow < nextMusicTickAt) return;
-      const levelPressure = clamp((currentLevel - 1) / (MAX_LEVEL - 1), 0, 1);
-      const speedPressure = clamp((currentSpeed - baseSpeed) / 1200, 0, 1);
-      const interval = Math.max(92, 330 - levelPressure * 105 - speedPressure * 120);
-      nextMusicTickAt = timeNow + interval;
-
-      const scaleIndex = (musicStep + currentLevel) % HARMONIC_SCALE.length;
-      const note = HARMONIC_SCALE[scaleIndex] * (musicStep % 8 === 0 ? 0.5 : 1);
-      const gain = 0.006 + levelPressure * 0.006;
-      playTone(note, 0.035 + speedPressure * 0.025, gain, musicStep % 4 === 0 ? "triangle" : "sine");
-      if (musicStep % 8 === 0) {
-        playTone(HARMONIC_SCALE[(scaleIndex + 3) % HARMONIC_SCALE.length] * 0.5, 0.07, gain * 0.8, "triangle");
-      }
-      musicStep += 1;
+      if (!audioCtx || currentState !== GameState.GAMEPLAY) return;
+      const tick = computeMusicTick(
+        timeNow,
+        nextMusicTickAt,
+        currentLevel,
+        MAX_LEVEL,
+        currentSpeed,
+        baseSpeed,
+        musicStep,
+        HARMONIC_SCALE,
+      );
+      if (!tick) return;
+      nextMusicTickAt = tick.nextTickAt;
+      musicStep = tick.nextMusicStep;
+      tick.tones.forEach((tone) => {
+        playTone(tone.frequency, tone.duration, tone.gain, tone.waveType);
+      });
     }
 
     // --- THREE.JS INFRASTRUCTURE ---
@@ -782,34 +888,28 @@ export default function App() {
     const ballMaterial = new THREE.MeshBasicMaterial({ color: COLOR_WHITE });
     const ballMesh = new THREE.Mesh(ballGeometry, ballMaterial);
     scene.add(ballMesh);
+    const ballGlintGeometry = new THREE.BoxGeometry(ballSize * 1.46, ballSize * 1.46, ballSize * 1.46);
+    const ballGlintMaterial = new THREE.MeshBasicMaterial({
+      color: COLOR_WHITE,
+      transparent: true,
+      opacity: 0,
+      wireframe: true,
+    });
+    const ballGlintMesh = new THREE.Mesh(ballGlintGeometry, ballGlintMaterial);
+    scene.add(ballGlintMesh);
 
-    const ball = {
-      x: 0,
-      y: 0,
-      vx: 0,
-      vy: 0,
-      curveSpin: 0,
-    };
+    const ball: BallState = createBallState(COLOR_WHITE);
 
-    // Reset ball velocity to random direction
     function launchBall(speed: number) {
-      ball.x = 0;
-      ball.y = 0;
-      ball.curveSpin = 0;
+      resetBallMotion(ball);
       ballMesh.position.set(0, 0, 0);
       ballMesh.rotation.set(0, 0, 0);
+      ballGlintMesh.position.set(0, 0, 2);
+      ballGlintMaterial.opacity = 0;
 
-      // Avoid dead vertical or horizontal trajectories
-      let angle = Math.random() * Math.PI * 2;
-      while (
-        Math.abs(Math.cos(angle)) < 0.25 ||
-        Math.abs(Math.sin(angle)) < 0.25
-      ) {
-        angle = Math.random() * Math.PI * 2;
-      }
-
-      ball.vx = Math.cos(angle) * speed;
-      ball.vy = Math.sin(angle) * speed;
+      const velocity = randomLaunchVelocity(speed);
+      ball.vx = velocity.vx;
+      ball.vy = velocity.vy;
     }
 
     function clearCountdownMeshes() {
@@ -821,7 +921,15 @@ export default function App() {
       clearCountdownMeshes();
 
       const gridMatrix = FONT_5X7[String(value)] || FONT_5X7["1"];
-      const sizeFactor = value === 3 ? 0.92 : value === 2 ? 0.62 : 0.28;
+      const sizeFactor = value >= 7
+        ? 0.95
+        : value >= 4
+          ? 0.72
+          : value === 3
+            ? 0.92
+            : value === 2
+              ? 0.62
+              : 0.28;
       const gapRatio = 0.1;
       const block = Math.max(
         BRICK_PIXEL_SIZE,
@@ -835,7 +943,13 @@ export default function App() {
       const gap = Math.max(BRICK_PIXEL_GAP, Math.floor(block * gapRatio));
       const digitW = 5 * block + 4 * gap;
       const digitH = 7 * block + 6 * gap;
-      const material = value === 3 ? materialCache.lossRed : value === 2 ? materialCache.playerScore : materialCache.winGreen;
+      const material = value >= 4
+        ? materialCache.active
+          : value === 3
+            ? materialCache.lossRed
+            : value === 2
+              ? materialCache.playerScore
+              : materialCache.winGreen;
 
       for (let r = 0; r < 7; r++) {
         for (let c = 0; c < 5; c++) {
@@ -850,23 +964,267 @@ export default function App() {
       }
     }
 
-    function clearServeCountdown() {
-      serveResumeAt = 0;
-      lastServeCountdownValue = null;
-      clearCountdownMeshes();
+    function ensureLevelIntroOverlay() {
+      if (levelIntroOverlayMesh) return;
+      const material = new THREE.MeshBasicMaterial({
+        color: COLOR_BLACK,
+        transparent: true,
+        opacity: 0,
+        depthTest: false,
+      });
+      levelIntroOverlayMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
+      levelIntroOverlayMesh.position.set(0, 0, 40);
+      levelIntroOverlayMesh.renderOrder = 20;
+      levelIntroOverlayMesh.visible = false;
+      scene.add(levelIntroOverlayMesh);
     }
 
-    function startServeCountdown(timeNow: number) {
+    function syncLevelIntroOverlaySize() {
+      if (!levelIntroOverlayMesh) return;
+      const pad = 1.28 * cameraZoomOut;
+      levelIntroOverlayMesh.scale.set(width * pad, height * pad, 1);
+    }
+
+    function setLevelIntroSceneMasked(masked: boolean) {
+      const show = !masked;
+      ballMesh.visible = show;
+      ballGlintMesh.visible = show;
+      leftRacketMesh.visible = show;
+      bottomRacketMesh.visible = show;
+      rightRacketMesh.visible = show;
+      topRacketMesh.visible = show;
+      cornerRailVertical.visible = show;
+      cornerRailHorizontal.visible = show;
+      cornerRailVerticalAi.visible = show;
+      cornerRailHorizontalAi.visible = show;
+      scoreBricks.forEach((brick) => {
+        if (brick.mesh) brick.mesh.visible = show;
+      });
+      centerMotifBricks.forEach((brick) => {
+        if (brick.mesh) brick.mesh.visible = show;
+      });
+      bricks.forEach((brick) => {
+        if (brick.mesh) brick.mesh.visible = show;
+      });
+      monsters.forEach((monster) => {
+        monster.bricks.forEach((brick) => {
+          if (brick.mesh) brick.mesh.visible = show;
+        });
+      });
+      monsterShots.forEach((shot) => {
+        shot.mesh.visible = show;
+      });
+    }
+
+    function clearServeCountdown() {
+      const wasLevelIntro = levelIntroActive;
+      serveResumeAt = 0;
+      lastServeCountdownValue = null;
+      levelIntroActive = false;
+      clearCountdownMeshes();
+      if (levelIntroOverlayMesh) {
+        levelIntroOverlayMesh.visible = false;
+        if (levelIntroOverlayMesh.material instanceof THREE.MeshBasicMaterial) {
+          levelIntroOverlayMesh.material.opacity = 0;
+        }
+      }
+      if (wasLevelIntro) {
+        setLevelIntroSceneMasked(false);
+      }
+    }
+
+    function renderLevelIntro(level: number) {
+      clearCountdownMeshes();
+      const lines = getLevelIntroLines(level);
+      const colorHex = getLevelIntroColor(level);
+      const lineCount = lines.length;
+      const spaceBetweenLines = level >= 7 ? 38 : 46;
+      const brickW = Math.max(10, Math.floor((width * 0.42) / 28));
+      const brickH = Math.floor(brickW * 1.05);
+      const gap = 2;
+      const charW = 5 * brickW + 4 * gap;
+      const charSpacing = brickW * 1.35;
+      const accentMat = new THREE.MeshBasicMaterial({
+        color: colorHex,
+        transparent: true,
+        opacity: 0.92,
+      });
+      const dimMat = new THREE.MeshBasicMaterial({
+        color: COLOR_WHITE,
+        transparent: true,
+        opacity: 0.42,
+      });
+
+      lines.forEach((lineText, lineIdx) => {
+        const len = lineText.length;
+        const totalLineWidth = len * charW + (len - 1) * charSpacing;
+        const startX = -totalLineWidth / 2;
+        const startY = (lineCount - 1) * (7 * brickH + 6 * gap + spaceBetweenLines) / 2 -
+          lineIdx * (7 * brickH + 6 * gap + spaceBetweenLines);
+        const mat = lineIdx === 1 ? accentMat : lineIdx === 2 ? accentMat : dimMat;
+        const depth = lineIdx === 1 ? 52 : 50;
+
+        for (let i = 0; i < len; i++) {
+          const char = lineText[i];
+          if (char === " ") continue;
+          const matrix = FONT_5X7[char];
+          if (!matrix) continue;
+          const charStartX = startX + i * (charW + charSpacing);
+
+          for (let r = 0; r < 7; r++) {
+            for (let c = 0; c < 5; c++) {
+              if (matrix[r][c] !== 1) continue;
+              const bx = charStartX + c * (brickW + gap) + brickW / 2;
+              const by = startY - r * (brickH + gap) - brickH / 2;
+              const mesh = new THREE.Mesh(getBrickGeometry(brickW, brickH), mat);
+              mesh.position.set(bx, by, depth);
+              scene.add(mesh);
+              countdownMeshes.push(mesh);
+            }
+          }
+        }
+      });
+    }
+
+    function startLevelIntro(timeNow: number, level: number) {
+      resetBallForCountdown();
+      ensureLevelIntroOverlay();
+      syncLevelIntroOverlaySize();
+      setLevelIntroSceneMasked(true);
+      levelIntroActive = true;
+      levelIntroStartedAt = timeNow;
+      countdownStepMs = LEVEL_INTRO_DURATION_MS;
+      serveResumeAt = timeNow + LEVEL_INTRO_DURATION_MS;
+      lastServeCountdownValue = null;
+      if (levelIntroOverlayMesh) {
+        levelIntroOverlayMesh.visible = true;
+        if (levelIntroOverlayMesh.material instanceof THREE.MeshBasicMaterial) {
+          levelIntroOverlayMesh.material.opacity = 0;
+        }
+      }
+      renderLevelIntro(level);
+      playTone(196 * (1 + level * 0.08), 0.07, 0.04, "triangle");
+      setTimeout(() => playTone(392 * (1 + level * 0.04), 0.05, 0.03, "sine"), 90);
+    }
+
+    function animateLevelIntroMeshes(timeNow: number) {
+      syncLevelIntroOverlaySize();
+      const curtain = levelIntroOverlayOpacity(timeNow, levelIntroStartedAt);
+      if (levelIntroOverlayMesh?.material instanceof THREE.MeshBasicMaterial) {
+        levelIntroOverlayMesh.material.opacity = curtain * 0.97;
+      }
+      countdownMeshes.forEach((mesh, index) => {
+        const offset = levelIntroWeirdOffset(timeNow, index, levelIntroStartedAt);
+        mesh.position.z = offset.z;
+        mesh.rotation.z = offset.rotZ;
+        mesh.scale.setScalar(offset.scale);
+        mesh.renderOrder = 30;
+        if (mesh.material instanceof THREE.MeshBasicMaterial) {
+          mesh.material.opacity = offset.opacity;
+          mesh.material.depthTest = false;
+        }
+      });
+    }
+
+    function resetBallForCountdown() {
       ball.x = 0;
       ball.y = 0;
       ball.vx = 0;
       ball.vy = 0;
       ball.curveSpin = 0;
+      ball.glint = 0;
       ballMesh.position.set(0, 0, 0);
       ballMesh.rotation.set(0, 0, 0);
-      serveResumeAt = timeNow + 1050;
-      lastServeCountdownValue = 3;
-      renderServeCountdownDigit(3);
+      ballGlintMesh.position.set(0, 0, 2);
+      ballGlintMaterial.opacity = 0;
+    }
+
+    function startCountdown(timeNow: number, fromValue: number, stepMs = 350) {
+      resetBallForCountdown();
+      countdownStepMs = stepMs;
+      serveResumeAt = timeNow + fromValue * stepMs;
+      lastServeCountdownValue = fromValue;
+      renderServeCountdownDigit(fromValue);
+    }
+
+    function startServeCountdown(timeNow: number) {
+      startCountdown(timeNow, 3, 350);
+    }
+
+    function clearCenterMotif() {
+      centerMotifBricks.forEach((brick) => {
+        if (brick.mesh) scene.remove(brick.mesh);
+      });
+      centerMotifBricks = [];
+      motifMirrorSign = 1;
+      motifMirrorBurstUntil = 0;
+    }
+
+    function spawnCenterMotif() {
+      clearCenterMotif();
+      const layout = getMotifLayoutSpec(currentLevel, width, height);
+      motifLastFlipAt = performance.now();
+
+      buildMotifBrickSpecs(layout).forEach((spec) => {
+        const color = layout.palette[spec.colorIndex];
+        const material = new THREE.MeshBasicMaterial({ color });
+        const mesh = new THREE.Mesh(getBrickGeometry(layout.block, layout.block), material);
+        mesh.position.set(spec.localX, spec.localY, 3);
+        scene.add(mesh);
+
+        centerMotifBricks.push({
+          id: `motif_${currentLevel}_${spec.row}_${spec.col}`,
+          x: spec.localX,
+          y: spec.localY,
+          w: layout.block,
+          h: layout.block,
+          hitsMax: 2,
+          hitsLeft: 2,
+          isCenterMotif: true,
+          motifLocalX: spec.localX,
+          motifLocalY: spec.localY,
+          state: "active",
+          mesh,
+          color,
+        });
+      });
+    }
+
+    function updateCenterMotif(timeNow: number) {
+      if (currentState !== GameState.GAMEPLAY || centerMotifBricks.length === 0) return;
+
+      const gameplayElapsed = timeNow - gameplayStartTime;
+      const rotation = computeMotifRotation(timeNow, currentLevel, gameplayElapsed);
+      const alive = centerMotifBricks.filter((brick) => brick.hitsLeft > 0);
+      const aliveRatio = alive.length / centerMotifBricks.length;
+
+      if (shouldTriggerMotifMirrorFlip(currentLevel, timeNow, motifLastFlipAt, aliveRatio)) {
+        motifMirrorSign *= -1;
+        motifMirrorBurstUntil = timeNow + 1200;
+        motifLastFlipAt = timeNow;
+        shakeIntensity = Math.max(shakeIntensity, 14);
+        playTone(110, 0.08, 0.05, "sawtooth");
+      }
+
+      centerMotifBricks.forEach((brick) => {
+        if (!brick.mesh || brick.hitsLeft <= 0 || brick.motifLocalX === undefined || brick.motifLocalY === undefined) {
+          return;
+        }
+        const world = getMotifBrickWorldPosition(
+          brick.motifLocalX,
+          brick.motifLocalY,
+          rotation,
+          motifMirrorSign,
+        );
+        brick.x = world.x;
+        brick.y = world.y;
+        const burst = getMotifMirrorBurstTilt(motifMirrorBurstUntil, timeNow, motifMirrorSign);
+        brick.mesh.position.set(world.x, world.y, 3);
+        brick.mesh.rotation.z = rotation;
+        brick.mesh.rotation.x = burst.pitch;
+        brick.mesh.rotation.y = burst.yaw;
+        brick.mesh.scale.set(burst.scaleX, 1, 1);
+      });
     }
 
     // --- BRICK AND GEOMETRY UTILITIES ---
@@ -1217,6 +1575,7 @@ export default function App() {
 
       clearMonsterEntities();
       clearPlayerShots();
+      clearCenterMotif();
       pendingNextLevelAt = 0;
       clearServeCountdown();
 
@@ -1258,13 +1617,11 @@ export default function App() {
         gameplayStartTime = performance.now();
 
         const startProfile = getLevelProfile(currentLevel);
-        let diffBase = baseSpeed + 58 + startProfile.speedBonus;
-        if (difficultyRef.current === "casual") {
-          diffBase = 292 + startProfile.speedBonus * 0.75;
-        } else if (difficultyRef.current === "impossible") {
-          diffBase = 500 + startProfile.speedBonus * 1.15;
-        }
-        currentSpeed = diffBase;
+        currentSpeed = computeLevelStartSpeed(
+          baseSpeed,
+          difficultyRef.current,
+          startProfile.speedBonus,
+        );
         ballMaterial.color.setHex(COLOR_WHITE);
         championRevealAt = 0;
         championBurstDone = false;
@@ -1281,10 +1638,11 @@ export default function App() {
         });
 
         rebuildScoreDigits();
+        spawnCenterMotif();
         if (currentLevel >= MAX_LEVEL) {
           bricks.push(...layOutLevelNineLeaderBricks());
         }
-        launchBall(currentSpeed);
+        startLevelIntro(performance.now(), currentLevel);
         spawnLevelMonsters();
       }
     }
@@ -1354,6 +1712,17 @@ export default function App() {
     }
 
     // --- SPARK / PARTICLE SYSTEM ---
+    function triggerBallGlint(hexColor: number, intensity = 1) {
+      ball.glint = Math.max(ball.glint, clamp(intensity, 0.35, 1.3));
+      ball.glintColor = hexColor;
+      ballGlintMaterial.color.setHex(hexColor);
+      ballGlintMesh.rotation.set(
+        Math.random() * Math.PI,
+        Math.random() * Math.PI,
+        Math.random() * Math.PI,
+      );
+    }
+
     function spawnSparks(x: number, y: number, hexColor: number) {
       const numSparks = 3 + Math.floor(Math.random() * 3);
       const sparkGeom = new THREE.BoxGeometry(3, 3, 3);
@@ -1500,7 +1869,7 @@ export default function App() {
         spawnSparks(b.x, b.y, b.isScoreBrick ? ownerColor : COLOR_INTRO_DAMAGED);
       } else if (b.hitsLeft === 0) {
         b.state = "dead";
-        if (currentState !== GameState.GAMEPLAY || b.isScoreBrick || b.isMonster) {
+        if (currentState !== GameState.GAMEPLAY || b.isScoreBrick || b.isMonster || b.isCenterMotif) {
           b.mesh.visible = false;
         } else {
           b.mesh.material = materialCache.dead;
@@ -1665,37 +2034,18 @@ export default function App() {
       });
     }
 
-    function shouldMonsterExplode(monster: {
-      hitCount: number;
-      bricks: Brick[];
-    }): boolean {
-      const alive = monster.bricks.filter((brick) => brick.hitsLeft > 0).length;
-      const total = monster.bricks.length;
-      if (alive <= 0 || total === 0) return true;
-      const destroyedRatio = 1 - alive / total;
-      return (
-        (monster.hitCount >= 2 && destroyedRatio >= 0.16) ||
-        monster.hitCount >= 4 ||
-        alive <= total * 0.5
-      );
-    }
-
     function registerMonsterBrickHit(brick: Brick) {
       const parent = monsters.find((monster) => monster.bricks.some((b) => b.id === brick.id));
       if (!parent || parent.explodedAt60) return;
       parent.hitCount += 1;
-      if (shouldMonsterExplode(parent)) {
+      if (shouldMonsterExplode(parent.hitCount, parent.bricks)) {
         explodeMonster(parent);
       }
     }
 
     function createBlockMonster(id: string, x: number, y: number, phase: number, variantIndex: number) {
-      const variant = MONSTER_VARIANTS[variantIndex % MONSTER_VARIANTS.length];
-      const pattern = variant.pattern;
-      const block = Math.max(10, Math.min(15, Math.floor(width / 88)));
-      const gap = 2;
-      const totalW = pattern[0].length * block + (pattern[0].length - 1) * gap;
-      const totalH = pattern.length * block + (pattern.length - 1) * gap;
+      const variant = getMonsterVariant(variantIndex);
+      const block = computeMonsterBlockSize(width);
       const bodyMaterial = new THREE.MeshBasicMaterial({ color: variant.bodyColor });
       const monster: {
         id: string;
@@ -1705,7 +2055,7 @@ export default function App() {
         nextShotAt: number;
         explodedAt60: boolean;
         hitCount: number;
-        variant: MonsterVariant;
+        variant: ReturnType<typeof getMonsterVariant>;
         bricks: Brick[];
       } = {
         id,
@@ -1719,50 +2069,38 @@ export default function App() {
         bricks: [],
       };
 
-      pattern.forEach((row, r) => {
-        [...row].forEach((cell, c) => {
-          if (cell === ".") return;
-          const bx = x - totalW / 2 + c * (block + gap) + block / 2;
-          const by = y + totalH / 2 - r * (block + gap) - block / 2;
-          const mesh = new THREE.Mesh(
-            getBrickGeometry(block, block),
-            cell === "E" ? monsterEyeMaterial : bodyMaterial,
-          );
-          mesh.position.set(bx, by, 4);
-          scene.add(mesh);
+      buildMonsterBrickCells(x, y, variant, block).forEach((cell) => {
+        const mesh = new THREE.Mesh(
+          getBrickGeometry(block, block),
+          cell.isEye ? monsterEyeMaterial : bodyMaterial,
+        );
+        mesh.position.set(cell.x, cell.y, 4);
+        scene.add(mesh);
 
-          const brick: Brick = {
-            id: `${id}_${r}_${c}`,
-            x: bx,
-            y: by,
-            w: block,
-            h: block,
-            hitsMax: cell === "E" ? 1 : variant.bodyHits,
-            hitsLeft: cell === "E" ? 1 : variant.bodyHits,
-            isMonster: true,
-            state: "active",
-            mesh,
-            color: cell === "E" ? COLOR_WHITE : variant.bodyColor,
-          };
-          monster.bricks.push(brick);
-          bricks.push(brick);
-        });
+        const brick: Brick = {
+          id: `${id}_${cell.row}_${cell.col}`,
+          x: cell.x,
+          y: cell.y,
+          w: block,
+          h: block,
+          hitsMax: cell.hitsMax,
+          hitsLeft: cell.hitsMax,
+          isMonster: true,
+          state: "active",
+          mesh,
+          color: cell.isEye ? COLOR_WHITE : variant.bodyColor,
+        };
+        monster.bricks.push(brick);
+        bricks.push(brick);
       });
       monsters.push(monster);
     }
 
     function spawnLevelMonsters() {
       const profile = getLevelProfile(currentLevel);
-      if (profile.monsterCount === 0) return;
-      const spread = Math.min(width * 0.22, 260);
-      createBlockMonster(`monster_${currentLevel}_a`, -spread, height * 0.16, 0, currentLevel);
-      createBlockMonster(`monster_${currentLevel}_b`, spread, -height * 0.12, Math.PI, currentLevel + 1);
-      if (profile.monsterCount >= 3) {
-        createBlockMonster(`monster_${currentLevel}_c`, 0, height * 0.27, Math.PI / 2, currentLevel + 2);
-      }
-      if (profile.monsterCount >= 4) {
-        createBlockMonster(`monster_${currentLevel}_d`, 0, -height * 0.24, -Math.PI / 2, currentLevel + 3);
-      }
+      getLevelMonsterSpawns(currentLevel, profile.monsterCount, width, height).forEach((spawn) => {
+        createBlockMonster(spawn.id, spawn.x, spawn.y, spawn.phase, spawn.variantIndex);
+      });
     }
 
     function spawnChampionCelebration() {
@@ -1784,8 +2122,15 @@ export default function App() {
     }
 
     function fireMonsterShot(monster: { id: string; x: number; y: number; phase: number; nextShotAt: number }) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = 210 + currentLevel * 34 + getLevelProfile(currentLevel).speedBonus * 0.2;
+      const profile = getLevelProfile(currentLevel);
+      const speed = monsterShotSpeed(currentLevel, profile.speedBonus);
+      const angle = monsterShotAngle(
+        currentLevel,
+        monster.x,
+        monster.y,
+        rackets.left.x,
+        rackets.bottom.y,
+      );
       const mesh = new THREE.Mesh(monsterShotGeom, monsterShotMaterial);
       mesh.position.set(monster.x, monster.y, 12);
       scene.add(mesh);
@@ -1810,26 +2155,37 @@ export default function App() {
         if (monster.explodedAt60) return;
         const alive = monster.bricks.some((b) => b.hitsLeft > 0);
         if (!alive) return;
-        const wobbleX = Math.sin(timeNow * 0.0013 + monster.phase) * (8 + currentLevel * 1.2) * levelProfile.wobbleScale;
-        const wobbleY = Math.cos(timeNow * 0.0011 + monster.phase) * 6 * levelProfile.wobbleScale;
+        const { x: wobbleX, y: wobbleY } = getMonsterWobble(
+          timeNow,
+          monster.phase,
+          currentLevel,
+          levelProfile.wobbleScale,
+        );
         monster.bricks.forEach((brick) => {
           if (!brick.mesh || brick.hitsLeft <= 0) return;
-          const baseParts = brick.id.split("_");
-          const r = Number(baseParts.at(-2));
-          const c = Number(baseParts.at(-1));
+          const { row, col } = parseMonsterBrickGrid(brick.id);
           const blockW = brick.w + 2;
-          brick.x = monster.x + (c - 4) * blockW + wobbleX;
-          brick.y = monster.y + (3 - r) * blockW + wobbleY;
+          const position = getMonsterBrickGridPosition(
+            monster.x,
+            monster.y,
+            row,
+            col,
+            blockW,
+            wobbleX,
+            wobbleY,
+          );
+          brick.x = position.x;
+          brick.y = position.y;
           brick.mesh.position.set(brick.x, brick.y, 4);
-          const pulse = 0.9 + Math.sin(timeNow * 0.004 + monster.phase) * 0.08;
-          brick.mesh.scale.setScalar(pulse);
+          brick.mesh.scale.setScalar(getMonsterPulseScale(timeNow, monster.phase));
         });
         if (!servePaused && timeNow > monster.nextShotAt) {
           fireMonsterShot(monster);
-          monster.nextShotAt =
-            timeNow +
-            Math.max(650, (2500 - currentLevel * 200) * levelProfile.monsterShotScale) +
-            Math.random() * 800;
+          monster.nextShotAt = getNextMonsterShotDelay(
+            timeNow,
+            currentLevel,
+            levelProfile.monsterShotScale,
+          );
         }
       });
 
@@ -1843,45 +2199,29 @@ export default function App() {
         shot.mesh.position.set(shot.x, shot.y, 12);
         shot.mesh.rotation.z += dt * 7;
 
-        const leftLen = rackets.left.length * playerScale;
-        const bottomLen = rackets.bottom.length * playerScale;
-        const hitLeft = Math.abs(shot.x - rackets.left.x) < racketThickness * 1.4 &&
-          shot.y > rackets.left.y - leftLen / 2 &&
-          shot.y < rackets.left.y + leftLen / 2;
-        const hitBottom = Math.abs(shot.y - rackets.bottom.y) < racketThickness * 1.4 &&
-          shot.x > rackets.bottom.x - bottomLen / 2 &&
-          shot.x < rackets.bottom.x + bottomLen / 2;
-        const rightLen = rackets.right.length * aiScale;
-        const topLen = rackets.top.length * aiScale;
-        const hitRight = Math.abs(shot.x - rackets.right.x) < racketThickness * 1.4 &&
-          shot.y > rackets.right.y - rightLen / 2 &&
-          shot.y < rackets.right.y + rightLen / 2;
-        const hitTop = Math.abs(shot.y - rackets.top.y) < racketThickness * 1.4 &&
-          shot.x > rackets.top.x - topLen / 2 &&
-          shot.x < rackets.top.x + topLen / 2;
+        const racketHit = getMonsterShotRacketHit(shot.x, shot.y, {
+          left: rackets.left,
+          bottom: rackets.bottom,
+          right: rackets.right,
+          top: rackets.top,
+          playerScale,
+          aiScale,
+          thickness: racketThickness,
+        });
 
-        if (hitLeft || hitBottom || hitRight || hitTop) {
-          if (hitLeft || hitBottom) {
+        if (racketHit) {
+          if (racketHit === "player") {
             playerTargetScale = Math.max(0.24, playerTargetScale * 0.93);
-          }
-          if (hitRight || hitTop) {
-            aiTargetScale = Math.max(0.24, aiTargetScale * 0.93);
-          }
-          if (hitLeft || hitBottom) {
             cornerComboPulse = Math.max(cornerComboPulse, 0.85);
+          } else {
+            aiTargetScale = Math.max(0.24, aiTargetScale * 0.93);
           }
           shakeIntensity = Math.max(shakeIntensity, 10);
           playScoreLossSound();
-          spawnSparks(shot.x, shot.y, hitRight || hitTop ? COLOR_AI : COLOR_LOSS_RED);
+          spawnSparks(shot.x, shot.y, racketHit === "ai" ? COLOR_AI : COLOR_LOSS_RED);
           scene.remove(shot.mesh);
           monsterShots.splice(i, 1);
-        } else if (
-          shot.life <= 0 ||
-          shot.x < -width / 2 - 80 ||
-          shot.x > width / 2 + 80 ||
-          shot.y < -height / 2 - 80 ||
-          shot.y > height / 2 + 80
-        ) {
+        } else if (shot.life <= 0 || isMonsterShotOutOfBounds(shot.x, shot.y, width, height)) {
           scene.remove(shot.mesh);
           monsterShots.splice(i, 1);
         }
@@ -1972,6 +2312,7 @@ export default function App() {
             shot.x < rackets.top.x + topLen / 2;
           if (hitRight || hitTop) {
             aiTargetScale = Math.max(0.68, aiTargetScale * 0.993);
+            addPlayerPoints(AI_RACKET_SHOT_SCORE);
             shakeIntensity = Math.max(shakeIntensity, 2);
             spawnSparks(shot.x, shot.y, COLOR_AI);
             playTone(220, 0.025, 0.012, "triangle");
@@ -2001,6 +2342,7 @@ export default function App() {
       bricks = [];
       scoreBricks.forEach(sb => { if (sb.mesh) scene.remove(sb.mesh); });
       scoreBricks = [];
+      clearCenterMotif();
       endBricks.forEach(eb => { if (eb.mesh) scene.remove(eb.mesh); });
       endBricks = [];
 
@@ -2081,6 +2423,7 @@ export default function App() {
       camera.top = (height / 2) * cameraZoomOut;
       camera.bottom = (-height / 2) * cameraZoomOut;
       camera.updateProjectionMatrix();
+      syncLevelIntroOverlaySize();
 
       // Recalculate racket coordinates
       rackets.left.x = -width / 2 + 35;
@@ -2148,12 +2491,19 @@ export default function App() {
         if (timeNow >= serveResumeAt) {
           clearServeCountdown();
           launchBall(currentSpeed);
+        } else if (levelIntroActive) {
+          animateLevelIntroMeshes(timeNow);
         } else {
-          const countdownValue = Math.max(1, Math.ceil((serveResumeAt - timeNow) / 350));
+          const countdownValue = Math.max(1, Math.ceil((serveResumeAt - timeNow) / countdownStepMs));
           if (countdownValue !== lastServeCountdownValue) {
             lastServeCountdownValue = countdownValue;
             renderServeCountdownDigit(countdownValue);
-            playTone(HARMONIC_SCALE[(3 - countdownValue) % HARMONIC_SCALE.length] * 1.5, 0.045, 0.026, "triangle");
+            playTone(
+              HARMONIC_SCALE[countdownValue % HARMONIC_SCALE.length] * 1.5,
+              0.045,
+              0.026,
+              "triangle",
+            );
           }
         }
       }
@@ -2176,11 +2526,15 @@ export default function App() {
           spawnChampionCelebration();
           persistChampionUnlock();
           showEasterEggRef.current(true);
-        } else {
+        } else if (action === "level1") {
           currentLevel = 1;
           championRevealAt = 0;
           championBurstDone = false;
+          explodeEndBricks();
           transitionToNextIntroState(GameState.INTRO_TWISTEDSTACKS);
+        } else {
+          explodeEndBricks();
+          pendingNextLevelAt = timeNow + 560;
         }
       }
 
@@ -2201,77 +2555,26 @@ export default function App() {
       }
 
       const gameplayElapsed = currentState === GameState.GAMEPLAY ? timeNow - gameplayStartTime : 0;
-      const levelPressure = currentState === GameState.GAMEPLAY
-        ? clamp((currentLevel - 1) / (MAX_LEVEL - 1), 0, 1)
-        : 0;
-      const speedPressure = currentState === GameState.GAMEPLAY
-        ? clamp((currentSpeed - 360) / 1150, 0, 1)
-        : 0;
-      const lateTwistPressure = currentLevel >= 7 ? clamp((currentLevel - 6) / 3, 0, 1) : 0;
-      const earlySpinCap = currentLevel < 7 ? 0.16 + levelPressure * 0.22 : 1;
-      const twistRamp = currentState === GameState.GAMEPLAY
-        ? Math.min(earlySpinCap, clamp(levelPressure * 0.38 + speedPressure * 0.18 + gameplayElapsed / 210000, 0, 1))
-        : 0;
-      const isNineDown = currentLevel >= MAX_LEVEL && currentState === GameState.GAMEPLAY;
-      const mirrorPressure = currentLevel >= 8 && !isNineDown
-        ? clamp(0.18 + speedPressure * 0.25, 0, 0.5)
-        : 0;
-      const nineDownRamp = isNineDown
-        ? clamp(0.55 + speedPressure * 0.45 + Math.min(gameplayElapsed / 85000, 0.45), 0, 1)
-        : 0;
-      const gameplayActive = currentState === GameState.GAMEPLAY;
-      const depthTiltRamp = gameplayActive
-        ? clamp(0.16 + levelPressure * 0.34 + speedPressure * 0.24 + lateTwistPressure * 0.18, 0, 1)
-        : 0;
-      const mouseTiltPitch = interactionRef.current.mouseY * (gameplayActive ? 0.075 : 0.03);
-      const mouseTiltYaw = interactionRef.current.mouseX * (gameplayActive ? 0.065 : 0.025);
-      const planarSpin = Math.sin(timeNow * (0.00022 + levelPressure * 0.0002)) * twistRamp * TILT_ROLL_MAX * (0.55 + lateTwistPressure * 0.45);
-      const inversionDrift = mirrorPressure * TILT_ROLL_MAX * (0.65 + 0.35 * Math.sin(timeNow * 0.00011));
-
-      // Level 9: labyrinth-knob wobble — swings to mirror-feel extremes, never edge-on slit
-      const nineDownWobbleRoll = Math.sin(timeNow * (0.00034 + speedPressure * 0.00008));
-      const nineDownWobblePitch = Math.cos(timeNow * 0.00029 + 0.7);
-      const nineDownWobbleYaw = Math.sin(timeNow * 0.00025 + 1.2);
-      const parallaxFade = 1 - nineDownRamp * 0.5;
-
-      let twistAngle = planarSpin + inversionDrift;
-      let pitchAngle = mouseTiltPitch + Math.sin(timeNow * 0.00031) * depthTiltRamp * TILT_PITCH_MAX;
-      let yawAngle = mouseTiltYaw + Math.cos(timeNow * 0.00023 + Math.PI / 4) * depthTiltRamp * TILT_YAW_MAX;
-      if (isNineDown) {
-        twistAngle = nineDownWobbleRoll * TILT_NINE_ROLL_MAX * nineDownRamp + planarSpin * (1 - nineDownRamp) * 0.2;
-        pitchAngle = mouseTiltPitch * parallaxFade + nineDownWobblePitch * TILT_NINE_PITCH_MAX * nineDownRamp;
-        yawAngle = mouseTiltYaw * parallaxFade + nineDownWobbleYaw * TILT_NINE_YAW_MAX * nineDownRamp;
-      }
-
-      const pitchMax = isNineDown
-        ? TILT_NINE_PITCH_MAX
-        : TILT_PITCH_MAX + depthTiltRamp * 0.08;
-      const yawMax = isNineDown
-        ? TILT_NINE_YAW_MAX
-        : TILT_YAW_MAX + depthTiltRamp * 0.06;
-      const rollMax = isNineDown
-        ? TILT_NINE_ROLL_MAX
-        : TILT_ROLL_MAX + twistRamp * 0.06 + mirrorPressure * 0.08;
-      [pitchAngle, yawAngle, twistAngle] = clampCameraTilt(
-        pitchAngle,
-        yawAngle,
-        twistAngle,
-        pitchMax,
-        yawMax,
-        rollMax,
-      );
-
-      const absCos = Math.abs(Math.cos(twistAngle));
-      const absSin = Math.abs(Math.sin(twistAngle));
-      const aspect = width / height;
-      const rotatedFit = Math.max(absCos + (1 / aspect) * absSin, absCos + aspect * absSin);
-      const depthFit = 1 + depthTiltRamp * 0.12 + Math.max(Math.abs(pitchAngle), Math.abs(yawAngle)) * 0.28;
-      const targetZoomOut = Math.min(
-        isNineDown ? 2.45 : 2.35,
-        rotatedFit * depthFit + twistRamp * 0.06 + mirrorPressure * 0.1 + nineDownRamp * 0.14 + 0.06,
-      );
-      if (Math.abs(targetZoomOut - cameraZoomOut) > 0.003) {
-        cameraZoomOut += (targetZoomOut - cameraZoomOut) * Math.min(1, dt * 5);
+      const cameraFrame = computeCameraTilt({
+        timeNow,
+        dt,
+        currentState,
+        currentLevel,
+        maxLevel: MAX_LEVEL,
+        currentSpeed,
+        gameplayStartTime,
+        wobbleScale: currentState === GameState.GAMEPLAY
+          ? getLevelProfile(currentLevel).wobbleScale
+          : 1,
+        mouseX: interactionRef.current.mouseX,
+        mouseY: interactionRef.current.mouseY,
+        width,
+        height,
+        cameraZoomOut,
+      });
+      const { pitchAngle, yawAngle, twistAngle } = cameraFrame;
+      if (cameraFrame.cameraZoomOut !== cameraZoomOut) {
+        cameraZoomOut = cameraFrame.cameraZoomOut;
         camera.left = (-width / 2) * cameraZoomOut;
         camera.right = (width / 2) * cameraZoomOut;
         camera.top = (height / 2) * cameraZoomOut;
@@ -2287,55 +2590,50 @@ export default function App() {
 
       // --- BALL PHYSICS ---
       if ((currentState !== GameState.END_SCREEN || endBricks.length > 0) && serveResumeAt === 0) {
-        if (Math.abs(ball.curveSpin) > 0.004) {
-          const velLen = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
-          if (velLen > 60) {
-            const perpX = -ball.vy / velLen;
-            const perpY = ball.vx / velLen;
-            const curveAccel = ball.curveSpin * currentSpeed * CURVE_FORCE;
-            ball.vx += perpX * curveAccel * dt;
-            ball.vy += perpY * curveAccel * dt;
-          }
-          ball.curveSpin *= Math.exp(-CURVE_SPIN_DECAY * dt);
-          if (Math.abs(ball.curveSpin) < 0.004) ball.curveSpin = 0;
-        }
-
-        ball.x += ball.vx * dt;
-        ball.y += ball.vy * dt;
-        const spinLift = Math.abs(ball.curveSpin) * 18;
+        integrateBallCurve(
+          ball,
+          dt,
+          currentSpeed,
+          currentState === GameState.GAMEPLAY,
+          currentLevel,
+        );
+        const spinLift = advanceBall(ball, dt);
         ballMesh.position.set(ball.x, ball.y, spinLift);
         ballMesh.rotation.z += ball.curveSpin * dt * 9;
         ballMesh.rotation.x = ball.curveSpin * 0.55;
+        ballGlintMesh.position.set(ball.x, ball.y, spinLift + 2);
+        ballGlintMesh.rotation.x += dt * 5.8;
+        ballGlintMesh.rotation.y += dt * 4.2;
+        ballGlintMesh.rotation.z -= dt * 6.4;
+        decayBallGlint(ball, dt);
+        if (ball.glint > 0) {
+          ballGlintMesh.scale.setScalar(getGlintScale(ball.glint));
+          ballGlintMaterial.opacity = getGlintOpacity(ball.glint);
+          ballMaterial.color.setHex(ball.glintColor);
+        } else {
+          ballGlintMaterial.opacity = 0;
+        }
       }
 
       // --- SPEEDS AND EXPONENTIAL PROGRESSIONS ---
       if (currentState === GameState.GAMEPLAY) {
         const profile = getLevelProfile(currentLevel);
-        let diffBase = baseSpeed + 58;
-        let compoundingRate = 1.026;
-        if (difficultyRef.current === "casual") {
-          diffBase = 292;
-          compoundingRate = 1.015;
-        } else if (difficultyRef.current === "impossible") {
-          diffBase = 500;
-          compoundingRate = 1.055;
-        }
-        diffBase += profile.speedBonus;
-        compoundingRate += profile.compoundBonus;
-
-        // Continuous Exponential: Compounding speed increase based on difficulty
-        const exponentMultiplier = Math.pow(compoundingRate, gameplayElapsed / 5000);
-        currentSpeed = diffBase * exponentMultiplier;
+        currentSpeed = computeGameplaySpeed(
+          baseSpeed,
+          difficultyRef.current,
+          profile,
+          gameplayElapsed,
+        );
 
         // Apply visual color shifts/pulsation to the active Ball mesh so it looks alive
         const pulse = 0.94 + Math.sin(timeNow * 0.01) * 0.06;
         ballMesh.scale.setScalar(pulse);
+        if (ball.glint <= 0) {
+          ballMaterial.color.setHex(COLOR_WHITE);
+        }
 
-        // Normalize ball vector & force scaling to target speed and prevent clipping
-        const velLen = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
-        if (velLen > 0 && serveResumeAt === 0) {
-          ball.vx = (ball.vx / velLen) * currentSpeed;
-          ball.vy = (ball.vy / velLen) * currentSpeed;
+        if (serveResumeAt === 0) {
+          normalizeBallSpeed(ball, currentSpeed);
         }
         updatePointMultiplier();
         updateMusicLoop(timeNow);
@@ -2374,38 +2672,32 @@ export default function App() {
         const halfAiLenX = (rackets.top.length * aiScale) / 2;
 
         const profile = getLevelProfile(currentLevel);
-        const levelPressureForAI = clamp((currentLevel - 1) / (MAX_LEVEL - 1), 0, 1);
-        let trackingAlpha = 0.08 + profile.aiTrackingBonus;
-        let aiSpeedFactor = 0.65 + profile.aiSpeedBonus + levelPressureForAI * 0.12;
-        let predictionLead = 0.035 + levelPressureForAI * 0.13;
-        let trackingNoise = 22 - levelPressureForAI * 16;
-        if (difficultyRef.current === "casual") {
-          trackingAlpha = 0.055 + profile.aiTrackingBonus * 0.65;
-          aiSpeedFactor = 0.45 + profile.aiSpeedBonus * 0.7;
-          predictionLead *= 0.55;
-          trackingNoise += 8;
-        } else if (difficultyRef.current === "impossible") {
-          trackingAlpha = 0.15 + profile.aiTrackingBonus * 1.2;
-          aiSpeedFactor = 0.85 + profile.aiSpeedBonus * 1.15;
-          predictionLead *= 1.45;
-          trackingNoise *= 0.45;
-        }
-
-        const maxAiSpeed = currentSpeed * aiSpeedFactor;
-        const aiNoiseY = Math.sin(timeNow * 0.0027 + currentLevel) * trackingNoise;
-        const aiNoiseX = Math.cos(timeNow * 0.0023 + currentLevel * 1.7) * trackingNoise;
-        const targetAiY = ball.y + (ball.vx > 0 ? ball.vy * predictionLead : 0) + aiNoiseY;
-        const targetAiX = ball.x + (ball.vy > 0 ? ball.vx * predictionLead : 0) + aiNoiseX;
+        const aiParams = computeAiTrackingParams(
+          difficultyRef.current,
+          currentLevel,
+          MAX_LEVEL,
+          profile,
+        );
+        const maxAiSpeed = currentSpeed * aiParams.aiSpeedFactor;
+        const { targetY: targetAiY, targetX: targetAiX } = computeAiTargetOffset(
+          ball.x,
+          ball.y,
+          ball.vx,
+          ball.vy,
+          aiParams,
+          timeNow,
+          currentLevel,
+        );
 
         // Right Racket moves along vertical coordinate (AI side)
         const diffY = targetAiY - rackets.right.y;
-        const trackY = diffY * trackingAlpha; // Smooth inertia tracking
+        const trackY = diffY * aiParams.trackingAlpha;
         const clampedTrackY = Math.sign(trackY) * Math.min(Math.abs(trackY), maxAiSpeed * dt);
         rackets.right.y = Math.max(-height / 2 + halfAiLenY + 30, Math.min(height / 2 - halfAiLenY - 30, rackets.right.y + clampedTrackY));
 
         // Top Racket moves along horizontal coordinate (AI side)
         const diffX = targetAiX - rackets.top.x;
-        const trackX = diffX * trackingAlpha;
+        const trackX = diffX * aiParams.trackingAlpha;
         const clampedTrackX = Math.sign(trackX) * Math.min(Math.abs(trackX), maxAiSpeed * dt);
         rackets.top.x = Math.max(-width / 2 + halfAiLenX + 30, Math.min(width / 2 - halfAiLenX - 30, rackets.top.x + clampedTrackX));
 
@@ -2466,70 +2758,30 @@ export default function App() {
         cornerTutorialFlash = Math.max(0, cornerTutorialFlash - dt * 2.8);
         cornerRailMaterial.opacity = Math.max(railPulse, cornerTutorialFlash * 0.85);
       }
+      updateCenterMotif(timeNow);
       updateMonsterSystem(timeNow, dt);
       updatePlayerShots(dt);
       syncHudToReact();
 
-      // --- COLLISION RESOLUTION: RACKETS ---
-      const maxBounceShift = Math.PI / 4; // 45-degree redirection
-      const applyRacketImpulse = (
-        axis: "x" | "y",
-        tangentVelocity: number,
-        owner: "player" | "ai",
-      ) => {
-        const spin = clamp(tangentVelocity / 1100, -1, 1);
-        const power = Math.abs(spin);
-        if (axis === "x") {
-          ball.vx += tangentVelocity * 0.2 + spin * currentSpeed * 0.14;
-        } else {
-          ball.vy += tangentVelocity * 0.2 + spin * currentSpeed * 0.14;
-        }
-        ball.curveSpin = clamp(
-          ball.curveSpin + spin * CURVE_HIT_GAIN,
-          -CURVE_SPIN_MAX,
-          CURVE_SPIN_MAX,
-        );
-
-        const speed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
-        if (speed > 0) {
-          const boostedSpeed = currentSpeed * (1 + power * 0.07);
-          ball.vx = (ball.vx / speed) * boostedSpeed;
-          ball.vy = (ball.vy / speed) * boostedSpeed;
-        }
-        if (power > 0.14) {
-          shakeIntensity = Math.max(shakeIntensity, 2 + power * 4);
-        }
-        playHitSound(power, owner);
-      };
-
       const handlePlayerCornerHit = (side: "left" | "bottom") => {
         const otherSide = side === "left" ? "bottom" : "left";
         const timeSinceOther = lastPlayerHitSide === otherSide ? (timeNow - lastPlayerHitAt) : Number.POSITIVE_INFINITY;
-        const comboWindow = 1250;
-        if (timeSinceOther < comboWindow) {
-          const intensity = clamp(1 - timeSinceOther / comboWindow, 0.2, 1);
-          const speed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
-          if (speed > 0) {
-            const boost = 1 + intensity * 0.075;
-            ball.vx *= boost;
-            ball.vy *= boost;
-          }
+        const comboIntensity = cornerComboIntensity(timeSinceOther);
+        if (comboIntensity !== null) {
+          applyCornerComboBoost(ball, comboIntensity);
           cornerComboPulse = Math.max(cornerComboPulse, 1);
           cornerComboCount += 1;
           if (!cornerTutorialSeen) {
             cornerTutorialSeen = true;
             cornerTutorialFlash = 1.35;
           }
-          shakeIntensity = Math.max(shakeIntensity, 5 + intensity * 6);
-          playCornerComboSound(intensity);
+          shakeIntensity = Math.max(shakeIntensity, 5 + comboIntensity * 6);
+          playCornerComboSound(comboIntensity);
           spawnSparks(ball.x, ball.y, COLOR_WIN_GREEN);
           spawnSparks(ball.x, ball.y, COLOR_PLAYER);
         }
 
-        const panicDistance = side === "left"
-          ? Math.abs((ball.x - ballSize / 2) - (-width / 2))
-          : Math.abs((ball.y - ballSize / 2) - (-height / 2));
-        if (panicDistance < 54) {
+        if (isPanicSave(side, ball.x, ball.y, ballSize, width, height)) {
           cornerComboPulse = Math.max(cornerComboPulse, 0.75);
           shakeIntensity = Math.max(shakeIntensity, 9);
           playPanicSaveSound();
@@ -2548,11 +2800,17 @@ export default function App() {
         if (ball.y >= rackets.left.y - currentLen / 2 && ball.y <= rackets.left.y + currentLen / 2) {
           ball.x = rackets.left.x + rackets.left.thickness / 2 + ballSize / 2;
           const intersectY = (rackets.left.y - ball.y) / (currentLen / 2);
-          const bounceAngle = Math.max(-1, Math.min(1, intersectY)) * maxBounceShift;
           const realSpeed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
-          ball.vx = Math.abs(Math.cos(bounceAngle) * realSpeed);
-          ball.vy = -Math.sin(bounceAngle) * realSpeed;
-          applyRacketImpulse("y", racketVelocity.left.y, "player");
+          ({ vx: ball.vx, vy: ball.vy } = bounceVelocityOffRacket("left", intersectY, realSpeed));
+          {
+            const power = applyRacketImpulse(ball, "y", racketVelocity.left.y, currentSpeed);
+            if (power > 0.14) shakeIntensity = Math.max(shakeIntensity, 2 + power * 4);
+            playHitSound(power, "player");
+          }
+          triggerBallGlint(
+            COLOR_PLAYER,
+            applyNaturalRacketDeflection(ball, "y", -intersectY, racketVelocity.left.y, currentSpeed, timeNow),
+          );
           handlePlayerCornerHit("left");
           addRescuePoints();
           spawnSparks(ball.x, ball.y, COLOR_PLAYER);
@@ -2572,11 +2830,17 @@ export default function App() {
         if (ball.x >= rackets.bottom.x - currentLen / 2 && ball.x <= rackets.bottom.x + currentLen / 2) {
           ball.y = rackets.bottom.y + rackets.bottom.thickness / 2 + ballSize / 2;
           const intersectX = (ball.x - rackets.bottom.x) / (currentLen / 2);
-          const bounceAngle = Math.max(-1, Math.min(1, intersectX)) * maxBounceShift;
           const realSpeed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
-          ball.vx = Math.sin(bounceAngle) * realSpeed;
-          ball.vy = Math.abs(Math.cos(bounceAngle) * realSpeed);
-          applyRacketImpulse("x", racketVelocity.bottom.x, "player");
+          ({ vx: ball.vx, vy: ball.vy } = bounceVelocityOffRacket("bottom", intersectX, realSpeed));
+          {
+            const power = applyRacketImpulse(ball, "x", racketVelocity.bottom.x, currentSpeed);
+            if (power > 0.14) shakeIntensity = Math.max(shakeIntensity, 2 + power * 4);
+            playHitSound(power, "player");
+          }
+          triggerBallGlint(
+            COLOR_PLAYER,
+            applyNaturalRacketDeflection(ball, "x", intersectX, racketVelocity.bottom.x, currentSpeed, timeNow),
+          );
           handlePlayerCornerHit("bottom");
           addRescuePoints();
           spawnSparks(ball.x, ball.y, COLOR_PLAYER);
@@ -2596,11 +2860,17 @@ export default function App() {
         if (ball.y >= rackets.right.y - currentLen / 2 && ball.y <= rackets.right.y + currentLen / 2) {
           ball.x = rackets.right.x - rackets.right.thickness / 2 - ballSize / 2;
           const intersectY = (rackets.right.y - ball.y) / (currentLen / 2);
-          const bounceAngle = Math.max(-1, Math.min(1, intersectY)) * maxBounceShift;
           const realSpeed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
-          ball.vx = -Math.abs(Math.cos(bounceAngle) * realSpeed);
-          ball.vy = -Math.sin(bounceAngle) * realSpeed;
-          applyRacketImpulse("y", racketVelocity.right.y, "ai");
+          ({ vx: ball.vx, vy: ball.vy } = bounceVelocityOffRacket("right", intersectY, realSpeed));
+          {
+            const power = applyRacketImpulse(ball, "y", racketVelocity.right.y, currentSpeed);
+            if (power > 0.14) shakeIntensity = Math.max(shakeIntensity, 2 + power * 4);
+            playHitSound(power, "ai");
+          }
+          triggerBallGlint(
+            COLOR_AI,
+            applyNaturalRacketDeflection(ball, "y", -intersectY, racketVelocity.right.y, currentSpeed, timeNow),
+          );
           spawnSparks(ball.x, ball.y, COLOR_AI);
           shakeIntensity = Math.max(shakeIntensity, 2);
         }
@@ -2614,11 +2884,17 @@ export default function App() {
         if (ball.x >= rackets.top.x - currentLen / 2 && ball.x <= rackets.top.x + currentLen / 2) {
           ball.y = rackets.top.y - rackets.top.thickness / 2 - ballSize / 2;
           const intersectX = (ball.x - rackets.top.x) / (currentLen / 2);
-          const bounceAngle = Math.max(-1, Math.min(1, intersectX)) * maxBounceShift;
           const realSpeed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
-          ball.vx = Math.sin(bounceAngle) * realSpeed;
-          ball.vy = -Math.abs(Math.cos(bounceAngle) * realSpeed);
-          applyRacketImpulse("x", racketVelocity.top.x, "ai");
+          ({ vx: ball.vx, vy: ball.vy } = bounceVelocityOffRacket("top", intersectX, realSpeed));
+          {
+            const power = applyRacketImpulse(ball, "x", racketVelocity.top.x, currentSpeed);
+            if (power > 0.14) shakeIntensity = Math.max(shakeIntensity, 2 + power * 4);
+            playHitSound(power, "ai");
+          }
+          triggerBallGlint(
+            COLOR_AI,
+            applyNaturalRacketDeflection(ball, "x", intersectX, racketVelocity.top.x, currentSpeed, timeNow),
+          );
           spawnSparks(ball.x, ball.y, COLOR_AI);
           shakeIntensity = Math.max(shakeIntensity, 2);
         }
@@ -2702,33 +2978,14 @@ export default function App() {
           }
         }
       } else {
-        // SOLITAIRE OUTBOUNDS RECOVERY: Ball ricochets on true borders during INTRO
-        if (ball.x - ballSize / 2 < -width / 2) {
-          ball.x = -width / 2 + ballSize / 2;
-          ball.vx = Math.abs(ball.vx);
-          ball.curveSpin *= -0.35;
-        } else if (ball.x + ballSize / 2 > width / 2) {
-          ball.x = width / 2 - ballSize / 2;
-          ball.vx = -Math.abs(ball.vx);
-          ball.curveSpin *= -0.35;
-        }
-
-        if (ball.y - ballSize / 2 < -height / 2) {
-          ball.y = -height / 2 + ballSize / 2;
-          ball.vy = Math.abs(ball.vy);
-          ball.curveSpin *= -0.35;
-        } else if (ball.y + ballSize / 2 > height / 2) {
-          ball.y = height / 2 - ballSize / 2;
-          ball.vy = -Math.abs(ball.vy);
-          ball.curveSpin *= -0.35;
-        }
+        ricochetIntroBounds(ball, ballSize, width, height);
       }
 
       // --- AXIS-ALIGNED COLLISION RESOLUTION: BRICKS ---
       // Single continuous collection hosting standard bricks and active score objects
       const activeBricks = currentState === GameState.END_SCREEN
         ? [...endBricks]
-        : [...bricks, ...scoreBricks];
+        : [...bricks, ...scoreBricks, ...centerMotifBricks];
       let brickHitResolved = false;
 
       for (let i = 0; i < activeBricks.length; i++) {
@@ -2761,33 +3018,17 @@ export default function App() {
         const overlapY = Math.min(ball.y + halfBS, bMaxY) - Math.max(ball.y - halfBS, bMinY);
 
         if (overlapX > 0 && overlapY > 0) {
-          // Intersection resolved! Calculate minimal axis of displacement
-          if (overlapX < overlapY) {
-            // Push along X-axis
-            if (ball.x < b.x) {
-              ball.x -= overlapX;
-              ball.vx = -Math.abs(ball.vx);
-            } else {
-              ball.x += overlapX;
-              ball.vx = Math.abs(ball.vx);
-            }
-            ball.curveSpin *= -0.45;
-          } else {
-            // Push along Y-axis
-            if (ball.y < b.y) {
-              ball.y -= overlapY;
-              ball.vy = -Math.abs(ball.vy);
-            } else {
-              ball.y += overlapY;
-              ball.vy = Math.abs(ball.vy);
-            }
-            ball.curveSpin *= -0.45;
-          }
-          ball.curveSpin = clamp(ball.curveSpin, -CURVE_SPIN_MAX, CURVE_SPIN_MAX);
+          resolveBrickBallCollision(ball, b.x, b.y, overlapX, overlapY);
 
           // Damage logic for active bricks, score digits, and end typography.
           if (b.hitsLeft > 0) {
-            const ownerColor = b.scoreOwner === "player" ? COLOR_PLAYER : b.scoreOwner === "ai" ? COLOR_AI : COLOR_INTRO_DEAD;
+            const ownerColor = b.scoreOwner === "player"
+              ? COLOR_PLAYER
+              : b.scoreOwner === "ai"
+                ? COLOR_AI
+                : b.isCenterMotif
+                  ? (b.color ?? COLOR_INTRO_ACTIVE)
+                  : COLOR_INTRO_DEAD;
             const wasOneHitFromDeath = b.hitsLeft <= 1;
             damageBrick(b, ownerColor, b.scoreOwner ?? "brick");
             if (b.isMonster) {
@@ -2951,6 +3192,17 @@ export default function App() {
         devLevelRequestRef.current = 2;
         return;
       }
+      if (currentState === GameState.END_SCREEN && endActionRef.current === "retry") {
+        if (e.key.toLowerCase() === "y") {
+          requestRetryYes();
+          return;
+        }
+        if (e.key.toLowerCase() === "n") {
+          requestAcceptAiWins();
+          return;
+        }
+        return;
+      }
       if (e.code === "Space") {
         e.preventDefault();
         if (
@@ -2977,7 +3229,10 @@ export default function App() {
         return;
       }
       if (currentState === GameState.END_SCREEN) {
-        endActionRequestRef.current = endOutcome === "player" ? "next" : "retry";
+        if (endOutcome === "player") {
+          endActionRequestRef.current = "next";
+        }
+        return;
       } else if (
         currentState === GameState.INTRO_TWISTED ||
         currentState === GameState.INTRO_STACKS ||
@@ -3022,11 +3277,21 @@ export default function App() {
       // Deep geometry and material release to avoid GPU leaks
       bricks.forEach((b) => { if (b.mesh) scene.remove(b.mesh); });
       scoreBricks.forEach((sb) => { if (sb.mesh) scene.remove(sb.mesh); });
+      centerMotifBricks.forEach((brick) => { if (brick.mesh) scene.remove(brick.mesh); });
       endBricks.forEach((eb) => { if (eb.mesh) scene.remove(eb.mesh); });
       countdownMeshes.forEach((mesh) => scene.remove(mesh));
       particles.forEach((p) => { if (p.mesh) scene.remove(p.mesh); });
       monsterShots.forEach((shot) => scene.remove(shot.mesh));
       playerShots.forEach((shot) => scene.remove(shot.mesh));
+      scene.remove(ballGlintMesh);
+      if (levelIntroOverlayMesh) {
+        scene.remove(levelIntroOverlayMesh);
+        levelIntroOverlayMesh.geometry.dispose();
+        if (levelIntroOverlayMesh.material instanceof THREE.Material) {
+          levelIntroOverlayMesh.material.dispose();
+        }
+        levelIntroOverlayMesh = null;
+      }
 
       verticalGeom.dispose();
       horizontalGeom.dispose();
@@ -3040,6 +3305,8 @@ export default function App() {
       cornerRailAiMaterial.dispose();
       ballGeometry.dispose();
       ballMaterial.dispose();
+      ballGlintGeometry.dispose();
+      ballGlintMaterial.dispose();
       paintDripGeom.dispose();
       paintDripMat.dispose();
       monsterEyeMaterial.dispose();
@@ -3113,7 +3380,10 @@ export default function App() {
 
           <section className="showroom-hero">
             <div className="showroom-kicker">TWISTEDSTACKS // SANDVIKEN AI LAB</div>
-            <h1>Useful systems with a TWISTED edge.</h1>
+            <h1 className="showroom-hero-title">
+              <span>Useful systems.</span>
+              <span className="showroom-hero-twist">TWISTED edge.</span>
+            </h1>
             <p className="showroom-lede">
               Local AI, legal workflows, grant tooling, voice-first interfaces, defensive research, and small polished
               sites. Built by Per Brinell as a practical showroom rather than a pitch deck.
@@ -3228,7 +3498,12 @@ export default function App() {
 
       {(showGame || highScores.length > 0) && (
         <aside className={`pongg-scoreboard ${showGame ? "is-game" : "is-showroom"}`} aria-label="Twisted Pongg scoreboard">
-          <div className="pongg-scoreboard-title">Top 5</div>
+          <div className="pongg-scoreboard-title">
+            Top 5
+            <span className={`pongg-scoreboard-badge ${leaderboardMode === "global" ? "is-global" : "is-local"}`}>
+              {leaderboardMode === "global" ? "Global" : "Local"}
+            </span>
+          </div>
           {highScores.length > 0 ? (
             <ol>
               {highScores.map((entry, index) => (
@@ -3278,34 +3553,53 @@ export default function App() {
 
       {endAction && (
         <div className="absolute bottom-8 left-1/2 z-40 flex -translate-x-1/2 items-center gap-3 pointer-events-auto">
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (!showGame) {
+          {!showGame ? (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
                 startTwistedPongg();
-                return;
-              }
-              endActionRequestRef.current = endAction;
-            }}
-            className={`rounded-sm border px-5 py-2 font-mono text-[10px] uppercase tracking-[0.28em] backdrop-blur-sm transition-all duration-150 ${
-              !showGame
-                ? "border-yellow-300/30 bg-yellow-300/10 text-yellow-200 hover:border-yellow-200 hover:text-yellow-50"
-                : endAction === "next"
-                ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300 hover:border-emerald-300 hover:text-emerald-100"
-                : "border-red-500/30 bg-red-500/10 text-red-300 hover:border-red-400 hover:text-red-100"
-            }`}
-          >
-            {!showGame
-              ? "Play Twisted Pongg"
-              : endAction === "next"
-              ? hud.level < MAX_LEVEL
-                ? `Level ${Math.min(hud.level + 1, MAX_LEVEL)}`
-                : "Next Level"
-              : endAction === "champion"
-                ? "Open Vault"
-                : "Try Again"}
-          </button>
+              }}
+              className="rounded-sm border border-yellow-300/30 bg-yellow-300/10 px-5 py-2 font-mono text-[10px] uppercase tracking-[0.28em] text-yellow-200 backdrop-blur-sm transition-all duration-150 hover:border-yellow-200 hover:text-yellow-50"
+            >
+              Play Twisted Pongg
+            </button>
+          ) : endAction === "retry" ? (
+            <div className="retry-prompt-dock" onClick={(e) => e.stopPropagation()}>
+              <div className="retry-prompt-title">Retry level {hud.level}?</div>
+              <div className="retry-prompt-countdown" aria-live="polite">
+                {retryCountdown}
+              </div>
+              <div className="retry-prompt-actions">
+                <button type="button" className="retry-prompt-btn retry-prompt-yes" onClick={requestRetryYes}>
+                  Yes
+                </button>
+                <button type="button" className="retry-prompt-btn retry-prompt-loss" onClick={requestAcceptAiWins}>
+                  AI Wins
+                </button>
+              </div>
+              <div className="retry-prompt-hint">Y = retry · 0 = AI wins → level 1</div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                endActionRequestRef.current = endAction;
+              }}
+              className={`rounded-sm border px-5 py-2 font-mono text-[10px] uppercase tracking-[0.28em] backdrop-blur-sm transition-all duration-150 ${
+                endAction === "next"
+                  ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300 hover:border-emerald-300 hover:text-emerald-100"
+                  : "border-yellow-300/30 bg-yellow-300/10 text-yellow-200 hover:border-yellow-200 hover:text-yellow-50"
+              }`}
+            >
+              {endAction === "next"
+                ? hud.level < MAX_LEVEL
+                  ? `Level ${Math.min(hud.level + 1, MAX_LEVEL)}`
+                  : "Next Level"
+                : "Open Vault"}
+            </button>
+          )}
         </div>
       )}
 
@@ -3429,7 +3723,7 @@ export default function App() {
                 className="easter-vault-btn"
                 onClick={() => {
                   closeEasterEgg();
-                  endActionRequestRef.current = "retry";
+                  endActionRequestRef.current = "level1";
                 }}
               >
                 Play Again
