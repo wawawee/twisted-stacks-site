@@ -126,14 +126,25 @@ function loadScoreboard(): ScoreEntry[] {
 }
 
 function rankScoreboard(entries: ScoreEntry[]) {
-  return entries
-    .map((entry) => ({
+  const deduped = new Map<string, ScoreEntry>();
+
+  entries.forEach((entry) => {
+    const rankedEntry = {
       name: normalizePlayerName(entry.name) || "PLAYER",
       score: Math.max(0, Math.round(entry.score)),
       level: Math.max(1, Math.min(MAX_LEVEL, Math.round(entry.level || 1))),
       date: typeof entry.date === "string" ? entry.date : new Date().toISOString(),
-    }))
-    .filter((entry) => entry.score > 0)
+    };
+    if (rankedEntry.score <= 0) return;
+
+    const key = `${rankedEntry.name}:${rankedEntry.score}:${rankedEntry.level}`;
+    const current = deduped.get(key);
+    if (!current || rankedEntry.date.localeCompare(current.date) < 0) {
+      deduped.set(key, rankedEntry);
+    }
+  });
+
+  return [...deduped.values()]
     .sort((a, b) => b.score - a.score || b.level - a.level || a.date.localeCompare(b.date))
     .slice(0, SCOREBOARD_LIMIT);
 }
@@ -160,6 +171,10 @@ export interface ShowroomProject {
   contactMessage?: string;
 }
 
+function isExternalProjectHref(href: string) {
+  return /^https?:\/\//i.test(href);
+}
+
 const CATALOG_PROJECTS: ShowroomProject[] = [
   {
     id: "system_skatterevision",
@@ -174,7 +189,8 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
       { label: "DATA", value: "HISTORIC" },
       { label: "STATUS", value: "DEMO" }
     ],
-    actionLabel: "Book Demo",
+    href: "/skatterevision.html",
+    actionLabel: "Deep View",
     contactMessage: "Hej Per,\n\nJag vill boka en full demonstration av SkatteRevision-systemet.\n\n"
   },
   {
@@ -227,18 +243,19 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
   {
     id: "system_anslag",
     name: "ANSLAG",
-    version: "free grant helper",
+    version: "public grant demo / SITK",
     status: "SHIPPED",
-    tagline: "Find grants. Shape applications. Move practical projects forward.",
-    description: "A free public grant-search and application-writing service for founders, associations, local projects, and teams that need help turning ideas into fundable applications.",
-    techStack: ["React", "Vite", "OpenRouter", "Grants"],
+    tagline: "Discover grants. Draft applications. Free, and allowed to be slow.",
+    description:
+      "Live at anslag.twistedstacks.com for Sandvikens IT-Kår and anyone hunting funding: Exa-backed discovery, Swedish application drafts, and an OpenRouter free-model chain with Kimi first. Slower than paid consulting — by design.",
+    techStack: ["React", "Vite", "Exa", "OpenRouter"],
     telemetry: [
       { label: "TARGET", value: "FUNDING" },
-      { label: "MODEL", value: "FREE ROUTE" },
+      { label: "MODEL", value: "KIMI→FREE" },
       { label: "STATUS", value: "LIVE" }
     ],
-    href: "https://app-one-olive-53.vercel.app/",
-    actionLabel: "Live"
+    href: "https://anslag.twistedstacks.com/",
+    actionLabel: "Live Demo"
   },
   {
     id: "system_silversmeden",
@@ -253,7 +270,7 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
       { label: "STATUS", value: "LIVE" },
       { label: "TEXTURE", value: "CLEAN" }
     ],
-    href: "https://silversmeden.vercel.app/",
+    href: "https://silversmeden.twistedstacks.com/",
     actionLabel: "Live"
   },
   {
@@ -338,7 +355,7 @@ export default function App() {
           setLeaderboardMode("local");
           return;
         }
-        const nextScores = rankScoreboard([...remoteScores, ...highScoresRef.current]);
+        const nextScores = rankScoreboard(remoteScores);
         persistScoreboard(nextScores);
         highScoresRef.current = nextScores;
         setHighScores(nextScores);
@@ -3425,6 +3442,14 @@ export default function App() {
               >
                 Book Demo
               </button>
+              <a
+                className="showroom-action"
+                href="https://anslag.twistedstacks.com/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Try ANSLAG
+              </a>
               <button
                 type="button"
                 className="showroom-action"
@@ -3462,7 +3487,12 @@ export default function App() {
                     {project.telemetry[0]?.label}: <strong>{project.telemetry[0]?.value}</strong>
                   </div>
                   {project.href ? (
-                    <a href={project.href} target="_blank" rel="noreferrer">
+                    <a
+                      href={project.href}
+                      {...(isExternalProjectHref(project.href)
+                        ? { target: "_blank", rel: "noreferrer" }
+                        : {})}
+                    >
                       {project.actionLabel || "Open"}
                     </a>
                   ) : project.contactMessage ? (
@@ -3485,6 +3515,10 @@ export default function App() {
           </section>
 
           <section className="showroom-note">
+            <p>
+              Runnable demos live on their own subdomains. Info-only pages and PDFs can stay on the main site — see
+              SkatteRevision for that pattern.
+            </p>
             <p>
               KryptoArkeologi is intentionally not linked yet. It needs a private-data scrub first, then a stripped
               public edition.
@@ -3828,6 +3862,17 @@ export default function App() {
                           </span>
                         ))}
                       </div>
+                      {proj.href ? (
+                        <a
+                          href={proj.href}
+                          className="mt-3 inline-block text-[8px] font-mono tracking-widest uppercase text-[#06B6D4] hover:text-cyan-300"
+                          {...(isExternalProjectHref(proj.href)
+                            ? { target: "_blank", rel: "noreferrer" }
+                            : {})}
+                        >
+                          {proj.actionLabel || "Open"} →
+                        </a>
+                      ) : null}
                     </div>
                   </div>
                 </div>

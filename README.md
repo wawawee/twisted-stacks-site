@@ -1,6 +1,17 @@
 # TwistedStacks Showroom — TWISTED PONGG
 
-Playable Vite/React/Three.js front door for [twistedstacks.com](https://twistedstacks.com). The homepage is a **4-way tactical Pong duel** with brick typography, racket spin, and an in-game project catalog.
+Playable Vite/React/Three.js front door for [twistedstacks.com](https://twistedstacks.com). The landing page is a **project showroom**; TWISTED PONGG is the playable proof layer behind it.
+
+## Showroom routing
+
+| Pattern | Example | Where it lives |
+| --- | --- | --- |
+| Main showroom + game | [twistedstacks.com](https://www.twistedstacks.com) | This repo (`twisted-pongg` on Vercel) |
+| Info-only HTML/PDF | [skatterevision.twistedstacks.com](https://skatterevision.twistedstacks.com) | `public/skatterevision.html` via host rewrite in `middleware.ts` + `vercel.json` |
+| Runnable demo/app | [anslag.twistedstacks.com](https://anslag.twistedstacks.com) | Separate Vercel project: [wawawee/AnslagSITK](https://github.com/wawawee/AnslagSITK) |
+| Client site | [silversmeden.twistedstacks.com](https://silversmeden.twistedstacks.com) | Separate Vercel project |
+
+DNS notes: [docs/namecheap-dns.md](./docs/namecheap-dns.md)
 
 ## Local dev
 
@@ -20,25 +31,25 @@ npm run build
 
 ## Supabase leaderboard
 
-The browser app uses Supabase directly for the public Twisted Pongg leaderboard, with `localStorage` fallback.
+The browser app uses `/api/leaderboard` for the public Twisted Pongg leaderboard, with `localStorage` fallback if the API is unavailable.
 
-Required Vite env vars:
+Required Vercel env vars:
 
 ```bash
-VITE_SUPABASE_URL=https://oeppjpbaafjsowecyjho.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_FMyVbwnJdeP0iuL5DY1P0Q_zFYwmggo
+SUPABASE_URL=https://oeppjpbaafjsowecyjho.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=...
 ```
 
 Run [supabase/leaderboard.sql](./supabase/leaderboard.sql) once in the Supabase SQL Editor.
 
-Do not expose the Supabase secret/service role key in Vite. Only `VITE_` variables are bundled into the browser.
+Do not expose the Supabase secret/service role key in Vite. Anything with a `VITE_` prefix is bundled into the browser.
 
 ## Deploy (Vercel)
 
 - Repo: [wawawee/twisted-stacks-site](https://github.com/wawawee/twisted-stacks-site) (public)
 - Project: `twisted-pongg` → [twistedstacks.com](https://www.twistedstacks.com)
 - Build: `npm run build` → `dist`
-- SPA rewrites: `vercel.json`
+- SPA rewrites and `/api/leaderboard`: `vercel.json`
 
 No API keys in the app. Contact: `mailto:hello@twistedstacks.com`.
 

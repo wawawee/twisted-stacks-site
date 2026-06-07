@@ -1,5 +1,3 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-
 export interface ScoreEntry {
   name: string;
   score: number;
@@ -14,74 +12,46 @@ export interface ScoreSubmission {
   outcome: "lost" | "champion";
 }
 
-interface ScoreRow {
-  name: string;
-  score: number;
-  level: number;
-  created_at: string;
+interface LeaderboardResponse {
+  scores?: ScoreEntry[];
+  error?: string;
 }
 
-const TABLE_NAME = "pongg_scores";
-
-let supabaseClient: SupabaseClient | null | undefined;
-
-function getSupabaseClient() {
-  if (supabaseClient !== undefined) return supabaseClient;
-
-  const url = import.meta.env.VITE_SUPABASE_URL?.trim();
-  const publishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY?.trim();
-
-  if (!url || !publishableKey) {
-    supabaseClient = null;
-    return supabaseClient;
-  }
-
-  supabaseClient = createClient(url, publishableKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
-  return supabaseClient;
-}
+const LEADERBOARD_API_PATH = import.meta.env.VITE_LEADERBOARD_API_PATH || "/api/leaderboard";
 
 export function isRemoteLeaderboardConfigured() {
-  return getSupabaseClient() !== null;
+  return LEADERBOARD_API_PATH.trim().length > 0;
+}
+
+function normalizeLimit(limit: number) {
+  return Math.max(1, Math.min(10, Math.round(limit || 5)));
+}
+
+async function parseLeaderboardResponse(response: Response): Promise<ScoreEntry[]> {
+  const payload = (await response.json()) as LeaderboardResponse;
+  if (!response.ok) {
+    throw new Error(payload.error || "Remote leaderboard unavailable.");
+  }
+  return Array.isArray(payload.scores) ? payload.scores : [];
 }
 
 export async function fetchRemoteScores(limit: number): Promise<ScoreEntry[]> {
-  const client = getSupabaseClient();
-  if (!client) return [];
-
-  const { data, error } = await client
-    .from(TABLE_NAME)
-    .select("name,score,level,created_at")
-    .order("score", { ascending: false })
-    .order("level", { ascending: false })
-    .order("created_at", { ascending: true })
-    .limit(limit);
-
-  if (error) throw error;
-
-  return ((data ?? []) as ScoreRow[]).map((row) => ({
-    name: row.name,
-    score: row.score,
-    level: row.level,
-    date: row.created_at,
-  }));
+  const query = new URLSearchParams({ limit: String(normalizeLimit(limit)) });
+  const response = await fetch(`${LEADERBOARD_API_PATH}?${query.toString()}`, {
+    headers: { Accept: "application/json" },
+  });
+  return parseLeaderboardResponse(response);
 }
 
 export async function submitRemoteScore(submission: ScoreSubmission, limit: number): Promise<ScoreEntry[]> {
-  const client = getSupabaseClient();
-  if (!client) return [];
-
-  const { error } = await client.from(TABLE_NAME).insert({
-    name: submission.name,
-    score: submission.score,
-    level: submission.level,
-    outcome: submission.outcome,
+  const query = new URLSearchParams({ limit: String(normalizeLimit(limit)) });
+  const response = await fetch(`${LEADERBOARD_API_PATH}?${query.toString()}`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(submission),
   });
-
-  if (error) throw error;
-  return fetchRemoteScores(limit);
+  return parseLeaderboardResponse(response);
 }

@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SkatteRevision - TwistedStacks</title>
+    <meta
+      name="description"
+      content="SkatteRevision is an audit-grade lead intelligence and dossier engine for retroactive Swedish tax recovery research."
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #050505;
+        --ink: #f4f4f5;
+        --muted: #a1a1aa;
+        --line: rgba(244, 244, 245, 0.13);
+        --panel: rgba(18, 18, 20, 0.84);
+        --panel-strong: rgba(28, 28, 32, 0.92);
+        --gold: #eab308;
+        --cyan: #22d3ee;
+        --green: #34d399;
+        --red: #fb7185;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        background: var(--bg);
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          linear-gradient(180deg, rgba(5, 5, 5, 0.6), #050505 34rem),
+          radial-gradient(circle at 78% 8%, rgba(34, 211, 238, 0.12), transparent 24rem),
+          radial-gradient(circle at 8% 22%, rgba(234, 179, 8, 0.12), transparent 22rem),
+          #050505;
+        color: var(--ink);
+        font-family:
+          Space Grotesk,
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        line-height: 1.5;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .shell {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid var(--line);
+        background: rgba(5, 5, 5, 0.82);
+        backdrop-filter: blur(16px);
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        min-height: 64px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .nav a {
+        text-decoration: none;
+        color: var(--muted);
+      }
+
+      .nav strong {
+        color: var(--gold);
+        font-weight: 600;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        min-height: calc(100vh - 64px);
+        padding: 58px 0 72px;
+      }
+
+      .kicker,
+      .eyebrow {
+        color: var(--cyan);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        margin-top: 18px;
+        max-width: 920px;
+        font-size: clamp(52px, 9vw, 112px);
+        line-height: 0.88;
+        letter-spacing: 0;
+      }
+
+      .lede {
+        max-width: 780px;
+        margin-top: 28px;
+        color: rgba(244, 244, 245, 0.82);
+        font-size: clamp(18px, 2vw, 23px);
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 34px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 0 18px;
+        border: 1px solid rgba(234, 179, 8, 0.42);
+        background: rgba(234, 179, 8, 0.12);
+        color: #fde68a;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-decoration: none;
+        text-transform: uppercase;
+      }
+
+      .btn.secondary {
+        border-color: rgba(244, 244, 245, 0.18);
+        background: rgba(244, 244, 245, 0.06);
+        color: var(--ink);
+      }
+
+      .instrument {
+        border: 1px solid var(--line);
+        background: var(--panel);
+        box-shadow: 0 26px 80px rgba(0, 0, 0, 0.38);
+      }
+
+      .screen {
+        padding: 22px;
+      }
+
+      .signal-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .metric {
+        min-height: 112px;
+        border: 1px solid var(--line);
+        background: rgba(5, 5, 5, 0.48);
+        padding: 14px;
+      }
+
+      .metric span {
+        display: block;
+        color: var(--muted);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .metric strong {
+        display: block;
+        margin-top: 10px;
+        color: var(--ink);
+        font-size: 24px;
+        line-height: 1.05;
+      }
+
+      section {
+        padding: 72px 0;
+        border-top: 1px solid var(--line);
+      }
+
+      h2 {
+        max-width: 820px;
+        font-size: clamp(32px, 5vw, 58px);
+        line-height: 0.95;
+      }
+
+      .section-lede {
+        max-width: 820px;
+        margin-top: 18px;
+        color: rgba(244, 244, 245, 0.74);
+        font-size: 18px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 32px;
+      }
+
+      .grid.two {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .card {
+        min-height: 210px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        padding: 22px;
+      }
+
+      .card h3 {
+        font-size: 22px;
+        line-height: 1.08;
+      }
+
+      .card p {
+        margin-top: 12px;
+        color: rgba(244, 244, 245, 0.7);
+      }
+
+      .card ul {
+        margin: 14px 0 0;
+        padding-left: 18px;
+        color: rgba(244, 244, 245, 0.72);
+      }
+
+      .card li + li {
+        margin-top: 7px;
+      }
+
+      .flow {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 32px;
+      }
+
+      .step {
+        border: 1px solid var(--line);
+        background: var(--panel-strong);
+        padding: 16px;
+        min-height: 148px;
+      }
+
+      .step span {
+        color: var(--gold);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 11px;
+      }
+
+      .step strong {
+        display: block;
+        margin-top: 12px;
+        font-size: 18px;
+      }
+
+      .step p {
+        margin-top: 10px;
+        color: rgba(244, 244, 245, 0.66);
+        font-size: 14px;
+      }
+
+      .band {
+        border: 1px solid rgba(34, 211, 238, 0.22);
+        background:
+          linear-gradient(90deg, rgba(34, 211, 238, 0.1), rgba(234, 179, 8, 0.08)),
+          rgba(12, 12, 14, 0.9);
+        padding: clamp(24px, 4vw, 42px);
+      }
+
+      .band p {
+        max-width: 900px;
+        margin-top: 14px;
+        color: rgba(244, 244, 245, 0.76);
+        font-size: 18px;
+      }
+
+      .split {
+        display: grid;
+        grid-template-columns: 0.82fr 1.18fr;
+        gap: clamp(22px, 4vw, 48px);
+        align-items: start;
+        margin-top: 32px;
+      }
+
+      .list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .item {
+        border: 1px solid var(--line);
+        background: rgba(5, 5, 5, 0.42);
+        padding: 14px 16px;
+      }
+
+      .item strong {
+        color: var(--ink);
+      }
+
+      .item p {
+        margin-top: 5px;
+        color: var(--muted);
+      }
+
+      footer {
+        border-top: 1px solid var(--line);
+        padding: 38px 0 52px;
+        color: var(--muted);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+      }
+
+      @media (max-width: 920px) {
+        .hero,
+        .grid,
+        .grid.two,
+        .flow,
+        .split {
+          grid-template-columns: 1fr;
+        }
+
+        .hero {
+          min-height: auto;
+          padding-top: 44px;
+        }
+
+        .flow {
+          gap: 12px;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .shell {
+          width: min(100% - 24px, 1180px);
+        }
+
+        .signal-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .nav {
+          align-items: flex-start;
+          flex-direction: column;
+          justify-content: center;
+          padding: 12px 0;
+        }
+
+        section {
+          padding: 54px 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav class="shell nav" aria-label="SkatteRevision navigation">
+        <a href="/">TwistedStacks</a>
+        <strong>SkatteRevision</strong>
+        <a href="mailto:dev@twistedstacks.com?subject=SkatteRevision%20demo">Boka demo</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="shell hero">
+        <div>
+          <div class="kicker">Audit-grade lead intelligence / local demo</div>
+          <h1>Retroaktiv skattepotential, sourcad för granskning.</h1>
+          <p class="lede">
+            SkatteRevision analyserar historiska svenska bolagsdata, iXBRL-årsredovisningar, domänregler och
+            myndighetssignaler för att hitta återbetalningscase som revisionsbyråer annars måste gräva fram manuellt.
+          </p>
+          <div class="hero-actions">
+            <a class="btn" href="mailto:dev@twistedstacks.com?subject=SkatteRevision%20demo">Boka lokal demo</a>
+            <a class="btn secondary" href="/assets/skatterevision-teaser.pdf">PDF</a>
+            <a class="btn secondary" href="/">Back to showroom</a>
+          </div>
+        </div>
+
+        <aside class="instrument" aria-label="SkatteRevision system summary">
+          <div class="screen">
+            <div class="eyebrow">System snapshot</div>
+            <div class="signal-grid">
+              <div class="metric">
+                <span>Primary use</span>
+                <strong>Lead + dossier engine</strong>
+              </div>
+              <div class="metric">
+                <span>Time horizon</span>
+                <strong>2019-2025</strong>
+              </div>
+              <div class="metric">
+                <span>Runtime</span>
+                <strong>Local Mac / iMac data vault</strong>
+              </div>
+              <div class="metric">
+                <span>Delivery</span>
+                <strong>Partner-ready evidence packs</strong>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section>
+        <div class="shell">
+          <h2>What it is, and what it is not.</h2>
+          <p class="section-lede">
+            SkatteRevision is not a public SaaS product and not a replacement for authorized tax advice. It is a
+            research and decision-support system that complements accountants, auditors, tax lawyers, and grant-backed
+            innovation partners.
+          </p>
+          <div class="grid">
+            <article class="card">
+              <h3>Lead intelligence</h3>
+              <p>
+                The system scans historical company signals to find where tax recovery work might be worth a human
+                professional's time.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Evidence-first dossiers</h3>
+              <p>
+                Outputs are designed as sourced workpapers: what was found, what legal basis applies, what is missing,
+                and why the next step is justified.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Private operational demo</h3>
+              <p>
+                The full system stays local because the data vault is large and valuable. Serious demos run directly
+                from the development machine.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="shell">
+          <div class="band">
+            <div class="eyebrow">Positioning</div>
+            <h2>We look backward. Most tools look forward.</h2>
+            <p>
+              Company databases usually sell current status. SkatteRevision works backward across fiscal years to find
+              missed positions, changed interpretations, hidden operational signals, and under-reviewed deductions.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="shell">
+          <h2>The four commercial recovery tracks.</h2>
+          <p class="section-lede">
+            Each track has different evidence requirements, risk gates, and professional handoff needs.
+          </p>
+          <div class="grid">
+            <article class="card">
+              <h3>FoU tax relief</h3>
+              <p>
+                Finds companies where R&D-like work appears in historical reporting but may not have been converted into
+                available payroll tax relief.
+              </p>
+              <ul>
+                <li>Development costs and intangible assets</li>
+                <li>Patent and technical staff signals</li>
+                <li>Six-year retroactive review window</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Industrial energy tax</h3>
+              <p>
+                Identifies manufacturing and process industries where electricity use, permits, and case law may support
+                recovery work.
+              </p>
+              <ul>
+                <li>SNI and process classification</li>
+                <li>SMP and environmental-report signals</li>
+                <li>Three-year retroactive review window</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Leasing VAT</h3>
+              <p>
+                Reviews vehicle and operating lease patterns for possible VAT recovery signals that require contract and
+                usage verification.
+              </p>
+              <ul>
+                <li>K3 lease disclosures</li>
+                <li>Vehicle registry enrichment</li>
+                <li>Human contract review handoff</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Property VAT adjustment</h3>
+              <p>
+                Searches for investment and property-use patterns where the 10-year adjustment mechanism may matter.
+              </p>
+              <ul>
+                <li>Asset and investment history</li>
+                <li>Taxable versus exempt revenue split</li>
+                <li>Building permit and property signals</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Risk and stop gates</h3>
+              <p>
+                Weak cases are stopped early. The system treats missing data as a sourcing task, not as permission to
+                invent a number.
+              </p>
+              <ul>
+                <li>Bankruptcy and enforcement checks</li>
+                <li>Data-quality scoring</li>
+                <li>Red-team challenge before output</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Partner handoff</h3>
+              <p>
+                The best output is not a final tax filing. It is a partner-ready dossier that lets a qualified advisor
+                decide whether to proceed.
+              </p>
+              <ul>
+                <li>Evidence manifest</li>
+                <li>Missing-data checklist</li>
+                <li>Client interview prompts</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="shell">
+          <h2>Pipeline from data vault to dossier.</h2>
+          <div class="flow" aria-label="SkatteRevision pipeline">
+            <div class="step">
+              <span>01</span>
+              <strong>Ingest</strong>
+              <p>Historical annual reports, iXBRL, registry snapshots, and local cache layers are normalized.</p>
+            </div>
+            <div class="step">
+              <span>02</span>
+              <strong>Index</strong>
+              <p>SQLite and vector stores make historical company signals queryable before any expensive research.</p>
+            </div>
+            <div class="step">
+              <span>03</span>
+              <strong>Route</strong>
+              <p>Hermes maps SNI and financial signals to the relevant specialist agents.</p>
+            </div>
+            <div class="step">
+              <span>04</span>
+              <strong>Challenge</strong>
+              <p>Risk-agent and Kritikern look for reasons the case should be killed or escalated.</p>
+            </div>
+            <div class="step">
+              <span>05</span>
+              <strong>Dossier</strong>
+              <p>Only high-quality cases become professional workpaper-style reports.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="shell">
+          <h2>The system has real machinery behind the pitch.</h2>
+          <div class="split">
+            <div>
+              <p class="section-lede">
+                The current codebase is a local, polyglot research platform rather than a clean product repository. That
+                is acceptable at this stage because the sellable asset is the data, the lead intelligence, and the
+                repeatable workflow.
+              </p>
+            </div>
+            <div class="list">
+              <div class="item">
+                <strong>Extraction layer</strong>
+                <p>Python iXBRL parsers, corruption handling, Swedish taxonomy mapping, and bulk processing scripts.</p>
+              </div>
+              <div class="item">
+                <strong>Index layer</strong>
+                <p>Local SQLite databases and vector indexes for fast historical lookup before web research.</p>
+              </div>
+              <div class="item">
+                <strong>Orchestration layer</strong>
+                <p>Express API, HermesOrchestrator, Azure AI Foundry routing, rate limiting, and agent prompts.</p>
+              </div>
+              <div class="item">
+                <strong>Evidence layer</strong>
+                <p>Core protocol, data-source hierarchy, insufficient-data handling, conflict checks, and PDF dossiers.</p>
+              </div>
+              <div class="item">
+                <strong>Operator layer</strong>
+                <p>Dashboard panels for leads, telemetry, knowledge, scoring, reports, scripts, and local data inspection.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="shell">
+          <h2>Why this is valuable to a partner.</h2>
+          <div class="grid two">
+            <article class="card">
+              <h3>For a revision or tax advisory firm</h3>
+              <p>
+                SkatteRevision can act as a second-look engine over existing and target-client portfolios. The firm
+                keeps the client relationship and professional sign-off; TwistedStacks supplies the discovery and
+                evidence-prep layer.
+              </p>
+            </article>
+            <article class="card">
+              <h3>For an employer or innovation funder</h3>
+              <p>
+                The system demonstrates applied AI in a concrete, revenue-linked domain: data engineering, legal
+                reasoning, local-first infrastructure, agent orchestration, and professional workflow design.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="shell">
+          <h2>Demo format.</h2>
+          <p class="section-lede">
+            A serious demo should not upload the data vault. It should run locally and show the workflow against a
+            sanitized or partner-approved company case.
+          </p>
+          <div class="grid">
+            <article class="card">
+              <h3>1. Pick a case</h3>
+              <p>Use a sanitized sample, a public company, or a partner-provided org number.</p>
+            </article>
+            <article class="card">
+              <h3>2. Show the chain</h3>
+              <p>Walk from local data lookup to agent routing, risk challenge, missing-data flags, and evidence notes.</p>
+            </article>
+            <article class="card">
+              <h3>3. Discuss handoff</h3>
+              <p>End with what a qualified advisor would need next: client interview, accounting files, contracts, or FOIA.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="shell">
+        SkatteRevision is a TwistedStacks research system. It provides decision support and sourced intelligence, not
+        legal, audit, or tax advice. Contact: dev@twistedstacks.com
+      </div>
+    </footer>
+  </body>
+</html>

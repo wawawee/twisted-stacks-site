@@ -10,21 +10,10 @@ create table if not exists public.pongg_scores (
 alter table public.pongg_scores enable row level security;
 
 drop policy if exists "Public can read Pongg leaderboard" on public.pongg_scores;
-create policy "Public can read Pongg leaderboard"
-  on public.pongg_scores
-  for select
-  using (true);
-
 drop policy if exists "Public can submit Pongg scores" on public.pongg_scores;
-create policy "Public can submit Pongg scores"
-  on public.pongg_scores
-  for insert
-  with check (
-    name ~ '^[A-Z0-9]{1,6}$'
-    and score between 1 and 10000000
-    and level between 1 and 9
-    and outcome in ('lost', 'champion')
-  );
+
+-- Leaderboard access now goes through Vercel /api/leaderboard with the Supabase
+-- service role key. Keep direct anon browser access closed.
 
 create index if not exists pongg_scores_rank_idx
   on public.pongg_scores (score desc, level desc, created_at asc);
