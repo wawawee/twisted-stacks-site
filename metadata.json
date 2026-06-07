@@ -1,0 +1,12 @@
+{
+  "name": "TwistedStacks",
+  "shortName": "TwistedStacks Showroom",
+  "description": "AI systems showroom for TwistedStacks: Skatterevision, LAGA, ANSLAG, Recon Search Assistant, THE-AI-BUTTON, Silversmeden, and playable TWISTED PONGG.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["webgl", "web-audio"],
+  "game": {
+    "title": "TWISTED PONGG",
+    "subtitle": "4-way tactical Pong duel",
+    "catalogId": "system_arena"
+  }
+}
