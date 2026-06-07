@@ -537,6 +537,27 @@ export default function App() {
     setFormError("");
   };
 
+  const openProjectDestination = (project: ShowroomProject) => {
+    if (project.href) {
+      if (isExternalProjectHref(project.href)) {
+        window.open(project.href, "_blank", "noopener,noreferrer");
+        return;
+      }
+      window.location.assign(project.href);
+      return;
+    }
+    if (project.contactMessage) {
+      openContactForm({ type: "QUERY", message: project.contactMessage });
+      return;
+    }
+    if (project.id === "system_arena") {
+      startTwistedPongg();
+    }
+  };
+
+  const isProjectActionable = (project: ShowroomProject) =>
+    Boolean(project.href || project.contactMessage || project.id === "system_arena");
+
   const championUnlockedRef = useRef(championUnlocked);
   championUnlockedRef.current = championUnlocked;
 
@@ -3469,8 +3490,27 @@ export default function App() {
             {CATALOG_PROJECTS.filter((project) => project.id !== "system_arena").map((project) => (
               <article
                 key={project.id}
-                className={`showroom-project ${selectedProjectId === project.id ? "is-selected" : ""}`}
+                className={`showroom-project ${selectedProjectId === project.id ? "is-selected" : ""} ${
+                  isProjectActionable(project) ? "is-actionable" : ""
+                }`}
                 onMouseEnter={() => setSelectedProjectId(project.id)}
+                onClick={() => {
+                  if (isProjectActionable(project)) openProjectDestination(project);
+                }}
+                onKeyDown={(event) => {
+                  if (!isProjectActionable(project)) return;
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    openProjectDestination(project);
+                  }
+                }}
+                role={isProjectActionable(project) ? "button" : undefined}
+                tabIndex={isProjectActionable(project) ? 0 : undefined}
+                aria-label={
+                  isProjectActionable(project)
+                    ? `${project.name}: ${project.actionLabel || "Open"}`
+                    : undefined
+                }
               >
                 <div className="showroom-project-topline">
                   <span>{project.version}</span>
@@ -3488,26 +3528,11 @@ export default function App() {
                   <div className="showroom-project-metric">
                     {project.telemetry[0]?.label}: <strong>{project.telemetry[0]?.value}</strong>
                   </div>
-                  {project.href ? (
-                    <a
-                      href={project.href}
-                      {...(isExternalProjectHref(project.href)
-                        ? { target: "_blank", rel: "noreferrer" }
-                        : {})}
-                    >
-                      {project.actionLabel || "Open"}
-                    </a>
-                  ) : project.contactMessage ? (
-                    <button
-                      type="button"
-                      onClick={() => openContactForm({ type: "QUERY", message: project.contactMessage })}
-                    >
-                      {project.actionLabel || "Contact"}
-                    </button>
-                  ) : project.id === "system_arena" ? (
-                    <button type="button" onClick={startTwistedPongg}>
-                      {project.actionLabel || "Open"}
-                    </button>
+                  {project.href || project.contactMessage || project.id === "system_arena" ? (
+                    <span className="showroom-project-cta">
+                      {project.actionLabel || (project.contactMessage ? "Contact" : "Open")}
+                      <span aria-hidden> →</span>
+                    </span>
                   ) : (
                     <span className="showroom-project-pending">{project.actionLabel || "Soon"}</span>
                   )}
@@ -3517,6 +3542,7 @@ export default function App() {
           </section>
 
           <section className="showroom-note">
+            <p>Click any project card to open its info page, live demo, or repo link.</p>
             <p>
               Runnable demos live on their own subdomains. Info-only pages and PDFs can stay on the main site — see
               SkatteRevision for that pattern.
@@ -3823,9 +3849,23 @@ export default function App() {
             {/* Grid layout of active systems in showrooms */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               {CATALOG_PROJECTS.map((proj) => (
-                <div 
-                  key={proj.id} 
-                  className="bg-[#050505]/60 border border-zinc-900 p-4 rounded-sm flex flex-col justify-between hover:border-zinc-800 hover:bg-zinc-950/20 transition-all duration-200"
+                <div
+                  key={proj.id}
+                  className={`bg-[#050505]/60 border border-zinc-900 p-4 rounded-sm flex flex-col justify-between hover:border-zinc-800 hover:bg-zinc-950/20 transition-all duration-200 ${
+                    isProjectActionable(proj) ? "cursor-pointer" : ""
+                  }`}
+                  onClick={() => {
+                    if (isProjectActionable(proj)) openProjectDestination(proj);
+                  }}
+                  onKeyDown={(event) => {
+                    if (!isProjectActionable(proj)) return;
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      openProjectDestination(proj);
+                    }
+                  }}
+                  role={isProjectActionable(proj) ? "button" : undefined}
+                  tabIndex={isProjectActionable(proj) ? 0 : undefined}
                 >
                   <div className="flex flex-col h-full justify-between">
                     <div>
@@ -3864,17 +3904,15 @@ export default function App() {
                           </span>
                         ))}
                       </div>
-                      {proj.href ? (
-                        <a
-                          href={proj.href}
-                          className="mt-3 inline-block text-[8px] font-mono tracking-widest uppercase text-[#06B6D4] hover:text-cyan-300"
-                          {...(isExternalProjectHref(proj.href)
-                            ? { target: "_blank", rel: "noreferrer" }
-                            : {})}
-                        >
-                          {proj.actionLabel || "Open"} →
-                        </a>
-                      ) : null}
+                      {isProjectActionable(proj) ? (
+                        <span className="mt-3 inline-block text-[8px] font-mono tracking-widest uppercase text-[#06B6D4]">
+                          {proj.actionLabel || (proj.contactMessage ? "Contact" : "Open")} →
+                        </span>
+                      ) : (
+                        <span className="mt-3 inline-block text-[8px] font-mono tracking-widest uppercase text-zinc-500">
+                          {proj.actionLabel || "Soon"}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>

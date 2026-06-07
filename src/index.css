@@ -384,13 +384,23 @@ html, body, #root {
   transition: border-color 0.16s ease, transform 0.16s ease, background 0.16s ease;
 }
 
+.showroom-project.is-actionable {
+  cursor: pointer;
+}
+
 .showroom-project:hover,
-.showroom-project.is-selected {
+.showroom-project.is-selected,
+.showroom-project.is-actionable:focus-visible {
   border-color: rgba(234, 179, 8, 0.34);
   background:
     linear-gradient(180deg, rgba(39, 39, 42, 0.58), rgba(5, 5, 5, 0.72)),
     rgba(5, 5, 5, 0.86);
   transform: translateY(-2px);
+}
+
+.showroom-project.is-actionable:focus-visible {
+  outline: 1px solid rgba(234, 179, 8, 0.55);
+  outline-offset: 2px;
 }
 
 .showroom-project-topline,
@@ -458,7 +468,8 @@ html, body, #root {
 }
 
 .showroom-project-footer a,
-.showroom-project-footer button {
+.showroom-project-footer button,
+.showroom-project-cta {
   border: 0;
   background: transparent;
   color: rgba(6, 182, 212, 0.92);
@@ -466,7 +477,25 @@ html, body, #root {
   letter-spacing: 0.18em;
   text-decoration: none;
   text-transform: uppercase;
-  cursor: pointer;
+  cursor: inherit;
+}
+
+.showroom-project-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid rgba(6, 182, 212, 0.28);
+  background: rgba(6, 182, 212, 0.08);
+  border-radius: 2px;
+}
+
+.showroom-project.is-actionable:hover .showroom-project-cta,
+.showroom-project.is-actionable:focus-visible .showroom-project-cta {
+  color: rgba(103, 232, 249, 0.98);
+  border-color: rgba(103, 232, 249, 0.42);
+  background: rgba(6, 182, 212, 0.14);
 }
 
 .showroom-project-pending {
