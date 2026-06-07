@@ -8,6 +8,7 @@ Vercel already has these custom domains assigned to the right projects:
 | `anslag.twistedstacks.com` | `app` | `https://anslag.twistedstacks.com` |
 | `silversmeden.twistedstacks.com` | `silversmeden` | `https://silversmeden.vercel.app` |
 | `skatterevision.twistedstacks.com` | `twisted-pongg` host rewrite | `https://www.twistedstacks.com/skatterevision.html` |
+| `recon.twistedstacks.com` | `recon-search-assistant` (when ready) | Not live yet — info at `/recon.html` on main site |
 
 ## Add These Records In Namecheap
 

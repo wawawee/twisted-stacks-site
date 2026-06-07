@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recon Search Assistant - TwistedStacks</title>
+    <meta
+      name="description"
+      content="Recon Search Assistant — authorized defensive security research lab. Paused from public demo until API keys and scope controls are production-ready on Vercel."
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #050505;
+        --ink: #f4f4f5;
+        --muted: #a1a1aa;
+        --line: rgba(244, 244, 245, 0.13);
+        --panel: rgba(18, 18, 20, 0.84);
+        --gold: #eab308;
+        --cyan: #22d3ee;
+        --green: #34d399;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          linear-gradient(180deg, rgba(5, 5, 5, 0.6), #050505 34rem),
+          radial-gradient(circle at 80% 12%, rgba(52, 211, 153, 0.1), transparent 24rem),
+          #050505;
+        color: var(--ink);
+        font-family: Space Grotesk, Inter, ui-sans-serif, system-ui, sans-serif;
+        line-height: 1.5;
+      }
+
+      body.lang-en .i18n-sv,
+      body.lang-sv .i18n-en {
+        display: none !important;
+      }
+
+      .shell {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid var(--line);
+        background: rgba(5, 5, 5, 0.82);
+        backdrop-filter: blur(16px);
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        min-height: 64px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .nav a {
+        text-decoration: none;
+        color: var(--muted);
+      }
+
+      .nav strong {
+        color: var(--green);
+        font-weight: 600;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+
+      .lang-switch {
+        display: inline-flex;
+        border: 1px solid var(--line);
+      }
+
+      .lang-switch button {
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        font: inherit;
+        padding: 8px 10px;
+        cursor: pointer;
+      }
+
+      .lang-switch button.is-active {
+        color: var(--gold);
+        background: rgba(234, 179, 8, 0.1);
+      }
+
+      .hero {
+        padding: 58px 0 72px;
+        min-height: calc(100vh - 64px);
+      }
+
+      .kicker,
+      .eyebrow {
+        color: var(--cyan);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 18px 0 0;
+        max-width: 920px;
+        font-size: clamp(40px, 8vw, 88px);
+        line-height: 0.92;
+      }
+
+      .lede {
+        max-width: 780px;
+        margin-top: 28px;
+        color: rgba(244, 244, 245, 0.82);
+        font-size: clamp(18px, 2vw, 23px);
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 34px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        min-height: 42px;
+        padding: 0 18px;
+        border: 1px solid rgba(52, 211, 153, 0.42);
+        background: rgba(52, 211, 153, 0.1);
+        color: #a7f3d0;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-decoration: none;
+        text-transform: uppercase;
+      }
+
+      .btn.secondary {
+        border-color: rgba(244, 244, 245, 0.18);
+        background: rgba(244, 244, 245, 0.06);
+        color: var(--ink);
+      }
+
+      section {
+        padding: 72px 0;
+        border-top: 1px solid var(--line);
+      }
+
+      h2 {
+        font-size: clamp(30px, 5vw, 52px);
+        line-height: 0.95;
+        margin: 0;
+      }
+
+      .section-lede {
+        max-width: 820px;
+        margin-top: 18px;
+        color: rgba(244, 244, 245, 0.74);
+        font-size: 18px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 32px;
+      }
+
+      .card {
+        border: 1px solid var(--line);
+        background: var(--panel);
+        padding: 22px;
+        min-height: 180px;
+      }
+
+      .card h3 {
+        margin: 0;
+        font-size: 20px;
+      }
+
+      .card p,
+      .card ul {
+        margin: 12px 0 0;
+        color: rgba(244, 244, 245, 0.72);
+      }
+
+      .card ul {
+        padding-left: 18px;
+      }
+
+      .band {
+        border: 1px solid rgba(52, 211, 153, 0.22);
+        background: rgba(12, 12, 14, 0.92);
+        padding: clamp(24px, 4vw, 42px);
+      }
+
+      .band p,
+      .band ul {
+        max-width: 900px;
+        margin-top: 14px;
+        color: rgba(244, 244, 245, 0.76);
+        font-size: 18px;
+      }
+
+      .band ul {
+        padding-left: 20px;
+      }
+
+      footer {
+        border-top: 1px solid var(--line);
+        padding: 38px 0 52px;
+        color: var(--muted);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+      }
+
+      @media (max-width: 920px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body class="lang-sv">
+    <header>
+      <nav class="shell nav" aria-label="Recon navigation">
+        <a href="/">TwistedStacks</a>
+        <strong>Recon</strong>
+        <div class="nav-links">
+          <div class="lang-switch" role="group" aria-label="Language">
+            <button type="button" data-lang="sv" class="is-active">SV</button>
+            <button type="button" data-lang="en">EN</button>
+          </div>
+          <a href="mailto:dev@twistedstacks.com?subject=Recon%20Search%20Assistant" class="i18n-sv">Kontakt</a>
+          <a href="mailto:dev@twistedstacks.com?subject=Recon%20Search%20Assistant" class="i18n-en">Contact</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="shell hero">
+        <div class="kicker i18n-sv">Defensiv säkerhetsforskning / pausad publik demo</div>
+        <div class="kicker i18n-en">Defensive security research / public demo paused</div>
+        <h1 class="i18n-sv">Recon Search Assistant</h1>
+        <h1 class="i18n-en">Recon Search Assistant</h1>
+        <p class="lede i18n-sv">
+          Ett labb för <strong>auktoriserad</strong> ytrecon, dork-baserad discovery och AI-triage för bug bounty och
+          defensiv forskning. Det är <em>inte</em> en publik demo i showroom ännu — vi städar arkitektur, scope och
+          nyckelhantering innan något går live.
+        </p>
+        <p class="lede i18n-en">
+          A lab for <strong>authorized</strong> surface recon, dork-based discovery, and AI triage for bug bounty and
+          defensive research. It is <em>not</em> a public showroom demo yet — we are cleaning architecture, scope controls,
+          and secret handling before anything goes live.
+        </p>
+        <div class="hero-actions">
+          <a class="btn i18n-sv" href="mailto:dev@twistedstacks.com?subject=Recon%20Search%20Assistant">Fråga om labbet</a>
+          <a class="btn i18n-en" href="mailto:dev@twistedstacks.com?subject=Recon%20Search%20Assistant">Ask about the lab</a>
+          <a class="btn secondary i18n-sv" href="/">Till showroom</a>
+          <a class="btn secondary i18n-en" href="/">Back to showroom</a>
+        </div>
+      </section>
+
+      <section>
+        <div class="shell">
+          <div class="band">
+            <div class="eyebrow i18n-sv">Säkerhet först</div>
+            <div class="eyebrow i18n-en">Security first</div>
+            <h2 class="i18n-sv">API-nycklar ska ligga i Vercel — inte i repo eller README.</h2>
+            <h2 class="i18n-en">API keys belong in Vercel — not in the repo or README.</h2>
+            <p class="i18n-sv">
+              Koden har flyttats mot en server-proxy (<code>server.js</code>), men äldre README och GitHub Pages-deploy
+              ger fel bild. GitHub Pages kör bara statiska filer — utan proxy fungerar inte SerpAPI, OpenRouter eller
+              andra backends säkert.
+            </p>
+            <p class="i18n-en">
+              The code is moving toward a server proxy (<code>server.js</code>), but older README text and GitHub Pages
+              deploy send the wrong message. GitHub Pages is static-only — without the proxy, SerpAPI, OpenRouter, and
+              other backends do not run safely.
+            </p>
+            <ul class="i18n-sv">
+              <li>Rotera nycklar som någonsin legat i git eller i klientkod</li>
+              <li>Sätt env i Vercel: <code>OPENROUTER_KEYS</code>, <code>SERPAPI_KEYS</code>, <code>GEMINI_API_KEY</code>, m.fl.</li>
+              <li>Deploy som eget Vercel-projekt med Express-proxy — inte ren static hosting</li>
+            </ul>
+            <ul class="i18n-en">
+              <li>Rotate any keys that ever lived in git or client code</li>
+              <li>Set Vercel env: <code>OPENROUTER_KEYS</code>, <code>SERPAPI_KEYS</code>, <code>GEMINI_API_KEY</code>, etc.</li>
+              <li>Deploy as its own Vercel project with the Express proxy — not static hosting alone</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="shell">
+          <h2 class="i18n-sv">Vad det är — och inte är.</h2>
+          <h2 class="i18n-en">What it is — and what it is not.</h2>
+          <div class="grid">
+            <article class="card">
+              <h3 class="i18n-sv">Defensivt &amp; scoped</h3>
+              <h3 class="i18n-en">Defensive &amp; scoped</h3>
+              <p class="i18n-sv">För bug bounty och säkerhetsforskning med tydlig auktorisation — inte offensiv scanning mot godtyckliga mål.</p>
+              <p class="i18n-en">For bug bounty and security research with clear authorization — not offensive scanning of arbitrary targets.</p>
+            </article>
+            <article class="card">
+              <h3 class="i18n-sv">Discovery + triage</h3>
+              <h3 class="i18n-en">Discovery + triage</h3>
+              <p class="i18n-sv">Dork-bibliotek, sökproxy och AI-analys för att prioritera findings — med mänsklig review i loopen.</p>
+              <p class="i18n-en">Dork library, search proxy, and AI analysis to prioritize findings — with human review in the loop.</p>
+            </article>
+            <article class="card">
+              <h3 class="i18n-sv">Inte showroom-live</h3>
+              <h3 class="i18n-en">Not showroom-live</h3>
+              <p class="i18n-sv">
+                Arkivkod finns på
+                <a href="https://github.com/wawawee/Recon-Search-Assistant" target="_blank" rel="noreferrer">GitHub</a>
+                men länkas inte som aktiv demo förrän review är klar.
+              </p>
+              <p class="i18n-en">
+                Archive code lives on
+                <a href="https://github.com/wawawee/Recon-Search-Assistant" target="_blank" rel="noreferrer">GitHub</a>
+                but is not promoted as a live demo until review is complete.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="shell">
+          <h2 class="i18n-sv">Innan vi går live.</h2>
+          <h2 class="i18n-en">Before we go live.</h2>
+          <p class="section-lede i18n-sv">Checklista för dig (ingen Namecheap ändring krävs förrän Vercel-projektet finns).</p>
+          <p class="section-lede i18n-en">Checklist for you (no Namecheap change needed until the Vercel project exists).</p>
+          <div class="grid">
+            <article class="card">
+              <h3 class="i18n-sv">1. Vercel-projekt</h3>
+              <h3 class="i18n-en">1. Vercel project</h3>
+              <p class="i18n-sv">Nytt projekt från <code>wawawee/Recon-Search-Assistant</code> med <code>server.js</code> som backend.</p>
+              <p class="i18n-en">New project from <code>wawawee/Recon-Search-Assistant</code> with <code>server.js</code> as the backend.</p>
+            </article>
+            <article class="card">
+              <h3 class="i18n-sv">2. Env-nycklar</h3>
+              <h3 class="i18n-en">2. Env secrets</h3>
+              <p class="i18n-sv">Minst en OpenRouter-nyckel (en räcker). Valfritt: SerpAPI, Gemini, Supabase URL + anon key.</p>
+              <p class="i18n-en">At least one OpenRouter key (one is enough). Optional: SerpAPI, Gemini, Supabase URL + anon key.</p>
+            </article>
+            <article class="card">
+              <h3 class="i18n-sv">3. Subdomän (senare)</h3>
+              <h3 class="i18n-en">3. Subdomain (later)</h3>
+              <p class="i18n-sv">
+                Först när appen funkar: valfri <code>recon.twistedstacks.com</code> → CNAME
+                <code>cname.vercel-dns.com</code> i Namecheap + custom domain i Vercel.
+              </p>
+              <p class="i18n-en">
+                Once the app works: optional <code>recon.twistedstacks.com</code> → CNAME
+                <code>cname.vercel-dns.com</code> in Namecheap + custom domain in Vercel.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="shell i18n-sv">
+        Endast för auktoriserad säkerhetsforskning. TwistedStacks ansvarar inte för missbruk. Kontakt: dev@twistedstacks.com
+      </div>
+      <div class="shell i18n-en">
+        For authorized security research only. TwistedStacks is not responsible for misuse. Contact: dev@twistedstacks.com
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        var storageKey = "twistedstacks.recon.lang";
+        var buttons = document.querySelectorAll("[data-lang]");
+        var saved = localStorage.getItem(storageKey);
+
+        function setLang(lang) {
+          var next = lang === "en" ? "en" : "sv";
+          document.body.classList.remove("lang-sv", "lang-en");
+          document.body.classList.add(next === "en" ? "lang-en" : "lang-sv");
+          document.documentElement.lang = next;
+          buttons.forEach(function (button) {
+            button.classList.toggle("is-active", button.getAttribute("data-lang") === next);
+          });
+          localStorage.setItem(storageKey, next);
+        }
+
+        buttons.forEach(function (button) {
+          button.addEventListener("click", function () {
+            setLang(button.getAttribute("data-lang"));
+          });
+        });
+
+        if (saved === "en" || saved === "sv") setLang(saved);
+      })();
+    </script>
+  </body>
+</html>

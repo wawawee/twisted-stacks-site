@@ -230,18 +230,20 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
   {
     id: "system_recon",
     name: "Recon Search Assistant",
-    version: "responsible cyber",
-    status: "ACTIVE DEMO",
-    tagline: "Defensive recon with scope, memory, and AI triage.",
-    description: "A security research assistant for authorized search, exposed-surface checks, finding triage, and responsible workflows.",
-    techStack: ["JavaScript", "Supabase", "OpenRouter", "OSINT"],
+    version: "defensive cyber / security review",
+    status: "LAB / PAUSED",
+    tagline: "Authorized recon and triage — not a public demo yet.",
+    description:
+      "Bug bounty and defensive research lab (dorks, search proxy, AI triage). Paused from showroom until API keys live in Vercel env and GitHub Pages static deploy is retired.",
+    techStack: ["Express", "Supabase", "OpenRouter", "OSINT"],
     telemetry: [
       { label: "MODE", value: "DEFENSIVE" },
-      { label: "SCOPE", value: "REQUIRED" },
-      { label: "STATUS", value: "LAB" }
+      { label: "SECRETS", value: "VERCEL" },
+      { label: "STATUS", value: "REVIEW" }
     ],
-    href: "https://github.com/wawawee/Recon-Search-Assistant",
-    actionLabel: "Repo"
+    href: "/recon.html",
+    actionLabel: "Deep View",
+    contactMessage: "Hej Per,\n\nJag vill veta mer om Recon Search Assistant och eventuell defensiv användning.\n\n"
   },
   {
     id: "system_anslag",
