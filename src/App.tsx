@@ -163,7 +163,7 @@ export interface ShowroomProject {
   version: string;
   tagline: string;
   description: string;
-  status: "SHIPPED" | "PRODUCTION" | "DEPRECATED" | "ACTIVE DEMO" | "LAB / PAUSED";
+  status: "SHIPPED" | "PRODUCTION" | "DEPRECATED" | "ACTIVE DEMO" | "LAB / PAUSED" | "HARDWARE LAB";
   techStack: string[];
   telemetry: { label: string; value: string }[];
   href?: string;
@@ -178,7 +178,7 @@ function isExternalProjectHref(href: string) {
 const CATALOG_PROJECTS: ShowroomProject[] = [
   {
     id: "system_skatterevision",
-    name: "SkatteRevision",
+    name: "REVISION",
     version: "working product / private demo",
     status: "PRODUCTION",
     tagline: "Lead discovery for retroactive Swedish tax recovery — not org-number lookup.",
@@ -192,7 +192,7 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
     ],
     href: "/skatterevision.html",
     actionLabel: "Deep View",
-    contactMessage: "Hej Per,\n\nJag vill boka en full demonstration av SkatteRevision-systemet.\n\n"
+    contactMessage: "Hej Per,\n\nJag vill boka en full demonstration av REVISION-systemet.\n\n"
   },
   {
     id: "system_laga",
@@ -247,20 +247,54 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
   },
   {
     id: "system_anslag",
-    name: "TWISTED+Anslag",
-    version: "public grant demo / SITK",
+    name: "Anslag",
+    version: "gratis fonder & stipendier",
     status: "SHIPPED",
-    tagline: "Discover grants. Draft applications. Free, and allowed to be slow.",
+    tagline: "Hitta fonder, stipendier och andra anslag till ditt projekt.",
     description:
-      "Live at anslag.twistedstacks.com for Sandvikens IT-Kår and anyone hunting funding: Exa-backed discovery, Swedish application drafts, and an OpenRouter free-model chain with Kimi first. Slower than paid consulting — by design.",
-    techStack: ["React", "Vite", "Exa", "OpenRouter"],
+      "Sök utlysningar, jämför möjligheter och få hjälp att skriva ansökningsutkast — gratis och öppet för alla.",
+    techStack: ["React", "Vite", "AI", "Svenska utlysningar"],
     telemetry: [
-      { label: "TARGET", value: "FUNDING" },
-      { label: "MODEL", value: "KIMI→FREE" },
+      { label: "SÖK", value: "FONDER" },
+      { label: "UTKAST", value: "ANSÖKAN" },
       { label: "STATUS", value: "LIVE" }
     ],
     href: "https://anslag.twistedstacks.com/",
     actionLabel: "Live Demo"
+  },
+  {
+    id: "system_vr_superpowers",
+    name: "VR Super-Senses",
+    version: "Meta Quest / sensor array",
+    status: "HARDWARE LAB",
+    tagline: "See the invisible world: WiFi, heat, RF, and EMF in passthrough VR.",
+    description:
+      "A public Quest lab where ESP32 sensor nodes stream into a Python WebSocket hub and Unity renders the hidden signal world as RF orbs, WiFi towers, heat overlays, field lines, and fused source estimates.",
+    techStack: ["Unity", "Meta Quest", "ESP32", "Python Hub"],
+    telemetry: [
+      { label: "LAYERS", value: "6" },
+      { label: "SIGNAL", value: "PASSIVE" },
+      { label: "STATUS", value: "PUBLIC" }
+    ],
+    href: "https://github.com/wawawee/VR-SuperPowers",
+    actionLabel: "GitHub"
+  },
+  {
+    id: "system_cymwave",
+    name: "CymWave",
+    version: "hydro-wellness / prototype planning",
+    status: "ACTIVE DEMO",
+    tagline: "Programmable water, sound, light, and guided relaxation journeys.",
+    description:
+      "Early-stage immersive bath and float concept for hotels, spas, retreats, and wellbeing environments. Current work covers demand validation, safe prototype planning, vibration/pressure tuning, IP mapping, and grant strategy.",
+    techStack: ["Hydrotherapy", "Vibration R&D", "Spatial Audio", "Light Scenes"],
+    telemetry: [
+      { label: "MODE", value: "WELLNESS" },
+      { label: "REPO", value: "PUBLIC" },
+      { label: "ADDED", value: "2026-06-07" }
+    ],
+    href: "https://github.com/wawawee/CymWave",
+    actionLabel: "GitHub"
   },
   {
     id: "system_silversmeden",
@@ -303,8 +337,8 @@ const ASCII_ROWS = [
   "  .=*-.       AGENTS  RAG  LEGAL  VOICE  CYBER      .-*=: ",
   " .+=.      01001010 01100101 01110100 01110011       .=+. ",
   ":+:       public data -> sourced decisions -> tools     :+:",
-  "-*.       SkatteRevision   LAGA   Relay   Recon         .*-",
-  ":+:       applets, demos, grants, jobs, and strange UI   :+:",
+  "-*.       REVISION   LAGA   VR   CymWave   Anslag       .*-",
+  ":+:       applets, demos, grants, sensors, strange UI    :+:",
   " .+=.      01010011 01010100 01000001 01000011 01001011 .=+. ",
   "  .=*-.        clean front door / playable archive     .-*=: ",
   "    :=*+=:.                                      .:=*=:   ",
@@ -3469,7 +3503,7 @@ export default function App() {
                 className="showroom-action"
                 onClick={() => openContactForm({
                   type: "QUERY",
-                  message: "Hej Per,\n\nJag vill boka en full demonstration av SkatteRevision-systemet.\n\n",
+                  message: "Hej Per,\n\nJag vill boka en full demonstration av REVISION-systemet.\n\n",
                 })}
               >
                 Book Demo
@@ -3480,7 +3514,7 @@ export default function App() {
                 target="_blank"
                 rel="noreferrer"
               >
-                Try ANSLAG
+                Prova Anslag
               </a>
               <button
                 type="button"
@@ -3555,7 +3589,7 @@ export default function App() {
             <p>Click any project card to open its info page, live demo, or repo link.</p>
             <p>
               Runnable demos live on their own subdomains. Info-only pages and PDFs can stay on the main site — see
-              SkatteRevision for that pattern.
+              REVISION for that pattern.
             </p>
             <p>
               KryptoArkeologi is intentionally not linked yet. It needs a private-data scrub first, then a stripped

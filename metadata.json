@@ -1,7 +1,7 @@
 {
   "name": "TwistedStacks",
   "shortName": "TwistedStacks Showroom",
-  "description": "AI systems showroom for TwistedStacks: Skatterevision, LAGA, ANSLAG, Recon Search Assistant, THE-AI-BUTTON, Silversmeden, and playable TWISTED PONGG.",
+  "description": "AI systems showroom for TwistedStacks: REVISION, LAGA, Anslag, VR Super-Senses, CymWave, Recon Search Assistant, THE-AI-BUTTON, Silversmeden, and playable TWISTED PONGG.",
   "requestFramePermissions": [],
   "majorCapabilities": ["webgl", "web-audio"],
   "game": {
