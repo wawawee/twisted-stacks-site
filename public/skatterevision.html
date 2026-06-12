@@ -3,23 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>REVISION - TwistedStacks</title>
+    <title>Skatterevision - TwistedStacks</title>
     <meta
       name="description"
-      content="REVISION helps Swedish tax and audit partners find retroactive recovery leads by signee, accounting firm, region, and track — not random org-number lookup."
+      content="Förklarande systemsida för TwistedStacks skatterevision: historiska årsredovisningar, retroaktiva signaler, egna databaser, granskningslager och dossiers."
     />
     <style>
       :root {
         color-scheme: dark;
         --bg: #050505;
+        --bg-soft: #0d1014;
+        --panel: rgba(17, 19, 24, 0.84);
+        --panel-strong: rgba(22, 25, 31, 0.94);
+        --line: rgba(244, 244, 245, 0.11);
+        --line-strong: rgba(244, 244, 245, 0.2);
         --ink: #f4f4f5;
         --muted: #a1a1aa;
-        --line: rgba(244, 244, 245, 0.13);
-        --panel: rgba(18, 18, 20, 0.84);
-        --panel-strong: rgba(28, 28, 32, 0.92);
         --gold: #eab308;
+        --gold-soft: rgba(234, 179, 8, 0.14);
         --cyan: #22d3ee;
+        --cyan-soft: rgba(34, 211, 238, 0.12);
+        --emerald: #34d399;
+        --emerald-soft: rgba(52, 211, 153, 0.12);
         --rose: #fb7185;
+        --rose-soft: rgba(251, 113, 133, 0.1);
       }
 
       * {
@@ -28,19 +35,20 @@
 
       html {
         background: var(--bg);
+        scroll-behavior: smooth;
       }
 
       body {
         margin: 0;
         min-height: 100vh;
         background:
-          linear-gradient(180deg, rgba(5, 5, 5, 0.6), #050505 34rem),
-          radial-gradient(circle at 78% 8%, rgba(34, 211, 238, 0.12), transparent 24rem),
-          radial-gradient(circle at 8% 22%, rgba(234, 179, 8, 0.12), transparent 22rem),
+          radial-gradient(circle at 12% 10%, rgba(234, 179, 8, 0.14), transparent 26rem),
+          radial-gradient(circle at 84% 18%, rgba(34, 211, 238, 0.14), transparent 30rem),
+          linear-gradient(180deg, rgba(5, 5, 5, 0.76), #050505 28rem),
           #050505;
         color: var(--ink);
         font-family:
-          Space Grotesk,
+          "Space Grotesk",
           Inter,
           ui-sans-serif,
           system-ui,
@@ -48,122 +56,11 @@
           BlinkMacSystemFont,
           "Segoe UI",
           sans-serif;
-        line-height: 1.5;
-      }
-
-      body.lang-en .i18n-sv,
-      body.lang-sv .i18n-en {
-        display: none !important;
+        line-height: 1.55;
       }
 
       a {
         color: inherit;
-      }
-
-      .shell {
-        width: min(1180px, calc(100% - 32px));
-        margin: 0 auto;
-      }
-
-      header {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        border-bottom: 1px solid var(--line);
-        background: rgba(5, 5, 5, 0.82);
-        backdrop-filter: blur(16px);
-      }
-
-      .nav {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 18px;
-        min-height: 64px;
-        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-        font-size: 12px;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
-
-      .nav-links {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        flex-wrap: wrap;
-      }
-
-      .nav-start {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        flex-wrap: wrap;
-      }
-
-      .nav a {
-        text-decoration: none;
-        color: var(--muted);
-      }
-
-      .showroom-back {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 12px;
-        border: 1px solid rgba(234, 179, 8, 0.45);
-        background: rgba(234, 179, 8, 0.1);
-        color: #fde68a !important;
-        letter-spacing: 0.12em;
-      }
-
-      .showroom-back:hover {
-        border-color: rgba(234, 179, 8, 0.75);
-        color: #fef08a !important;
-      }
-
-      .nav strong {
-        color: var(--gold);
-        font-weight: 600;
-      }
-
-      .lang-switch {
-        display: inline-flex;
-        border: 1px solid var(--line);
-        background: rgba(5, 5, 5, 0.55);
-      }
-
-      .lang-switch button {
-        border: 0;
-        background: transparent;
-        color: var(--muted);
-        font: inherit;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        padding: 8px 10px;
-        cursor: pointer;
-      }
-
-      .lang-switch button.is-active {
-        color: var(--gold);
-        background: rgba(234, 179, 8, 0.1);
-      }
-
-      .hero {
-        display: grid;
-        grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
-        gap: clamp(28px, 5vw, 64px);
-        align-items: center;
-        min-height: calc(100vh - 64px);
-        padding: 58px 0 72px;
-      }
-
-      .kicker,
-      .eyebrow {
-        color: var(--cyan);
-        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-        font-size: 12px;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
       }
 
       h1,
@@ -173,26 +70,122 @@
         margin: 0;
       }
 
+      .shell {
+        width: min(1200px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid var(--line);
+        background: rgba(5, 5, 5, 0.82);
+        backdrop-filter: blur(18px);
+      }
+
+      .nav {
+        min-height: 68px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .nav-start,
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .nav-links a,
+      .nav-start a {
+        text-decoration: none;
+        color: var(--muted);
+      }
+
+      .nav-mark {
+        color: var(--gold);
+        font-weight: 700;
+      }
+
+      .showroom-back,
+      .mini-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 38px;
+        padding: 0 14px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .showroom-back {
+        border-color: rgba(234, 179, 8, 0.42);
+        background: rgba(234, 179, 8, 0.1);
+        color: #fde68a !important;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        min-height: calc(100vh - 68px);
+        padding: 56px 0 72px;
+      }
+
+      .kicker,
+      .eyebrow,
+      .micro-label {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+      }
+
+      .kicker,
+      .eyebrow {
+        color: var(--cyan);
+        font-size: 12px;
+      }
+
+      .micro-label {
+        color: var(--muted);
+        font-size: 10px;
+      }
+
       h1 {
         margin-top: 18px;
-        max-width: 920px;
-        font-size: clamp(44px, 8vw, 96px);
-        line-height: 0.9;
-        letter-spacing: 0;
+        max-width: 940px;
+        font-size: clamp(42px, 7.8vw, 92px);
+        line-height: 0.92;
       }
 
       .lede {
         max-width: 780px;
-        margin-top: 28px;
-        color: rgba(244, 244, 245, 0.82);
+        margin-top: 26px;
         font-size: clamp(18px, 2vw, 23px);
+        color: rgba(244, 244, 245, 0.82);
+      }
+
+      .sublede {
+        max-width: 760px;
+        margin-top: 16px;
+        font-size: 16px;
+        color: rgba(244, 244, 245, 0.66);
       }
 
       .hero-actions {
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
-        margin-top: 34px;
+        margin-top: 32px;
       }
 
       .btn {
@@ -202,32 +195,61 @@
         min-height: 42px;
         padding: 0 18px;
         border: 1px solid rgba(234, 179, 8, 0.42);
-        background: rgba(234, 179, 8, 0.12);
+        background: rgba(234, 179, 8, 0.1);
         color: #fde68a;
+        text-decoration: none;
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
         font-size: 12px;
         letter-spacing: 0.08em;
-        text-decoration: none;
         text-transform: uppercase;
       }
 
       .btn.secondary {
-        border-color: rgba(244, 244, 245, 0.18);
-        background: rgba(244, 244, 245, 0.06);
+        border-color: var(--line);
+        background: rgba(255, 255, 255, 0.05);
         color: var(--ink);
       }
 
-      .instrument {
+      .panel,
+      .card,
+      .band,
+      .stack-card,
+      .table-card {
         border: 1px solid var(--line);
         background: var(--panel);
-        box-shadow: 0 26px 80px rgba(0, 0, 0, 0.38);
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
       }
 
-      .screen {
-        padding: 22px;
+      .panel {
+        padding: clamp(24px, 4vw, 36px);
       }
 
-      .signal-grid {
+      .yearline {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 22px;
+      }
+
+      .yearline .year {
+        text-align: center;
+      }
+
+      .yearline .dot {
+        height: 10px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(234, 179, 8, 0.92), rgba(34, 211, 238, 0.92));
+      }
+
+      .yearline .year span {
+        display: block;
+        margin-top: 8px;
+        color: var(--muted);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 11px;
+      }
+
+      .instrument-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px;
@@ -235,43 +257,39 @@
       }
 
       .metric {
-        min-height: 112px;
+        min-height: 116px;
         border: 1px solid var(--line);
-        background: rgba(5, 5, 5, 0.48);
-        padding: 14px;
-      }
-
-      .metric span {
-        display: block;
-        color: var(--muted);
-        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-        font-size: 10px;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
+        background: rgba(5, 5, 5, 0.42);
+        padding: 15px;
       }
 
       .metric strong {
         display: block;
         margin-top: 10px;
-        color: var(--ink);
-        font-size: 22px;
+        font-size: 21px;
         line-height: 1.08;
       }
 
+      .metric p {
+        margin-top: 8px;
+        color: rgba(244, 244, 245, 0.66);
+        font-size: 14px;
+      }
+
       section {
-        padding: 72px 0;
+        padding: 76px 0;
         border-top: 1px solid var(--line);
       }
 
       h2 {
-        max-width: 820px;
-        font-size: clamp(32px, 5vw, 58px);
+        max-width: 880px;
+        font-size: clamp(30px, 5vw, 58px);
         line-height: 0.95;
       }
 
       .section-lede {
-        max-width: 820px;
-        margin-top: 18px;
+        max-width: 860px;
+        margin-top: 16px;
         color: rgba(244, 244, 245, 0.74);
         font-size: 18px;
       }
@@ -287,21 +305,23 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
+      .grid.four {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
       .card {
         min-height: 210px;
-        border: 1px solid var(--line);
-        background: var(--panel);
         padding: 22px;
       }
 
       .card h3 {
         font-size: 22px;
-        line-height: 1.08;
+        line-height: 1.06;
       }
 
       .card p {
         margin-top: 12px;
-        color: rgba(244, 244, 245, 0.7);
+        color: rgba(244, 244, 245, 0.72);
       }
 
       .card ul {
@@ -316,7 +336,7 @@
 
       .flow {
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(5, minmax(0, 1fr));
         gap: 10px;
         margin-top: 32px;
       }
@@ -324,11 +344,11 @@
       .step {
         border: 1px solid var(--line);
         background: var(--panel-strong);
-        padding: 16px;
-        min-height: 148px;
+        min-height: 168px;
+        padding: 18px;
       }
 
-      .step span {
+      .step .num {
         color: var(--gold);
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
         font-size: 11px;
@@ -337,7 +357,7 @@
       .step strong {
         display: block;
         margin-top: 12px;
-        font-size: 18px;
+        font-size: 19px;
       }
 
       .step p {
@@ -347,175 +367,304 @@
       }
 
       .band {
-        border: 1px solid rgba(34, 211, 238, 0.22);
-        background:
-          linear-gradient(90deg, rgba(34, 211, 238, 0.1), rgba(234, 179, 8, 0.08)),
-          rgba(12, 12, 14, 0.9);
         padding: clamp(24px, 4vw, 42px);
-      }
-
-      .band.moat {
-        border-color: rgba(251, 113, 133, 0.28);
         background:
-          linear-gradient(90deg, rgba(251, 113, 133, 0.1), rgba(34, 211, 238, 0.08)),
-          rgba(12, 12, 14, 0.92);
+          linear-gradient(90deg, rgba(34, 211, 238, 0.08), rgba(234, 179, 8, 0.08)),
+          rgba(12, 12, 14, 0.9);
       }
 
-      .band p,
-      .band ul {
-        max-width: 900px;
+      .band p {
+        max-width: 920px;
         margin-top: 14px;
-        color: rgba(244, 244, 245, 0.76);
+        color: rgba(244, 244, 245, 0.78);
         font-size: 18px;
       }
 
-      .band ul {
-        padding-left: 20px;
+      .lane-wrap {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 30px;
       }
 
-      .band li + li {
-        margin-top: 8px;
+      .stack-card {
+        padding: 22px;
       }
 
-      .not-list {
+      .stack-card h3 {
+        font-size: 24px;
+      }
+
+      .stack-list {
         display: grid;
         gap: 10px;
         margin-top: 18px;
       }
 
-      .not-list .item {
-        border: 1px solid rgba(251, 113, 133, 0.22);
-        background: rgba(5, 5, 5, 0.42);
-        padding: 14px 16px;
+      .stack-item {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.03);
+        padding: 14px;
       }
 
-      .not-list .item strong {
-        color: var(--rose);
+      .stack-index {
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+        border-radius: 999px;
+        border: 1px solid rgba(34, 211, 238, 0.32);
+        background: rgba(34, 211, 238, 0.12);
+        color: #a5f3fc;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
       }
 
-      .not-list .item p {
-        margin-top: 5px;
+      .stack-copy strong {
+        display: block;
+        font-size: 16px;
+      }
+
+      .stack-copy p {
+        margin-top: 6px;
+        color: rgba(244, 244, 245, 0.66);
+        font-size: 14px;
+      }
+
+      .improvements {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 32px;
+      }
+
+      .improvement-card {
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.03);
+        padding: 18px;
+      }
+
+      .improvement-card h3 {
+        font-size: 20px;
+      }
+
+      .improvement-card p {
+        margin-top: 10px;
+        color: rgba(244, 244, 245, 0.7);
+      }
+
+      .budget-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 32px;
+      }
+
+      .artifact-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 32px;
+      }
+
+      .budget-card {
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.03);
+        padding: 20px;
+      }
+
+      .budget-card strong {
+        display: block;
+        margin-top: 10px;
+        font-size: 24px;
+        line-height: 1.1;
+      }
+
+      .budget-card p {
+        margin-top: 10px;
+        color: rgba(244, 244, 245, 0.68);
+      }
+
+      .table-card {
+        margin-top: 24px;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        text-align: left;
+        vertical-align: top;
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      th {
+        background: rgba(255, 255, 255, 0.04);
         color: var(--muted);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      td strong {
+        display: block;
+        font-size: 16px;
+      }
+
+      td p {
+        margin-top: 6px;
+        color: rgba(244, 244, 245, 0.68);
+        font-size: 14px;
+      }
+
+      .note {
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 13px;
       }
 
       footer {
         border-top: 1px solid var(--line);
-        padding: 38px 0 52px;
+        padding: 36px 0 48px;
+      }
+
+      .footer-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 18px;
+        align-items: end;
+      }
+
+      .footer-copy {
         color: var(--muted);
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
         font-size: 12px;
       }
 
-      @media (max-width: 920px) {
+      @media (max-width: 1040px) {
         .hero,
+        .lane-wrap,
         .grid,
         .grid.two,
-        .flow {
+        .grid.four,
+        .flow,
+        .budget-grid,
+        .improvements,
+        .artifact-grid {
           grid-template-columns: 1fr;
         }
 
         .hero {
           min-height: auto;
-          padding-top: 44px;
+          padding-top: 42px;
         }
       }
 
-      @media (max-width: 560px) {
+      @media (max-width: 640px) {
         .shell {
-          width: min(100% - 24px, 1180px);
+          width: min(100% - 24px, 1200px);
         }
 
-        .signal-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .nav {
+        .nav,
+        .footer-grid {
           align-items: flex-start;
           flex-direction: column;
           justify-content: center;
-          padding: 12px 0;
+        }
+
+        .instrument-grid,
+        .improvements {
+          grid-template-columns: 1fr;
+        }
+
+        th,
+        td {
+          padding: 14px;
         }
 
         section {
-          padding: 54px 0;
+          padding: 56px 0;
         }
       }
     </style>
   </head>
-  <body class="lang-sv">
+  <body>
     <header>
-      <nav class="shell nav" aria-label="REVISION navigation">
+      <nav class="shell nav" aria-label="Skatterevision navigation">
         <div class="nav-start">
-          <a href="/" class="showroom-back i18n-sv">← Showroom</a>
-          <a href="/" class="showroom-back i18n-en">← Showroom</a>
-          <strong>REVISION</strong>
+          <a href="/" class="showroom-back">← Showroom</a>
+          <span class="nav-mark">Skatterevision</span>
         </div>
         <div class="nav-links">
-          <div class="lang-switch" role="group" aria-label="Language">
-            <button type="button" data-lang="sv" class="is-active">SV</button>
-            <button type="button" data-lang="en">EN</button>
-          </div>
-          <a href="mailto:dev@twistedstacks.com?subject=REVISION%20demo" class="i18n-sv">Boka demo</a>
-          <a href="mailto:dev@twistedstacks.com?subject=REVISION%20demo" class="i18n-en">Book demo</a>
+          <a href="#oversikt">Översikt</a>
+          <a href="#flode">Flöde</a>
+          <a href="/assets/skatterevision-teaser.pdf" class="mini-link">System-PDF</a>
         </div>
       </nav>
     </header>
 
     <main>
-      <section class="shell hero">
+      <section class="shell hero" id="oversikt">
         <div>
-          <div class="kicker i18n-sv">Lead intelligence för svenska rådgivare</div>
-          <div class="kicker i18n-en">Lead intelligence for Swedish advisors</div>
-          <h1 class="i18n-sv">Hitta rätt retroaktiva case — inte slumpmässiga bolag.</h1>
-          <h1 class="i18n-en">Find the right retroactive cases — not random companies.</h1>
-          <p class="lede i18n-sv">
-            REVISION hjälper revisions- och skatterådgivare prioritera mandat där historisk data, domänregler och
-            spårbara signaler faktiskt kan bära ett retroaktivt ärende. Endast en liten andel svenska bolag har relevant
-            potential — därför börjar vi med hur ni hittar leads, inte med orgnummer-sök.
+          <div class="kicker">TwistedStacks · Skatterevision</div>
+          <h1>Retroaktiv skatterevision byggd för historiska bolagsdata.</h1>
+          <p class="lede">
+            Den här delen beskriver hur systemet arbetar när historiska årsredovisningar, rättsliga spår och
+            återkommande signaler får styra vilka bolag som ens är värda att granska vidare.
           </p>
-          <p class="lede i18n-en">
-            REVISION helps audit and tax advisors prioritize mandates where historical data, domain rules, and
-            traceable signals can actually support a retroactive case. Only a small share of Swedish companies have
-            relevant potential — so we start with how you find leads, not org-number lookup.
+          <p class="sublede">
+            Bakom ytan ligger hundratals GB historisk årsdata, ett tjugotal kompletterande källspår och egna databaser
+            som gör materialet sökbart, jämförbart och användbart i retroaktiv analys.
           </p>
           <div class="hero-actions">
-            <a class="btn i18n-sv" href="mailto:dev@twistedstacks.com?subject=REVISION%20demo">Boka demo</a>
-            <a class="btn i18n-en" href="mailto:dev@twistedstacks.com?subject=REVISION%20demo">Book demo</a>
-            <a class="btn secondary" href="/assets/skatterevision-teaser.pdf">PDF</a>
-            <a class="btn secondary i18n-sv" href="/">Till showroom</a>
-            <a class="btn secondary i18n-en" href="/">Back to showroom</a>
+            <a class="btn" href="#flode">Se systemflödet</a>
+            <a class="btn secondary" href="/assets/skatterevision-teaser.pdf">Öppna system-PDF</a>
           </div>
         </div>
 
-        <aside class="instrument" aria-label="REVISION summary">
-          <div class="screen">
-            <div class="eyebrow i18n-sv">Översikt</div>
-            <div class="eyebrow i18n-en">Overview</div>
-            <div class="signal-grid">
-              <div class="metric">
-                <span class="i18n-sv">Primärt fokus</span>
-                <span class="i18n-en">Primary focus</span>
-                <strong class="i18n-sv">Lead discovery</strong>
-                <strong class="i18n-en">Lead discovery</strong>
-              </div>
-              <div class="metric">
-                <span class="i18n-sv">Sökaxlar</span>
-                <span class="i18n-en">Search axes</span>
-                <strong class="i18n-sv">Signee · byrå · region</strong>
-                <strong class="i18n-en">Signee · firm · region</strong>
-              </div>
-              <div class="metric">
-                <span class="i18n-sv">Målgrupp</span>
-                <span class="i18n-en">Audience</span>
-                <strong class="i18n-sv">Svenska rådgivare</strong>
-                <strong class="i18n-en">Swedish advisors</strong>
-              </div>
-              <div class="metric">
-                <span class="i18n-sv">Leverans</span>
-                <span class="i18n-en">Delivery</span>
-                <strong class="i18n-sv">Sourcade dossiers</strong>
-                <strong class="i18n-en">Sourced dossiers</strong>
-              </div>
+        <aside class="panel" aria-label="System snapshot">
+          <div class="eyebrow">Tidsriktning</div>
+          <div class="yearline" aria-label="Retroactive time window">
+            <div class="year"><div class="dot"></div><span>2019</span></div>
+            <div class="year"><div class="dot"></div><span>2020</span></div>
+            <div class="year"><div class="dot"></div><span>2021</span></div>
+            <div class="year"><div class="dot"></div><span>2022</span></div>
+            <div class="year"><div class="dot"></div><span>2023</span></div>
+            <div class="year"><div class="dot"></div><span>2024</span></div>
+            <div class="year"><div class="dot"></div><span>2025</span></div>
+          </div>
+          <div class="instrument-grid">
+            <div class="metric">
+              <div class="micro-label">Startpunkt</div>
+              <strong>Historik före nuläge</strong>
+              <p>Årsredovisning, iXBRL, SNI över tid, verksamhetsbeskrivningar och förändringar mellan år.</p>
+            </div>
+            <div class="metric">
+              <div class="micro-label">Leadaxlar</div>
+              <strong>Signee · byrå · region</strong>
+              <p>Systemet blir mer användbart när kontexten kommer från relation, geografi eller bransch.</p>
+            </div>
+            <div class="metric">
+              <div class="micro-label">Stoppunkter</div>
+              <strong>Källa före claim</strong>
+              <p>Saknad data blir nästa arbetsuppgift, inte en ursäkt att fylla ut med gissning.</p>
+            </div>
+            <div class="metric">
+              <div class="micro-label">Utdata</div>
+              <strong>Dossier istället för pitch</strong>
+              <p>Vad som stöds, vad som inte stöds och vad som krävs innan ett case är byrånära.</p>
             </div>
           </div>
         </aside>
@@ -523,142 +672,199 @@
 
       <section>
         <div class="shell">
-          <div class="band moat">
-            <div class="eyebrow i18n-sv">Kärnposition — läs detta först</div>
-            <div class="eyebrow i18n-en">Core positioning — read this first</div>
-            <h2 class="i18n-sv">Vår moat är att hitta leads — inte att söka orgnummer i bulk.</h2>
-            <h2 class="i18n-en">Our moat is finding leads — not bulk org-number search.</h2>
-            <p class="i18n-sv">
-              REVISION är byggt för partners som redan arbetar med svenska bolag och behöver veta <em>var</em> nästa
-              retroaktiva ärende sannolikt finns. Det är fel produktlöfte att lova bred bolagssökning: bara en liten andel
-              har faktisk retroaktiv potential per spår.
+          <div class="band">
+            <div class="eyebrow">Systemöversikt</div>
+            <h2>Byggt ovanpå historiska datamängder, egna index och flera typer av källmaterial.</h2>
+            <p>
+              Skatterevision arbetar inte direkt mot råmaterialet varje gång en analys startar. Historiska
+              årsredovisningar, iXBRL-extrakt, rättsliga källor, öppna webbkällor och egna specialspår filtreras först
+              in i lokala databaser och söklager. Det gör att systemet kan jämföra år, hitta avvikelser och bygga
+              underlag med betydligt högre precision än ett rent nulägesregister.
             </p>
-            <p class="i18n-en">
-              REVISION is built for partners already working with Swedish companies who need to know <em>where</em> the
-              next retroactive case likely exists. Promising broad company search is the wrong product promise: only a small
-              share have real retroactive potential per track.
-            </p>
-            <ul class="i18n-sv">
-              <li><strong>Firmatecknare / signee</strong> — hitta mandatkluster kopplade till personer ni redan förstår</li>
-              <li><strong>Redovisningsbyrå</strong> — följ byråns kundbas och historik där ni har relation</li>
-              <li><strong>Geografiskt område</strong> — prioritera kommuner, regioner eller industriella kluster</li>
-              <li><strong>Spårfilter</strong> — FoU, energi, leasing, fastighet med rätt evidenskrav från start</li>
-            </ul>
-            <ul class="i18n-en">
-              <li><strong>Signee / company representative</strong> — find mandate clusters tied to people you already understand</li>
-              <li><strong>Accounting firm</strong> — follow a firm's client base and history where you have a relationship</li>
-              <li><strong>Geographic area</strong> — prioritize municipalities, regions, or industrial clusters</li>
-              <li><strong>Track filters</strong> — R&D, energy, leasing, property with the right evidence bar from day one</li>
-            </ul>
-            <div class="not-list">
-              <div class="item">
-                <strong class="i18n-sv">Inte vår moat</strong>
-                <strong class="i18n-en">Not our moat</strong>
-                <p class="i18n-sv">
-                  Slumpmässig orgnummer-sökning, "skriv in vilket bolag som helst", eller demo som börjar med ett enskilt
-                  publikt bolag utan rådgivarkontext.
-                </p>
-                <p class="i18n-en">
-                  Random org-number lookup, "type any company", or demos that start with a single public company without
-                  advisor context.
-                </p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="shell">
+          <h2>Vad systemet faktiskt gör.</h2>
+          <p class="section-lede">
+            Inte allt börjar med ett orgnummer. I många fall börjar ett relevant case med ett mönster kring person,
+            byrå, ort, industrikluster eller skiftande årsdata.
+          </p>
+          <div class="grid four">
+            <article class="card">
+              <h3>Ser bakåt i stället för bara på nuet</h3>
+              <p>
+                Där vanliga bolagsvyer komprimerar allt till ett nuläge blir tiden här en aktiv variabel:
+                räkenskapsår, skiften, luckor, omklassificeringar och återkommande språkbruk.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Filtrerar hårt före fördjupning</h3>
+              <p>
+                De flesta kandidater ska stanna som signal. Bara de få som överlever negativ kontroll, retro-logik och
+                saklig granskning går vidare till dossierläge.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Arbetar per spår, inte per universallöfte</h3>
+              <p>
+                FoU, energi, leasing och fastighet har olika bevisbörda. Därför behöver systemet växla metod beroende
+                på vilket spår som faktiskt bär.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Visar vad som fortfarande saknas</h3>
+              <p>
+                Ett ärende blir bättre av att rätt saknas tydligt, inte av att det ser färdigt ut för tidigt. Det gör
+                handoffen till byrå eller partner renare.
+              </p>
+            </article>
+          </div>
+
+          <div class="grid two">
+            <article class="card">
+              <h3>Egna databaser för retroanalys</h3>
+              <p>
+                Systemet använder inte bara externa källor, utan också egna lager för historik, signaler, textsökning
+                och rättslig retrieval. Det är där den praktiska nyttan uppstår: råmaterialet blir jämförbart i flera år
+                samtidigt och kan användas per spår i stället för som en lös dokumentmängd.
+              </p>
+              <ul>
+                <li>Historiska bolagsindex och årsbundna extrakt</li>
+                <li>Semantiska lager för prejudikat, lagrum och textlikhet</li>
+                <li>Specialspår för signaler, tidslinjer och granskningssteg</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Källmaterial i flera lager</h3>
+              <p>
+                Materialet kommer från fler än en datatyp. Historisk rapportering, registerspår, rättskällor,
+                verksamhetstexter, myndighetsfragment och öppna webbkällor fyller olika funktion beroende på vilken
+                hypotes som prövas.
+              </p>
+              <ul>
+                <li>Hundratals GB historisk årsdata och iXBRL</li>
+                <li>Ett tjugotal källspår för fördjupning och kontroll</li>
+                <li>Egna filtrerade databaser för snabbare och säkrare analys</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="flode">
+        <div class="shell">
+          <h2>Hur flödet arbetar.</h2>
+          <p class="section-lede">
+            Vägen från historisk rapport till läsbart underlag består av flera små beslut. Det viktiga är att de går
+            att följa baklänges.
+          </p>
+          <div class="flow" aria-label="Skatterevision workflow">
+            <article class="step">
+              <span class="num">01</span>
+              <strong>Hitta ingången</strong>
+              <p>Välj relation, ort, bransch eller signaturspår där ett retroaktivt case över huvud taget är meningsfullt.</p>
+            </article>
+            <article class="step">
+              <span class="num">02</span>
+              <strong>Jämför år mot år</strong>
+              <p>Leta efter sådant som förändras, återkommer, försvinner eller ser felklassat ut när tidslinjen vecklas ut.</p>
+            </article>
+            <article class="step">
+              <span class="num">03</span>
+              <strong>Pröva rätt spår</strong>
+              <p>Matcha signalen mot FoU, energi, leasing eller fastighet och använd rätt retrofönster och rätt beviskrav.</p>
+            </article>
+            <article class="step">
+              <span class="num">04</span>
+              <strong>Försök stoppa caset</strong>
+              <p>Risk-gates, negativ evidens och dataluckor ska arbeta mot caset, inte för det.</p>
+            </article>
+            <article class="step">
+              <span class="num">05</span>
+              <strong>Skriv först därefter</strong>
+              <p>När tillräckligt håller blir nästa steg ett läsbart dossierutkast snarare än en lös säljhypotes.</p>
+            </article>
+          </div>
+
+          <div class="lane-wrap">
+            <article class="stack-card">
+              <div class="eyebrow">Datalager</div>
+              <h3>Ordningen styr kvaliteten.</h3>
+              <div class="stack-list">
+                <div class="stack-item">
+                  <div class="stack-index">01</div>
+                  <div class="stack-copy">
+                    <strong>Historiska årsredovisningar</strong>
+                    <p>iXBRL-fält, noter, verksamhetsbeskrivningar och ekonomiska mönster som faktiskt såg ut så under året.</p>
+                  </div>
+                </div>
+                <div class="stack-item">
+                  <div class="stack-index">02</div>
+                  <div class="stack-copy">
+                    <strong>Lokala index och retro-SNI</strong>
+                    <p>Normalisering som gör det möjligt att läsa förändring snarare än bara senast kända klassificering.</p>
+                  </div>
+                </div>
+                <div class="stack-item">
+                  <div class="stack-index">03</div>
+                  <div class="stack-copy">
+                    <strong>Prejudikat och lagstöd</strong>
+                    <p>Rättslig jordning som visar vad ett spår kräver och när det ska bromsas redan i screening.</p>
+                  </div>
+                </div>
+                <div class="stack-item">
+                  <div class="stack-index">04</div>
+                  <div class="stack-copy">
+                    <strong>Öppen webbresearch</strong>
+                    <p>Myndighetssidor, projektrester, miljöspår, patentsignaler och andra publika fragment som kan styrka eller fälla.</p>
+                  </div>
+                </div>
+                <div class="stack-item">
+                  <div class="stack-index">05</div>
+                  <div class="stack-copy">
+                    <strong>Betald data vid tydlig fråga</strong>
+                    <p>Köps först när ett konkret claim eller en konkret lucka motiverar kostnad och handläggning.</p>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
+            </article>
 
-      <section>
-        <div class="shell">
-          <h2 class="i18n-sv">Vad det är — och inte är.</h2>
-          <h2 class="i18n-en">What it is — and what it is not.</h2>
-          <p class="section-lede i18n-sv">
-            REVISION är inte en publik SaaS och inte skatterådgivning. Det är beslutsstöd för kvalificerade
-            revisorer, skatterådgivare och jurister som behöver prioritera rätt mandat med sourcad underlag.
-          </p>
-          <p class="section-lede i18n-en">
-            REVISION is not a public SaaS and not tax advice. It is decision support for qualified auditors, tax
-            advisors, and lawyers who need to prioritize the right mandates with sourced material.
-          </p>
-          <div class="grid">
-            <article class="card">
-              <h3 class="i18n-sv">Lead intelligence</h3>
-              <h3 class="i18n-en">Lead intelligence</h3>
-              <p class="i18n-sv">
-                Prioritera var retroaktivt arbete är värt en mänsklig professionells tid — utifrån byrå, signee, geografi
-                och spår, inte bredd-sök på alla bolag.
-              </p>
-              <p class="i18n-en">
-                Prioritize where retroactive work is worth a qualified professional's time — via firm, signee, geography,
-                and track, not breadth-search across every company.
-              </p>
-            </article>
-            <article class="card">
-              <h3 class="i18n-sv">Evidens först</h3>
-              <h3 class="i18n-en">Evidence first</h3>
-              <p class="i18n-sv">
-                Leveranser är arbetsunderlag med källor: vad som hittades, vilken rättslig grund som kan gälla, vad som
-                saknas, och varför nästa steg är motiverat.
-              </p>
-              <p class="i18n-en">
-                Outputs are sourced workpapers: what was found, which legal basis may apply, what is missing, and why the
-                next step is justified.
-              </p>
-            </article>
-            <article class="card">
-              <h3 class="i18n-sv">Partnerstyrt</h3>
-              <h3 class="i18n-en">Partner-led</h3>
-              <p class="i18n-sv">
-                Byrån behåller kundrelation och professionellt ställningstagande. TwistedStacks levererar discovery,
-                prioritering och dossierförberedelse — inte slutlig deklaration.
-              </p>
-              <p class="i18n-en">
-                The firm keeps the client relationship and professional sign-off. TwistedStacks supplies discovery,
-                prioritization, and dossier prep — not a final tax filing.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <div class="shell">
-          <h2 class="i18n-sv">Så hittar partners leads.</h2>
-          <h2 class="i18n-en">How partners find leads.</h2>
-          <p class="section-lede i18n-sv">
-            Ett seriöst arbetsflöde börjar med rådgivarens kontext — inte med att mata in ett orgnummer i ett sökfält.
-          </p>
-          <p class="section-lede i18n-en">
-            A serious workflow starts from the advisor's context — not by typing an org number into a search box.
-          </p>
-          <div class="flow" aria-label="Lead discovery workflow">
-            <article class="step">
-              <span>01</span>
-              <strong class="i18n-sv">Välj axel</strong>
-              <strong class="i18n-en">Choose axis</strong>
-              <p class="i18n-sv">Signee, redovisningsbyrå, geografi eller befintlig kundportfölj.</p>
-              <p class="i18n-en">Signee, accounting firm, geography, or an existing client portfolio.</p>
-            </article>
-            <article class="step">
-              <span>02</span>
-              <strong class="i18n-sv">Filtrera spår</strong>
-              <strong class="i18n-en">Filter track</strong>
-              <p class="i18n-sv">FoU, energi, leasing eller fastighet — med rätt retroaktivt fönster och evidenskrav.</p>
-              <p class="i18n-en">R&D, energy, leasing, or property — with the right retroactive window and evidence bar.</p>
-            </article>
-            <article class="step">
-              <span>03</span>
-              <strong class="i18n-sv">Prioritera</strong>
-              <strong class="i18n-en">Prioritize</strong>
-              <p class="i18n-sv">Ranka kandidater med riskgate, datakvalitet och saknad-information som stoppar svaga case tidigt.</p>
-              <p class="i18n-en">Rank candidates with risk gates, data quality, and missing-data stops for weak cases early.</p>
-            </article>
-            <article class="step">
-              <span>04</span>
-              <strong class="i18n-sv">Dossier &amp; handoff</strong>
-              <strong class="i18n-en">Dossier &amp; handoff</strong>
-              <p class="i18n-sv">Bara starka case blir partnerklara underlag: källor, checklistor och nästa intervjufrågor.</p>
-              <p class="i18n-en">Only strong cases become partner-ready packs: sources, checklists, and next interview prompts.</p>
+            <article class="stack-card">
+              <div class="eyebrow">Granskningskedja</div>
+              <h3>Systemet ska kunna säga nej till sig självt.</h3>
+              <div class="stack-list">
+                <div class="stack-item">
+                  <div class="stack-index">A</div>
+                  <div class="stack-copy">
+                    <strong>Signalbyggare</strong>
+                    <p>Hittar mönster i tidslinjen utan att dra slutlig slutsats.</p>
+                  </div>
+                </div>
+                <div class="stack-item">
+                  <div class="stack-index">B</div>
+                  <div class="stack-copy">
+                    <strong>Domänspecialist</strong>
+                    <p>Prövar om signalen beter sig som ett FoU-, energi-, leasing- eller fastighetsspår.</p>
+                  </div>
+                </div>
+                <div class="stack-item">
+                  <div class="stack-index">C</div>
+                  <div class="stack-copy">
+                    <strong>Negativ kontroll</strong>
+                    <p>Frågar vad som talar emot caset, vad som saknas och om tiden faktiskt räcker retroaktivt.</p>
+                  </div>
+                </div>
+                <div class="stack-item">
+                  <div class="stack-index">D</div>
+                  <div class="stack-copy">
+                    <strong>Dossierläge</strong>
+                    <p>Översätter bara det som fortfarande håller till ett underlag som kan granskas mänskligt.</p>
+                  </div>
+                </div>
+              </div>
             </article>
           </div>
         </div>
@@ -667,17 +873,12 @@
       <section>
         <div class="shell">
           <div class="band">
-            <div class="eyebrow i18n-sv">Tidsriktning</div>
-            <div class="eyebrow i18n-en">Time direction</div>
-            <h2 class="i18n-sv">Vi tittar bakåt. De flesta verktyg tittar framåt.</h2>
-            <h2 class="i18n-en">We look backward. Most tools look forward.</h2>
-            <p class="i18n-sv">
-              Bolagsdatabaser säljer ofta nuläge. REVISION arbetar över historiska räkenskapsår för att hitta
-              undergranskade positioner — men bara där leadaxeln redan gör mandatet relevant.
-            </p>
-            <p class="i18n-en">
-              Company databases usually sell current status. REVISION works across historical fiscal years to find
-              under-reviewed positions — but only where the lead axis already makes the mandate relevant.
+            <div class="eyebrow">Det som antyds, inte skryts om</div>
+            <h2>Några system visar bolag. Det här visar skiften.</h2>
+            <p>
+              När ett case blir intressant här beror det ofta inte på att ett bolag är stort, utan på att någonting i
+              historiken inte riktigt linjerar: språk, investering, arbetsställe, klassificering, patentspår, rättslig
+              kontext eller ändrad användning. Det går att förstå utan att det behöver sägas med stora bokstäver.
             </p>
           </div>
         </div>
@@ -685,191 +886,54 @@
 
       <section>
         <div class="shell">
-          <h2 class="i18n-sv">Fyra kommersiella återbetalningsspår.</h2>
-          <h2 class="i18n-en">Four commercial recovery tracks.</h2>
-          <p class="section-lede i18n-sv">
-            Varje spår har olika evidenskrav, riskgate och behov av professionell handoff.
+          <h2>Vad systemet lämnar efter sig.</h2>
+          <p class="section-lede">
+            Arbetet stannar inte i ett sökresultat. När systemet går vidare skapas flera typer av material som kan
+            användas för läsning, granskning och fortsatt fördjupning.
           </p>
-          <p class="section-lede i18n-en">
-            Each track has different evidence requirements, risk gates, and professional handoff needs.
-          </p>
-          <div class="grid">
+          <div class="artifact-grid">
             <article class="card">
-              <h3 class="i18n-sv">FoU-personalavgifter</h3>
-              <h3 class="i18n-en">R&D payroll tax relief</h3>
-              <p class="i18n-sv">
-                Spår där FoU-liknande arbete syns historiskt men kanske inte omvandlats till tillgänglig relief.
-              </p>
-              <p class="i18n-en">
-                Tracks where R&D-like work appears historically but may not have been converted into available relief.
-              </p>
-              <ul class="i18n-sv">
-                <li>Utvecklingskostnader och immateriella tillgångar</li>
-                <li>Patent- och teknikpersonalsignaler</li>
-                <li>Sex års retroaktivt fönster</li>
-              </ul>
-              <ul class="i18n-en">
-                <li>Development costs and intangible assets</li>
-                <li>Patent and technical staff signals</li>
-                <li>Six-year retroactive window</li>
-              </ul>
-            </article>
-            <article class="card">
-              <h3 class="i18n-sv">Industriell energiskatt</h3>
-              <h3 class="i18n-en">Industrial energy tax</h3>
-              <p class="i18n-sv">
-                Tillverkning och processindustri där elanvändning, tillstånd och praxis kan stödja återbetalningsarbete.
-              </p>
-              <p class="i18n-en">
-                Manufacturing and process industries where electricity use, permits, and case law may support recovery work.
-              </p>
-              <ul class="i18n-sv">
-                <li>SNI och processklassning</li>
-                <li>SMP- och miljörapportsignaler</li>
-                <li>Tre års retroaktivt fönster</li>
-              </ul>
-              <ul class="i18n-en">
-                <li>SNI and process classification</li>
-                <li>SMP and environmental-report signals</li>
-                <li>Three-year retroactive window</li>
-              </ul>
-            </article>
-            <article class="card">
-              <h3 class="i18n-sv">Leasingmoms</h3>
-              <h3 class="i18n-en">Leasing VAT</h3>
-              <p class="i18n-sv">
-                Fordons- och driftleasingmönster där momsåtervinning kan kräva kontrakt- och användningsverifiering.
-              </p>
-              <p class="i18n-en">
-                Vehicle and operating lease patterns where VAT recovery may require contract and usage verification.
-              </p>
-              <ul class="i18n-sv">
-                <li>K3-leasing i rapportering</li>
-                <li>Fordonsregister och användning</li>
-                <li>Mänsklig kontraktsgranskning</li>
-              </ul>
-              <ul class="i18n-en">
-                <li>K3 lease disclosures</li>
-                <li>Vehicle registry and usage</li>
-                <li>Human contract review</li>
-              </ul>
-            </article>
-            <article class="card">
-              <h3 class="i18n-sv">Fastighetsmomsjustering</h3>
-              <h3 class="i18n-en">Property VAT adjustment</h3>
-              <p class="i18n-sv">
-                Investerings- och fastighetsmönster där tioårsregeln kan bli relevant.
-              </p>
-              <p class="i18n-en">
-                Investment and property patterns where the ten-year adjustment rule may matter.
-              </p>
-              <ul class="i18n-sv">
-                <li>Tillgångs- och investeringshistorik</li>
-                <li>Beskattad vs undantagen omsättning</li>
-                <li>Bygglov och fastighetssignaler</li>
-              </ul>
-              <ul class="i18n-en">
-                <li>Asset and investment history</li>
-                <li>Taxable vs exempt revenue split</li>
-                <li>Building permit and property signals</li>
-              </ul>
-            </article>
-            <article class="card">
-              <h3 class="i18n-sv">Risk och stop gates</h3>
-              <h3 class="i18n-en">Risk and stop gates</h3>
-              <p class="i18n-sv">
-                Svaga case stoppas tidigt. Saknad data är en sourcing-uppgift — inte tillåtelse att hitta på siffror.
-              </p>
-              <p class="i18n-en">
-                Weak cases stop early. Missing data is a sourcing task — not permission to invent numbers.
+              <h3>Dossiers i PDF</h3>
+              <p>
+                Flerstegsdokument som samlar signal, källor, risk, osäkerhet och nästa verifieringssteg i ett läsbart
+                underlag.
               </p>
             </article>
             <article class="card">
-              <h3 class="i18n-sv">Partner-handoff</h3>
-              <h3 class="i18n-en">Partner handoff</h3>
-              <p class="i18n-sv">
-                Bästa output är inte färdig deklaration utan dossier som låter kvalificerad rådgivare besluta om nästa steg.
+              <h3>Markdown-underlag</h3>
+              <p>
+                Promemorior, analysutkast och strukturerade resonemang som går att granska, revidera och bygga vidare
+                på.
               </p>
-              <p class="i18n-en">
-                The best output is not a finished filing but a dossier that lets a qualified advisor decide the next step.
+            </article>
+            <article class="card">
+              <h3>Systembilder och infographics</h3>
+              <p>
+                Visualiseringar av dataflöden, återvinningsspår, granskningslager och hur olika typer av källor vävs in
+                i analysmotorn.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Kunskapslager</h3>
+              <p>
+                Index, sammanställningar och återanvändbara kontextfiler som gör att tidigare fynd kan kopplas tillbaka
+                in i nya analyser.
               </p>
             </article>
           </div>
         </div>
       </section>
 
-      <section>
-        <div class="shell">
-          <h2 class="i18n-sv">Varför det är värdefullt för en partner.</h2>
-          <h2 class="i18n-en">Why this is valuable to a partner.</h2>
-          <div class="grid two">
-            <article class="card">
-              <h3 class="i18n-sv">För revisions- eller skattebyrå</h3>
-              <h3 class="i18n-en">For audit or tax advisory firms</h3>
-              <p class="i18n-sv">
-                REVISION fungerar som ett second-look-lager över befintliga och målade mandat — med leadaxlar som
-                byrå, signee och geografi i centrum.
-              </p>
-              <p class="i18n-en">
-                REVISION acts as a second-look layer over existing and target mandates — with lead axes centered on
-                firm, signee, and geography.
-              </p>
-            </article>
-            <article class="card">
-              <h3 class="i18n-sv">För innovation och samarbete</h3>
-              <h3 class="i18n-en">For innovation partnerships</h3>
-              <p class="i18n-sv">
-                Konkret tillämpad AI i en intäktsnära domän: prioritering, evidens, domänregler och professionella
-                arbetsflöden — utan felaktigt löfte om bred orgnummer-sökning.
-              </p>
-              <p class="i18n-en">
-                Applied AI in a revenue-linked domain: prioritization, evidence, domain rules, and professional workflows —
-                without the wrong promise of broad org-number search.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
     </main>
 
     <footer>
-      <div class="shell i18n-sv">
-        REVISION är ett TwistedStacks-beslutsstöd. Det ersätter inte skatterådgivning, revision eller juridik.
-        Kontakt: dev@twistedstacks.com
-      </div>
-      <div class="shell i18n-en">
-        REVISION is a TwistedStacks decision-support system. It is not tax, audit, or legal advice. Contact:
-        dev@twistedstacks.com
+      <div class="shell footer-grid">
+        <div class="footer-copy">
+          Skatterevision på TwistedStacks är beskriven här som ett besluts- och granskningslager. Sidan är avsiktligt
+          förklarande och ersätter inte revisionsbedömning, skatterådgivning eller juridiskt ställningstagande.
+        </div>
+        <a href="/" class="mini-link">Till showroom</a>
       </div>
     </footer>
-
-    <script>
-      (function () {
-        var storageKey = "twistedstacks.skatterevision.lang";
-        var buttons = document.querySelectorAll("[data-lang]");
-        var saved = localStorage.getItem(storageKey);
-
-        function setLang(lang) {
-          var next = lang === "en" ? "en" : "sv";
-          document.body.classList.remove("lang-sv", "lang-en");
-          document.body.classList.add(next === "en" ? "lang-en" : "lang-sv");
-          document.documentElement.lang = next;
-          buttons.forEach(function (button) {
-            button.classList.toggle("is-active", button.getAttribute("data-lang") === next);
-          });
-          localStorage.setItem(storageKey, next);
-        }
-
-        buttons.forEach(function (button) {
-          button.addEventListener("click", function () {
-            setLang(button.getAttribute("data-lang"));
-          });
-        });
-
-        if (saved === "en" || saved === "sv") {
-          setLang(saved);
-        }
-      })();
-    </script>
   </body>
 </html>
