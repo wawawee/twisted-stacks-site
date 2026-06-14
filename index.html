@@ -53,7 +53,7 @@
     <meta name="twitter:image" content="https://twistedstacks.com/og-image.svg" />
     <meta name="twitter:image:alt" content="TwistedStacks — AI systems showroom" />
 
-    <!-- Structured data: Organization + WebSite (SearchAction) -->
+    <!-- Structured data: Organization + WebSite + FAQPage -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -87,6 +87,59 @@
             "name": "TwistedStacks",
             "inLanguage": ["en", "sv"],
             "publisher": { "@id": "https://twistedstacks.com/#organization" }
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Vad är TwistedStacks?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "TwistedStacks är en svensk AI-byggstudio som utvecklar användbara AI-system och labb: REVISION (retroaktiv skatteåtervinning), LAGA (juridisk AI-workflow), Anslag (fri anslagssökning), VR Super-Senses (sensor-mesh för AR), CymWave (hydro-wellness), Recon Search Assistant (defensiv säkerhet) och utvalda webbprojekt."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Vilka projekt finns i showroom?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Showroomen visar nio projekt: REVISION, LAGA, Relay / THE-AI-BUTTON, Recon Search Assistant, Anslag, VR Super-Senses, CymWave, Silversmeden och Twisted Pongg. Klicka på ett kort för att läsa mer, öppna live-demo eller repo."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Vad kostar det att använda TwistedStacks produkter?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Anslag är öppet och gratis. REVISION kör success-fee (20–35% av återvunnen skatt, delat med byrån). Övriga projekt är i labb-, pilot- eller privat-demo-fas. För prisförfrågan: dev@twistedstacks.com."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Vem står bakom TwistedStacks?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "TwistedStacks drivs av Per Brinell, en svensk utvecklare med fokus på lokala AI-workflows, sensor-system och kundrespekterande design. Grundarens profil finns på GitHub: github.com/wawawee."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Hur kontaktar jag TwistedStacks?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "E-post: dev@twistedstacks.com. För demos, samarbeten och kundprojekt — använd ämnesraden för det specifika projektet (t.ex. 'REVISION demo' eller 'LAGA workflow lab')."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Var hittar jag källorna till era påståenden?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Alla projekt har en docs/projects/README-sources.md som spårar varje claim till en specifik fil och rad i källmapparna. REVISION har dessutom ett publikt system-PDF och en publik Vinnova/ERUF-ansökan. Se varje projektsida för länkar."
+                }
+              }
+            ]
           }
         ]
       }

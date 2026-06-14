@@ -44,7 +44,7 @@
     <meta name="twitter:image" content="https://twistedstacks.com/og-image.svg" />
     <meta name="twitter:image:alt" content="LAGA – legal workflow lab, TwistedStacks" />
 
-    <!-- Structured data: SoftwareApplication + BreadcrumbList -->
+    <!-- Structured data: SoftwareApplication + BreadcrumbList + FAQPage -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -57,7 +57,7 @@
             "applicationCategory": "BusinessApplication",
             "applicationSubCategory": "Legal AI workflow",
             "operatingSystem": "Web, macOS",
-            "description": "LAGA is an experimental Swedish legal workflow lab: media ingestion, MLX transcription, contradiction analysis, and OpenRouter-assisted review.",
+            "description": "LAGA är en experimentell juridisk AI-arbetsflödes-plattform som omvandlar långforms juridisk media till strukturerat granskningsmaterial via en fyra-nods React Flow-graf.",
             "url": "https://twistedstacks.com/laga.html",
             "inLanguage": "sv",
             "isAccessibleForFree": true,
@@ -88,6 +88,51 @@
                 "position": 2,
                 "name": "LAGA",
                 "item": "https://twistedstacks.com/laga.html"
+              }
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Vad är LAGA och vad gör det?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "LAGA är en experimentell juridisk AI-arbetsflödes-plattform som tar långforms juridisk media (ljud/video från förhör, intervjuer, utsagor) och omvandlar det till strukturerat granskningsmaterial. Transkribering sker lokalt med MLX på Apple Silicon; motsägelser inom och mellan talare detekteras automatiskt; OpenRouter kopplar påståenden till SFS-lagrum."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Vem är LAGA till för?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Advokater, åklagare, utredare och forskningsgrupper som redan arbetar med källmaterial och behöver ett spårbart arbetsflöde — inte konsumenter som vill chatta med en juridisk bot."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Är LAGA en chattbot?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Nej. LAGA är ett workflow: fyra explicita noder (Media → Transcribe → Analyze → Eval) i React Flow med run-monitor och spårbara artefakter under data/. Du ser vad som sades, vad som påstods och vad som motsades — inte bara ett svar i en ruta."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Hanterar LAGA svensk media och juridisk kontext?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Ja. MLX Whisper transkriberar svenska lokalt på Apple Silicon (sv-SE, ingen molnuppladdning), och OpenRouter-baserad granskning kopplar påståenden till SFS-lagrum och HFD-prejudikat."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Kan jag prova LAGA idag?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Det finns ingen publik demo just nu. Den senaste macOS Swift-versionen ligger på en privat iMac och webblabben är pausad. Kontakta dev@twistedstacks.com om du vill diskutera en privat återstart för ett konkret case."
+                }
               }
             ]
           }
@@ -694,6 +739,56 @@
                 </ul>
               </article>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="shell">
+          <div class="eyebrow">FAQ</div>
+          <h2 style="margin-top:8px;">Vanliga frågor om LAGA.</h2>
+          <div class="grid two" style="margin-top:24px;">
+            <article class="card">
+              <h3>Vad är LAGA och vad gör det?</h3>
+              <p>
+                LAGA är en experimentell juridisk AI-arbetsflödes-plattform som tar långforms juridisk media (ljud och
+                video från förhör, intervjuer och utsagor) och omvandlar det till strukturerat granskningsmaterial —
+                transkribering lokalt med MLX på Apple Silicon, automatisk detektering av motsägelser inom och mellan
+                talare, och OpenRouter-baserad granskning som kopplar påståenden till SFS-lagrum.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Vem är LAGA till för?</h3>
+              <p>
+                Advokater, åklagare, utredare och forskningsgrupper som redan arbetar med källmaterial och behöver ett
+                spårbart arbetsflöde. Inte konsumenter som vill chatta med en juridisk bot.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Är LAGA en chattbot?</h3>
+              <p>
+                Nej. LAGA är ett workflow: fyra explicita noder (Media → Transcribe → Analyze → Eval) i React Flow
+                med run-monitor och spårbara artefakter under <code>data/</code>. Du ser vad som sades, vad som
+                påstods och vad som motsades — inte bara ett svar i en ruta.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Hanterar LAGA svensk media och juridisk kontext?</h3>
+              <p>
+                Ja. MLX Whisper transkriberar svenska lokalt på Apple Silicon (sv-SE, ingen molnuppladdning), och
+                OpenRouter-baserad granskning kopplar påståenden till SFS-lagrum och HFD-prejudikat.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Kan jag prova LAGA idag?</h3>
+              <p>
+                Det finns ingen publik demo just nu. Den senaste macOS Swift-versionen ligger på en privat iMac och
+                webblabben är pausad. Kontakta <a href="mailto:dev@twistedstacks.com?subject=LAGA%20workflow%20lab"
+                  >dev@twistedstacks.com</a
+                >
+                om du vill diskutera en privat återstart för ett konkret case.
+              </p>
+            </article>
           </div>
         </div>
       </section>

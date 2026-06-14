@@ -46,7 +46,7 @@
     <meta name="twitter:image" content="https://twistedstacks.com/og-image.svg" />
     <meta name="twitter:image:alt" content="Recon Search Assistant – TwistedStacks" />
 
-    <!-- Structured data: SoftwareApplication + BreadcrumbList -->
+    <!-- Structured data: SoftwareApplication + BreadcrumbList + FAQPage -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -59,7 +59,7 @@
             "applicationCategory": "SecurityApplication",
             "applicationSubCategory": "Defensive security / OSINT triage",
             "operatingSystem": "Web (Vercel, server proxy)",
-            "description": "Authorized defensive security research lab: dork-based discovery, search proxy, AI triage. Paused from public demo until API keys and scope controls are production-ready.",
+            "description": "Recon Search Assistant är en defensiv säkerhetsresearch-workbench som kör auktoriserad ytrecon, dork-baserad discovery och AI-triage för bug bounty och defensiv forskning.",
             "url": "https://twistedstacks.com/recon.html",
             "inLanguage": ["sv", "en"],
             "isAccessibleForFree": false,
@@ -83,6 +83,51 @@
                 "position": 2,
                 "name": "Recon Search Assistant",
                 "item": "https://twistedstacks.com/recon.html"
+              }
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Vad är Recon Search Assistant?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Recon Search Assistant är en defensiv säkerhetsresearch-workbench som kör auktoriserad ytrecon, dork-baserad discovery och AI-triage av findings för bug bounty och defensiv forskning. Det är inte en publik hackningsplattform."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Är Recon ett hackerverktyg?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Nej. Recon är en labb-miljö för auktoriserad säkerhetsforskning: dork-bibliotek, sökproxy och AI-triage av fynd — med mänsklig review i loopen. README:n är tydlig: 'legitimate security research and bug bounty hunting purposes only'."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Vad innehåller dork-biblioteket?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "115+ Google-dorks uppdelat på fildiscovery, webbapplikationer, informationsinhämtning, moln och infrastruktur, API/utveckling samt krypto/OSINT. SerpAPI driver sökningen i appen och OpenRouter prioriterar findings (critical / high / medium / low / info)."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Varför är Recon pausad i showroom?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Den statiska GitHub-Pages-deployn ska fasas ut och API-nycklarna (SerpAPI, OpenRouter, Gemini) ska flyttas in i Vercel-env innan projektet visas publikt igen. Säkerhet först."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Kan jag använda Recon för sårbarhetstester?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Endast på system du äger eller har uttrycklig auktorisation att testa. För defensiv forskning eller samarbete — hör av dig via dev@twistedstacks.com."
+                }
               }
             ]
           }
@@ -535,6 +580,89 @@
                 Archive code lives on
                 <a href="https://github.com/wawawee/Recon-Search-Assistant" target="_blank" rel="noreferrer">GitHub</a>
                 but is not promoted as a live demo until review is complete.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="shell">
+          <div class="eyebrow i18n-sv">FAQ</div>
+          <div class="eyebrow i18n-en">FAQ</div>
+          <h2 class="i18n-sv" style="margin-top:8px;">Vanliga frågor om Recon.</h2>
+          <h2 class="i18n-en" style="margin-top:8px;">Common questions about Recon.</h2>
+          <div class="grid two" style="margin-top:24px;">
+            <article class="card">
+              <h3 class="i18n-sv">Vad är Recon Search Assistant?</h3>
+              <h3 class="i18n-en">What is Recon Search Assistant?</h3>
+              <p class="i18n-sv">
+                Recon Search Assistant är en defensiv säkerhetsresearch-workbench som kör auktoriserad ytrecon,
+                dork-baserad discovery och AI-triage av findings för bug bounty och defensiv forskning. Det är
+                <em>inte</em> en publik hackningsplattform.
+              </p>
+              <p class="i18n-en">
+                Recon Search Assistant is a defensive security research workbench running authorized surface recon,
+                dork-based discovery, and AI triage of findings for bug bounty and defensive research. It is
+                <em>not</em> a public hacking platform.
+              </p>
+            </article>
+            <article class="card">
+              <h3 class="i18n-sv">Är Recon ett hackerverktyg?</h3>
+              <h3 class="i18n-en">Is Recon a hacking tool?</h3>
+              <p class="i18n-sv">
+                Nej. Recon är en labb-miljö för auktoriserad säkerhetsforskning: dork-bibliotek, sökproxy och
+                AI-triage av fynd — med mänsklig review i loopen. README:n är tydlig: 'legitimate security research
+                and bug bounty hunting purposes only'.
+              </p>
+              <p class="i18n-en">
+                No. Recon is a lab for authorized security research: dork library, search proxy, and AI triage of
+                findings — with human review in the loop. The README is explicit: 'legitimate security research and
+                bug bounty hunting purposes only'.
+              </p>
+            </article>
+            <article class="card">
+              <h3 class="i18n-sv">Vad innehåller dork-biblioteket?</h3>
+              <h3 class="i18n-en">What is in the dork library?</h3>
+              <p class="i18n-sv">
+                115+ Google-dorks uppdelat på fildiscovery, webbapplikationer, informationsinhämtning, moln och
+                infrastruktur, API/utveckling samt krypto/OSINT. SerpAPI driver sökningen och OpenRouter prioriterar
+                findings (critical / high / medium / low / info).
+              </p>
+              <p class="i18n-en">
+                115+ Google dorks across file discovery, web application discovery, information gathering, cloud and
+                infrastructure, API/development, and crypto/OSINT. SerpAPI powers the in-app search and OpenRouter
+                prioritizes findings (critical / high / medium / low / info).
+              </p>
+            </article>
+            <article class="card">
+              <h3 class="i18n-sv">Varför är Recon pausad i showroom?</h3>
+              <h3 class="i18n-en">Why is Recon paused in the showroom?</h3>
+              <p class="i18n-sv">
+                Den statiska GitHub-Pages-deployn ska fasas ut och API-nycklarna (SerpAPI, OpenRouter, Gemini) ska
+                flyttas in i Vercel-env innan projektet visas publikt igen. Säkerhet först.
+              </p>
+              <p class="i18n-en">
+                The static GitHub Pages deploy is being retired and the API keys (SerpAPI, OpenRouter, Gemini) need
+                to move into the Vercel environment before the project is shown publicly again. Security first.
+              </p>
+            </article>
+            <article class="card">
+              <h3 class="i18n-sv">Kan jag använda Recon för sårbarhetstester?</h3>
+              <h3 class="i18n-en">Can I use Recon for vulnerability testing?</h3>
+              <p class="i18n-sv">
+                Endast på system du äger eller har uttrycklig auktorisation att testa. För defensiv forskning eller
+                samarbete — hör av dig via
+                <a href="mailto:dev@twistedstacks.com?subject=Recon%20defensive" style="color:var(--green);"
+                  >dev@twistedstacks.com</a
+                >.
+              </p>
+              <p class="i18n-en">
+                Only on systems you own or have explicit authorization to test. For defensive research or
+                collaboration, reach out via
+                <a href="mailto:dev@twistedstacks.com?subject=Recon%20defensive" style="color:var(--green);"
+                  >dev@twistedstacks.com</a
+                >.
               </p>
             </article>
           </div>

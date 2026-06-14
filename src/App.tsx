@@ -3697,6 +3697,17 @@ export default function App() {
                       {para}
                     </p>
                   ))}
+                  {ext.faq.length > 0 ? (
+                    <div className="showroom-project-detail-faq" aria-label="FAQ">
+                      <div className="showroom-project-detail-faq-kicker">FAQ</div>
+                      {ext.faq.map((item, i) => (
+                        <div key={`${ext.id}-faq-${i}`} className="showroom-project-detail-faq-item">
+                          <h3 className="showroom-project-detail-faq-q">{item.q}</h3>
+                          <p className="showroom-project-detail-faq-a">{item.a}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
                   <div className="showroom-project-detail-stack">
                     {ext.stack.map((tech) => (
                       <span key={`${ext.id}-${tech}`}>{tech}</span>

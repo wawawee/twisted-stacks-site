@@ -44,7 +44,7 @@
     <meta name="twitter:image" content="https://twistedstacks.com/og-image.svg" />
     <meta name="twitter:image:alt" content="Skatterevision – TwistedStacks" />
 
-    <!-- Structured data: Article + SoftwareApplication + BreadcrumbList -->
+    <!-- Structured data: SoftwareApplication + BreadcrumbList + FAQPage -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -57,7 +57,7 @@
             "applicationCategory": "BusinessApplication",
             "applicationSubCategory": "Retroaktiv skatte- och bolagsrevision",
             "operatingSystem": "Web (Vercel)",
-            "description": "Retroaktiv skatterevision byggd för historiska bolagsdata. iXBRL, SNI över tid, egna databaser, granskningslager och dossierutskrift.",
+            "description": "REVISION är ett retroaktivt skatteåtervinnings-system som analyserar historiska iXBRL-årsredovisningar 2019–2025 och producerar revisionsbara PDF-dossiers med full källhänvisning.",
             "url": "https://skatterevision.twistedstacks.com/",
             "inLanguage": "sv",
             "isAccessibleForFree": false,
@@ -81,6 +81,51 @@
                 "position": 2,
                 "name": "Skatterevision",
                 "item": "https://skatterevision.twistedstacks.com/"
+              }
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Vad är REVISION och vad gör det?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "REVISION är ett retroaktivt skatteåtervinnings-system som analyserar svenska bolags historiska iXBRL-årsredovisningar (2019–2025) och identifierar missade positioner inom FoU-avdrag, energiskatt, leasingmoms och fastighetsmoms. Utdata är revisionsbara PDF-dossiers där varje siffra har en källhänvisning ankare till HFD-prejudikat."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Vem är REVISION till för?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Svenska revisionsbyråer och skattekonsulter som vill ha färdiggrävd, källbelagd lead-intelligens som beslutsstöd. Byrån behåller kund, attest och slutansvar; REVISION levererar granskningen."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Hur fungerar skatteåtervinningen i praktiken?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Systemet läser historiska årsredovisningar, kör 17 specialiserade LLM-agenter (FoU, energi, leasing, fastighet) och utmanar varje claim med en dubbelkritiker-grind (kritikern + verifikator). Ett case blir ett PDF-dossier först när evidensen håller; annars markeras det INSUFFICIENT_DATA."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Vad kostar REVISION?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Success-fee-modell: 20–35% av faktiskt återvunnen skatt, delat med byrån. Ingen återvinning — ingen kostnad. Pilotregion: Gävleborg/Dalarna, tillverknings-SME 10–250 anställda."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Är REVISION live?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "REVISION är i produktions-pilot med privat demo. Privat demo bokas via dev@twistedstacks.com. Systemet är inte publikt — det bygger på kundens eget datalager och partnerskap."
+                }
               }
             ]
           }
@@ -1015,6 +1060,55 @@
               historiken inte riktigt linjerar: språk, investering, arbetsställe, klassificering, patentspår, rättslig
               kontext eller ändrad användning. Det går att förstå utan att det behöver sägas med stora bokstäver.
             </p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="shell">
+          <div class="eyebrow">FAQ</div>
+          <h2 style="margin-top:8px;">Vanliga frågor om REVISION.</h2>
+          <div class="grid two" style="margin-top:24px;">
+            <article class="card">
+              <h3>Vad är REVISION och vad gör det?</h3>
+              <p>
+                REVISION är ett retroaktivt skatteåtervinnings-system som analyserar svenska bolags historiska
+                iXBRL-årsredovisningar (2019–2025) och identifierar missade positioner inom FoU-avdrag, energiskatt,
+                leasingmoms och fastighetsmoms. Utdata är revisionsbara PDF-dossiers där varje siffra har en
+                källhänvisning ankare till HFD-prejudikat.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Vem är REVISION till för?</h3>
+              <p>
+                Svenska revisionsbyråer och skattekonsulter som vill ha färdiggrävd, källbelagd lead-intelligens som
+                beslutsstöd. Byrån behåller kund, attest och slutansvar; REVISION levererar granskningen.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Hur fungerar skatteåtervinningen i praktiken?</h3>
+              <p>
+                Systemet läser historiska årsredovisningar, kör 17 specialiserade LLM-agenter (FoU, energi, leasing,
+                fastighet) och utmanar varje claim med en dubbelkritiker-grind (kritikern + verifikator). Ett case blir
+                ett PDF-dossier först när evidensen håller; annars markeras det <code>INSUFFICIENT_DATA</code>.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Vad kostar REVISION?</h3>
+              <p>
+                Success-fee-modell: 20–35% av faktiskt återvunnen skatt, delat med byrån. Ingen återvinning — ingen
+                kostnad. Pilotregion: Gävleborg/Dalarna, tillverknings-SME 10–250 anställda.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Är REVISION live?</h3>
+              <p>
+                REVISION är i produktions-pilot med privat demo. Privat demo bokas via
+                <a href="mailto:dev@twistedstacks.com?subject=REVISION%20demo" style="color:var(--gold);"
+                  >dev@twistedstacks.com</a
+                >. Systemet är inte publikt — det bygger på kundens eget datalager och partnerskap.
+              </p>
+            </article>
           </div>
         </div>
       </section>
