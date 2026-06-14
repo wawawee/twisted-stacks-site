@@ -184,7 +184,7 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
     status: "PRODUCTION",
     tagline: "Lead discovery for retroactive Swedish tax recovery — not org-number lookup.",
     description:
-      "Helps audit and tax partners prioritize mandates via signee, accounting firm, geography, and track filters. Only a small share of companies qualify — the moat is finding the right leads, then building sourced dossiers.",
+      "REVISION is a retroactive Swedish tax-recovery engine that turns historical iXBRL annual reports (2019–2025) into audit-grade dossiers with full source citations. It identifies missed positions in R&D deductions, industrial energy tax, vehicle-leasing VAT and property VAT, anchored to relevant HFD precedents. The system is built as a complement to the audit firm, not a replacement: the byrå keeps customer, attestation and final responsibility while REVISION delivers ready-mined intelligence. A squad of seventeen specialised LLM agents — including a dual-critic gate (kritikern red-team, verifikator positive-evidence) and a zero-hallucination protocol — runs the analysis. The moat is finding the right leads, then building sourced dossiers that hold up to professional scrutiny.",
     techStack: ["TypeScript", "iXBRL", "AI Agents", "Dossiers"],
     telemetry: [
       { label: "MODE", value: "DOSSIERS" },
@@ -202,7 +202,7 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
     status: "LAB / PAUSED",
     tagline: "Swedish legal media to structured review — workflow, not chat.",
     description:
-      "Experimental legal-AI lab: React Flow graph, MLX transcription, contradiction analysis, and OpenRouter review. No live public demo right now; latest macOS build stays on a private iMac.",
+      "LAGA is an experimental Swedish legal-AI workflow platform for turning long-form legal media into structured review material. Audio and video flow through a four-node React Flow graph — Media, Transcribe, Analyze, Eval — with a run monitor and traceable artifacts under each run folder. Local MLX Whisper handles Swedish speech-to-text on Apple Silicon with a duty-budgeted GPU profile; OpenRouter serves as the fallback path for text and multimodal review. The point is workflow, not chat: a lawyer can see exactly what was transcribed, what was claimed and what was contradicted, with a Contradictions panel that filters by intra-speaker and inter-speaker relationships. No live public demo right now; the latest macOS Swift build stays on a private iMac.",
     techStack: ["React Flow", "MLX", "OpenRouter", "Swift"],
     telemetry: [
       { label: "NODES", value: "4 MVP" },
@@ -219,7 +219,8 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
     version: "voice-first iOS",
     status: "ACTIVE DEMO",
     tagline: "Say it once. Let the agent do the rest.",
-    description: "A tiny voice-first relay for sending spoken tasks to reminders, mail, n8n, or AI agents without living inside a chat window.",
+    description:
+      "Relay is a voice-first iOS app for sending spoken tasks to reminders, mail, n8n workflows, or AI agents without ever opening a chat window. The whole point is to skip the friction of launching an app and typing — instead, a single phrase (via Hey Siri, the Action Button, or Voice Control) triggers Note to AI or Note to Self. Note to AI POSTs the transcript to a user-owned webhook, runs the agent, and speaks the result back via TTS; Note to Self saves to a Reminders list or to email. The integration is the part nobody else assembles: Apple already exposes Siri, the Action Button, Voice Control and App Intents, but never connects them — Relay wires them into one installable flow. Swedish on-device STT (sv-SE, no cloud upload) keeps the privacy story clean. Built in Swift + SwiftUI on iOS 18+.",
     techStack: ["Swift", "iOS", "n8n", "Voice UX"],
     telemetry: [
       { label: "PLATFORM", value: "iOS" },
@@ -235,7 +236,7 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
     status: "LAB / PAUSED",
     tagline: "Authorized recon and triage — not a public demo yet.",
     description:
-      "Bug bounty and defensive research lab (dorks, search proxy, AI triage). Paused from showroom until API keys live in Vercel env and GitHub Pages static deploy is retired.",
+      "Recon Search Assistant is a defensive security research workbench, not a public hacking tool or offensive framework. The original prototype bundles 115+ Google dorks across file discovery, web application discovery, information gathering, cloud and infrastructure, and crypto/OSINT, with a SerpAPI-backed in-app search and OpenRouter AI triage that flags critical, high, medium, low and info findings automatically. User accounts, dashboard, history, saved searches and findings management are wired through Supabase. The project is currently paused from the public showroom: the static GitHub Pages deploy is being retired and the API keys need to move into the Vercel environment before it is shown again. The framing is explicit — legitimate security research and bug-bounty hunting on systems the operator owns or has permission to test, nothing else.",
     techStack: ["Express", "Supabase", "OpenRouter", "OSINT"],
     telemetry: [
       { label: "MODE", value: "DEFENSIVE" },
@@ -253,7 +254,7 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
     status: "SHIPPED",
     tagline: "Hitta fonder, stipendier och andra anslag till ditt projekt.",
     description:
-      "Sök utlysningar, jämför möjligheter och få hjälp att skriva ansökningsutkast — gratis och öppet för alla.",
+      "Anslag är en fri svensk anslagssöknings- och utkaststjänst som hittar utlysningar, stipendier och stiftelser åt dig. Tjänsten söker över Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi och svenska stiftelser via Exa och de officiella källorna, och hjälper dig sedan att skriva själva ansökan på svenska. Det finns två söklägen (bred och smal) och en modell-tier-väljare (auto / gratis / betald) så att en liten förening kan köra på gratis-modeller medan en konsult med deadline väljer en betald modell utan att byta arbetsflöde. Motorn är samma OpenRouter-gateway med sju nycklar som TwistedStacks själva använder för att skriva Almi-, ERUF- och Vinnova-ansökningar — men den publika appen är öppen och gratis för alla svenska projekt som söker finansiering.",
     techStack: ["React", "Vite", "AI", "Svenska utlysningar"],
     telemetry: [
       { label: "SÖK", value: "FONDER" },
@@ -270,7 +271,7 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
     status: "HARDWARE LAB",
     tagline: "See the invisible world: WiFi, heat, RF, and EMF in passthrough VR.",
     description:
-      "A public Quest lab where ESP32 sensor nodes stream into a Python WebSocket hub and Unity renders the hidden signal world as RF orbs, WiFi towers, heat overlays, field lines, and fused source estimates.",
+      "VR Super-Senses — Twisted SuperSenses under the brand book — is an open sensor mesh for VR and iOS AR passthrough that surfaces the normally invisible radio, thermal and electromagnetic world around the wearer. ESP32-S3 nodes with NRF24, CC1101, MLX90640 and 50 Hz coil sensors stream into a Python WebSocket hub on port 81; Unity 6 + URP + Meta XR SDK renders the scene on Meta Quest, and an ARKit / RealityKit client runs on iPhone 13 Pro+ with LiDAR. The capability matrix is intentionally honest: AR passthrough and LiDAR mesh are live, WiFi / RF / thermal / EMF / AC layers are partial, and CSI presence plus the Flipper bridge are stubs. Privacy posture is receive-only by default — no TX in any uncontrolled context, no CSI on other people's networks, no X-ray claims. Six sensor layers plus a fusion layer and gated stimulus modules.",
     techStack: ["Unity", "Meta Quest", "ESP32", "Python Hub"],
     telemetry: [
       { label: "LAYERS", value: "6" },
@@ -287,7 +288,7 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
     status: "ACTIVE DEMO",
     tagline: "Programmable water, sound, light, and guided relaxation journeys.",
     description:
-      "Early-stage immersive bath and float concept for hotels, spas, retreats, and wellbeing environments. Current work covers demand validation, safe prototype planning, vibration/pressure tuning, IP mapping, and grant strategy.",
+      "CymWave is an early-stage Swedish wellness-technology project for immersive bath and float experiences — warm water, controlled massage or low-frequency vibration, spatial or underwater-safe audio, chromotherapy-style light scenes, and guided journeys for calm, sleep preparation, recovery, romance, seasonal rituals, or premium hotel experiences. The current goal is explicitly not to overclaim medical effects: the first version is a premium B2B wellness installation for boutique hotels, destination spas, retreat centres and premium wellness studios, focused on relaxation, perceived stress, sleep readiness, comfort and memorable guest experience. The technical track is moving toward measured pressure and vibration design, with an aviation vibration-testing specialist supporting actuator and motor-side development. Phase 0 covers concept recovery, IP mapping and 10–15 customer interviews; Phase 1 is the proof-of-experience prototype on safe, off-the-shelf components. Funding runs through the Vinnova Test och Demo track with Almi Verifieringsmedel as the rolling alternative.",
     techStack: ["Hydrotherapy", "Vibration R&D", "Spatial Audio", "Light Scenes"],
     telemetry: [
       { label: "MODE", value: "WELLNESS" },
@@ -303,7 +304,8 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
     version: "client site",
     status: "SHIPPED",
     tagline: "Clean craft site for a working silversmith.",
-    description: "A restrained public site built for a silversmith: simple, elegant, and focused on the work rather than framework noise.",
+    description:
+      "Silversmeden is a quiet public site for a working silversmith — intentionally not a portfolio-app showcase and not a WordPress build. The design language is restrained, the work is the work, and the framework noise is kept out of the way of the customer. The page layout favours large product imagery, clean typography and minimal chrome, with a shallow product list and a checkout that is not bolted on as a feature. The brand-voice work is the more interesting part of the engagement: how do you sell hand-made silver online without falling into a 'buy now' shop interface that overwhelms an older customer? The site is the first shipped TwistedStacks client engagement — built on Vite, deployed on Vercel, structured to be operated by the silversmith himself after handover. It serves as a reference for the type of restrained, customer-respecting site TwistedStacks will build for craft businesses.",
     techStack: ["Vercel", "Frontend", "Design", "Client"],
     telemetry: [
       { label: "MODE", value: "CRAFT" },
@@ -319,7 +321,8 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
     version: "playable site",
     status: "ACTIVE DEMO",
     tagline: "Self-pass square court with spin.",
-    description: "The homepage itself is playable: a light arcade shell around the TwistedStacks portfolio instead of a static landing page.",
+    description:
+      "Twisted Pongg is the playable front door of the TwistedStacks showroom — the portfolio sits on top of a working four-paddle arcade game (left, right, top, bottom) running on React, Three.js and WebGL. The game runs in ambient mode by default, so the visitor lands on a live scene before they realise it is interactive. The physics, spin, curve, corner-combo system, monster bricks, centre motif and audio engine are all hand-rolled — no wrapper around another library. A hardcore arcade boot path skips the intro straight into the court; a casual / hardcore / impossible difficulty picker is held behind the D key. A global top-5 leaderboard syncs through Supabase when configured and falls back to a local scoreboard otherwise. Pongg is also the testbed for the brand system: the warm-brown ramp, baby-blue accent, cherry state, and pearl primary-button language are all carried by the showroom grid, the scoreboard, the contact FAB and the level badges.",
     techStack: ["React", "Three.js", "WebGL", "Vite"],
     telemetry: [
       { label: "BALL SPEED", value: "DYNAMIC" },
