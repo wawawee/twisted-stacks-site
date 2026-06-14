@@ -751,6 +751,62 @@
 
       <section>
         <div class="shell">
+          <div class="eyebrow">Om projektet</div>
+          <h2 style="margin-top:8px;">Vad REVISION gör, och vem det är till för.</h2>
+          <p class="section-lede">
+            REVISION (SkatteRevision / Anlagstavlan) är en retroaktiv skatteåterbetalningsmotor som
+            analyserar svenska bolags historiska iXBRL-årsredovisningar (2019–2025) och identifierar
+            missade positioner inom FoU-avdrag, energiskatt, leasingmoms och fastighetsmoms. Systemet
+            producerar audit-grade PDF-dossiers där varje siffra har en källhänvisning, ankare till
+            HFD-prejudikat och tydlig osäkerhetsredovisning.
+          </p>
+          <div class="grid two">
+            <article class="card">
+              <h3>Vad det är</h3>
+              <p>
+                En motor som kombinerar historiska årsredovisningar, iXBRL-extraktion och 17
+                specialiserade LLM-agenter (FoU, energiskatt, leasingmoms, fastighetsmoms,
+                kritikern, verifikator, mimir m.fl.) med ett noll-hallucinationsprotokoll —
+                varje numeriskt påstående har ett <code>source</code>-fält, annars
+                <code>INSUFFICIENT_DATA</code>.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Vem det är för</h3>
+              <p>
+                Svenska revisionsbyråer och skattekonsulter. Byrån behåller kund, attest och ansvar
+                — REVISION levererar färdiggrävd intelligens med rättslig grund som beslutsstöd.
+                Pilotregion: Gävleborg / Dalarna, tillverknings-SME 10–250 anställda.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Status</h3>
+              <p>
+                Produktions-pilot. Almi Verifieringsmedel 85k SEK sökt, ERUF 2,4 MSEK-ansökan
+                öppnar 2026-08-20, Vinnova Skalning 2027 i pipeline. R3-pitchmaterial klart, ~50
+                pilotbolag analyserade.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Demo / kontakt</h3>
+              <p>
+                Privat demo går att boka via
+                <a href="mailto:dev@twistedstacks.com?subject=REVISION%20demo" style="color:var(--gold);">dev@twistedstacks.com</a>.
+                Systemet är inte publikt — det bygger på kundens eget datalager och partnerskap.
+              </p>
+            </article>
+          </div>
+          <p style="margin-top:18px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:0.08em;">
+            <strong style="color:var(--cyan);">Stack:</strong> TypeScript · Express · React 19 · ReactFlow · iXBRL-pipeline · OpenRouter · Qdrant · Supabase · PDFKit
+            ·&nbsp;
+            <strong style="color:var(--cyan);">Källa:</strong>
+            <a href="/docs/projects/README-sources.md#system_skatterevision-revision" target="_blank" rel="noreferrer" style="color:var(--cyan);">docs/projects/README-sources.md</a>
+          </p>
+        </div>
+      </section>
+
+      <section>
+        <div class="shell">
           <div class="band">
             <div class="eyebrow">Systemöversikt</div>
             <h2>Byggt ovanpå historiska datamängder, egna index och flera typer av källmaterial.</h2>

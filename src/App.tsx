@@ -80,6 +80,7 @@ import {
   levelIntroWeirdOffset,
 } from "./levelIntro";
 import { monsterShotAngle, monsterShotSpeed } from "./monsterShots";
+import { PROJECTS, getProjectById, type ProjectEntry } from "./data/projects";
 
 // Theme Palette Configuration
 const COLOR_BLACK = 0x050505;       // Pure near-black background
@@ -371,6 +372,11 @@ export default function App() {
   const [selectedProjectId, setSelectedProjectId] = useState<string>("system_skatterevision");
   const [showShowroomModal, setShowShowroomModal] = useState(false);
   const [showGame, setShowGame] = useState(false);
+  // Read-more panel for extended project descriptions (longDescription + keywords).
+  // Independent of `selectedProjectId` (which is just a hover/focus highlight) and
+  // of `openProjectDestination` (which actually navigates). The user can expand
+  // a card to read more without leaving the showroom.
+  const [expandedProjectId, setExpandedProjectId] = useState<string | null>(null);
   const showGameRef = useRef(showGame);
   const [highScores, setHighScores] = useState<ScoreEntry[]>(loadScoreboard);
   const [leaderboardMode, setLeaderboardMode] = useState<"local" | "global">(
@@ -618,6 +624,12 @@ export default function App() {
 
   const isProjectActionable = (project: ShowroomProject) =>
     Boolean(project.href || project.contactMessage || project.id === "system_arena");
+
+  const getExtendedFor = (id: string): ProjectEntry | undefined => getProjectById(id);
+
+  const toggleProjectExpanded = (id: string) => {
+    setExpandedProjectId((prev) => (prev === id ? null : id));
+  };
 
   const championUnlockedRef = useRef(championUnlocked);
   championUnlockedRef.current = championUnlocked;
@@ -3580,12 +3592,14 @@ export default function App() {
           </section>
 
           <section className="showroom-project-grid" aria-label="TwistedStacks projects">
-            {CATALOG_PROJECTS.filter((project) => project.id !== "system_arena").map((project) => (
+            {CATALOG_PROJECTS.filter((project) => project.id !== "system_arena").map((project) => {
+              const isExpanded = expandedProjectId === project.id;
+              return (
               <article
                 key={project.id}
                 className={`showroom-project ${selectedProjectId === project.id ? "is-selected" : ""} ${
                   isProjectActionable(project) ? "is-actionable" : ""
-                }`}
+                } ${isExpanded ? "is-expanded" : ""}`}
                 onMouseEnter={() => setSelectedProjectId(project.id)}
                 onClick={() => {
                   if (isProjectActionable(project)) openProjectDestination(project);
@@ -3630,9 +3644,107 @@ export default function App() {
                     <span className="showroom-project-pending">{project.actionLabel || "Soon"}</span>
                   )}
                 </div>
+                <button
+                  type="button"
+                  className={`showroom-project-readmore ${isExpanded ? "is-open" : ""}`}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    toggleProjectExpanded(project.id);
+                  }}
+                  aria-expanded={isExpanded}
+                  aria-controls={`showroom-project-detail-${project.id}`}
+                >
+                  {isExpanded ? "Hide details" : "Read more"}
+                </button>
               </article>
-            ))}
+              );
+            })}
           </section>
+
+          {/* Extended project detail panel — shown when a project card is expanded */}
+          {expandedProjectId ? (() => {
+            const ext = getExtendedFor(expandedProjectId);
+            const live = CATALOG_PROJECTS.find((p) => p.id === expandedProjectId);
+            if (!ext || !live) return null;
+            return (
+              <section
+                id={`showroom-project-detail-${ext.id}`}
+                className="showroom-project-detail"
+                aria-label={`${ext.name} details`}
+              >
+                <div className="showroom-project-detail-inner">
+                  <div className="showroom-project-detail-head">
+                    <div>
+                      <div className="showroom-project-detail-kicker">
+                        {ext.status} · {ext.version}
+                      </div>
+                      <h3>{ext.name}</h3>
+                    </div>
+                    <button
+                      type="button"
+                      className="showroom-project-detail-close"
+                      onClick={() => setExpandedProjectId(null)}
+                      aria-label="Close details"
+                    >
+                      [CLOSE ×]
+                    </button>
+                  </div>
+                  {ext.longDescription.split(/\n\n+/).map((para, i) => (
+                    <p key={`${ext.id}-p-${i}`} className="showroom-project-detail-para">
+                      {para}
+                    </p>
+                  ))}
+                  <div className="showroom-project-detail-stack">
+                    {ext.stack.map((tech) => (
+                      <span key={`${ext.id}-${tech}`}>{tech}</span>
+                    ))}
+                  </div>
+                  {ext.keywords.length > 0 ? (
+                    <div className="showroom-project-detail-keywords" aria-label="Topics">
+                      {ext.keywords.map((kw) => (
+                        <span key={`${ext.id}-kw-${kw}`}>{kw}</span>
+                      ))}
+                    </div>
+                  ) : null}
+                  <div className="showroom-project-detail-cta">
+                    {ext.href ? (
+                      isExternalProjectHref(ext.href) ? (
+                        <a
+                          className="showroom-action showroom-action-primary"
+                          href={ext.href}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {ext.ctaLabel} →
+                        </a>
+                      ) : (
+                        <a className="showroom-action showroom-action-primary" href={ext.href}>
+                          {ext.ctaLabel} →
+                        </a>
+                      )
+                    ) : null}
+                    {ext.contactMessage ? (
+                      <button
+                        type="button"
+                        className="showroom-action"
+                        onClick={() => openContactForm({ type: "QUERY", message: ext.contactMessage })}
+                      >
+                        Contact
+                      </button>
+                    ) : null}
+                    <a
+                      className="showroom-action"
+                      href="/docs/projects/README-sources.md"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Source notes
+                    </a>
+                  </div>
+                </div>
+              </section>
+            );
+          })() : null}
 
           <section className="showroom-note">
             <p>Pongg runs quietly behind the page as a visual backdrop. Click Play Pongg for sound and full control.</p>

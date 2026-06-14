@@ -552,34 +552,51 @@
 
       <section>
         <div class="shell">
-          <h2>What it is, and what it is not.</h2>
+          <div class="eyebrow">Om projektet</div>
+          <h2 style="margin-top:8px;">Vad LAGA gör, och vem det är till för.</h2>
           <p class="section-lede">
-            LAGA is not a public SaaS product, not legal advice, and not currently running as an online demo. It is a
-            research and workflow system for turning messy legal media into structured review material.
+            LAGA är en experimentell svensk juridisk workflow-plattform som tar ljud och video från förhör
+            och utredningar, transkriberar lokalt med MLX på Apple Silicon, detekterar motsägelser
+            mellan och inom talare, och kopplar påståenden till SFS-lagrum och HFD-prejudikat via
+            OpenRouter-driven granskning. Det är inte en generisk chattbot och inte ett
+            klientrådgivningsverktyg — det är ett arbetsflöde för advokater, åklagare och utredare
+            som redan arbetar med källmaterial.
           </p>
           <div class="grid">
             <article class="card">
               <h3>Workflow-first</h3>
               <p>
-                Cases move through explicit nodes — ingest, transcribe, analyze, evaluate — instead of one opaque prompt
-                chain.
+                Fyra explicita noder — Media, Transcribe, Analyze, Eval — i React Flow istället för en
+                ogenomskinlig prompt-kedja. Run-monitor och artefakter under <code>data/</code> håller
+                allt spårbart.
               </p>
             </article>
             <article class="card">
               <h3>Contradiction-aware</h3>
               <p>
-                Built to surface intra-speaker and inter-speaker inconsistencies in hearings, interviews, and long-form
-                testimony.
+                Designad för att hitta motsägelser inom och mellan talare i förhör, intervjuer och
+                längre vittnesutsagor. OpenRouter-fallback när lokal MLX inte räcker till.
               </p>
             </article>
             <article class="card">
               <h3>Private by default</h3>
               <p>
-                Local MLX transcription and artifact storage were central to the design. Sensitive material should not
-                need to leave the machine unless you choose it.
+                Lokal MLX-transkription och artefakt-lagring var centralt i designen. Känsligt material
+                behöver inte lämna maskinen om du inte väljer det — ingen tvingad molnuppladdning av
+                förhörsfiler.
               </p>
             </article>
           </div>
+          <p style="margin-top:18px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:0.08em;">
+            <strong style="color:var(--cyan);">Status:</strong> labb / pausad · v0.1-MVP med inbyggda motsägelser i demo-ljudet
+            ·&nbsp;
+            <strong style="color:var(--cyan);">Demo:</strong> ingen publik demo idag
+            ·&nbsp;
+            <strong style="color:var(--cyan);">Källa:</strong>
+            <a href="/docs/projects/README-sources.md#system_laga-laga" target="_blank" rel="noreferrer" style="color:var(--cyan);">docs/projects/README-sources.md</a>
+            ·&nbsp;
+            <a href="https://github.com/wawawee/LAGA-REBOOT" target="_blank" rel="noreferrer" style="color:var(--cyan);">arkiv-repo</a>
+          </p>
         </div>
       </section>
 
