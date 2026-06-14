@@ -276,8 +276,8 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
       { label: "SIGNAL", value: "PASSIVE" },
       { label: "STATUS", value: "PUBLIC" }
     ],
-    href: "https://github.com/wawawee/VR-SuperPowers",
-    actionLabel: "GitHub"
+    href: "/vr-superpowers",
+    actionLabel: "Visualize"
   },
   {
     id: "system_cymwave",
@@ -2550,6 +2550,9 @@ export default function App() {
     // --- CORE ANIMATION & LAUNCH SYSTEM LOOP ---
     let lastTime = performance.now();
     let frameId: number;
+    let ambientFrameAccumulator = 0;
+    // When the page is hidden we stop the loop entirely. Re-armed on visibilitychange.
+    let loopRunning = !document.hidden;
 
     const gameLoop = (timeNow: number) => {
       try {
@@ -2560,6 +2563,18 @@ export default function App() {
 
       // Cap delta time to prevent clipping during deep frame rate drops
       if (dt > 0.1) dt = 0.1;
+
+      // Ambient showroom mode: pongg is a background actor, not the show.
+      // No input, no level logic, no monster shots, no music, no sparkles —
+      // just the scene rendered on a 30fps tick so it still feels alive.
+      if (!showGameRef.current) {
+        ambientFrameAccumulator += dt;
+        if (ambientFrameAccumulator >= 1 / 30) {
+          ambientFrameAccumulator = 0;
+          renderer.render(scene, camera);
+        }
+        return;
+      }
 
       if (devLevelRequestRef.current !== null) {
         currentLevel = devLevelRequestRef.current;
@@ -3363,6 +3378,20 @@ export default function App() {
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
 
+    // --- VISIBILITY (pause ambient pongg when tab is hidden, save battery) ---
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        loopRunning = false;
+        cancelAnimationFrame(frameId);
+      } else if (!loopRunning) {
+        loopRunning = true;
+        lastTime = performance.now();
+        ambientFrameAccumulator = 0;
+        frameId = requestAnimationFrame(gameLoop);
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
     // --- CLEANUP DISPOSAL VAULT ---
     return () => {
       window.removeEventListener("resize", handleResize);
@@ -3374,6 +3403,8 @@ export default function App() {
       }
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      loopRunning = false;
       cancelAnimationFrame(frameId);
 
       // Deep geometry and material release to avoid GPU leaks
@@ -3474,11 +3505,7 @@ export default function App() {
 
       {!showGame && (
         <main className="showroom-shell pointer-events-auto">
-          <div className="ascii-backdrop" aria-hidden>
-            {ASCII_ROWS.map((row, index) => (
-              <pre key={`${row}-${index}`}>{row}</pre>
-            ))}
-          </div>
+          <div className="ts-mesh" aria-hidden="true" />
 
           <section className="showroom-hero">
             <div className="showroom-kicker">TWISTEDSTACKS // SANDVIKEN AI LAB</div>
@@ -3621,7 +3648,7 @@ export default function App() {
         </div>
       )}
 
-      {(showGame || highScores.length > 0) && (
+      {showGame && highScores.length > 0 && (
         <aside className={`pongg-scoreboard ${showGame ? "is-game" : "is-showroom"}`} aria-label="Twisted Pongg scoreboard">
           <div className="pongg-scoreboard-title">
             Top 5

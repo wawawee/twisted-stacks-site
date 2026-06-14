@@ -1,0 +1,58 @@
+/* ----------------------------------------------------------------------------
+   Twisted Stacks — brand palette
+   Single source of truth for hex values in the showroom.
+   Origin story, typography, layer system, don'ts → see VR-SuperPowers/docs/BRAND.md
+   -------------------------------------------------------------------------- */
+
+:root {
+  /* Surfaces — warm dark browns. The "burnt umber" base. */
+  --bg-deep:        #1a0e0c;
+  --bg-base:        #261512;
+  --bg-tint:        #2f1c18;
+  --surface:        #3a2520;
+  --surface-strong: #432b25;
+
+  /* Text — warm white from the shirt button. */
+  --text:       #f6efe7;
+  --text-dim:   #d8c5b9;
+  --text-soft:  #a89589;
+  --muted:      #7a6b62;
+  --muted-2:    #564a42;
+
+  /* Accent — baby blue. */
+  --accent:        #7fc4e6;
+  --accent-hot:    #b3def0;
+  --accent-deep:   #4a8aab;
+  --accent-dim:    rgba(127, 196, 230, 0.4);
+
+  /* Cherry — the shirt. Mature, dusty. */
+  --cherry:        #b06a78;
+  --cherry-soft:   #c98a96;
+  --cherry-deep:   #7a3f4b;
+
+  /* Pearl — the button. */
+  --pearl:         #f0eee8;
+  --pearl-dim:     #d8d2c8;
+  --pearl-warm:    #e6dbd0;
+
+  /* Status — warm, not radioactive. */
+  --ok:    #7fc4a0;
+  --warn:  #e6c07f;
+  --err:   #e6887f;
+
+  /* Strokes */
+  --stroke:        rgba(127, 196, 230, 0.18);
+  --stroke-strong: rgba(127, 196, 230, 0.30);
+  --stroke-warm:   rgba(176, 106, 120, 0.22);
+
+  /* Type */
+  --font-display: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", "Fira Code", ui-monospace, "SF Mono", "Menlo", monospace;
+
+  /* Background glow alphas — used inside .showroom-shell to keep warmth readable */
+  --bg-glow-rf:       0.05;
+  --bg-glow-presence: 0.04;
+  --mesh-opacity:     0.06;
+  --scanline-spacing: 7px;
+  --scanline-opacity: 0.018;
+}
