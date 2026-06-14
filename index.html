@@ -3,25 +3,94 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1a0e0c" />
+    <meta name="color-scheme" content="dark" />
+
     <title>TwistedStacks | AI systems showroom</title>
     <meta
       name="description"
-      content="TwistedStacks builds useful AI systems and labs: REVISION, LAGA, Anslag, VR Super-Senses, CymWave, Recon Search Assistant, THE-AI-BUTTON, and selected web work."
+      content="TwistedStacks builds useful AI systems and labs: REVISION, LAGA, Anslag, VR Super-Senses, CymWave, Recon Search Assistant, and selected web work."
     />
-    <meta name="theme-color" content="#050505" />
+    <link rel="canonical" href="https://twistedstacks.com/" />
+    <link rel="alternate" hreflang="en" href="https://twistedstacks.com/" />
+    <link rel="alternate" hreflang="sv" href="https://twistedstacks.com/" />
+    <link rel="alternate" hreflang="x-default" href="https://twistedstacks.com/" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <!-- Performance hints: warm up font + image origins before HTML is parsed -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="TwistedStacks" />
     <meta property="og:title" content="TwistedStacks | AI systems showroom" />
     <meta
       property="og:description"
       content="A clean showroom for TwistedStacks projects: legal AI, grant discovery, VR sensor overlays, hydro-wellness research, OSINT/search support, and playable TWISTED PONGG."
     />
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="TwistedStacks" />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content="https://twistedstacks.com/" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="sv_SE" />
+    <meta property="og:image" content="https://twistedstacks.com/og-image.svg" />
+    <meta property="og:image:secure_url" content="https://twistedstacks.com/og-image.svg" />
+    <meta property="og:image:type" content="image/svg+xml" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="TwistedStacks — AI systems showroom, dark warm brown HUD with baby-blue accent" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="TwistedStacks | AI systems showroom" />
     <meta
       name="twitter:description"
       content="Useful systems. TWISTED edge: AI projects, product demos, hardware labs, wellness research, and a playable showroom."
     />
+    <meta name="twitter:image" content="https://twistedstacks.com/og-image.svg" />
+    <meta name="twitter:image:alt" content="TwistedStacks — AI systems showroom" />
+
+    <!-- Structured data: Organization + WebSite (SearchAction) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://twistedstacks.com/#organization",
+            "name": "TwistedStacks",
+            "alternateName": "Twisted Stacks",
+            "url": "https://twistedstacks.com/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://twistedstacks.com/og-image.svg",
+              "width": 1200,
+              "height": 630
+            },
+            "description": "TwistedStacks builds useful AI systems and labs: REVISION, LAGA, Anslag, VR Super-Senses, CymWave, Recon Search Assistant, and selected web work.",
+            "email": "dev@twistedstacks.com",
+            "founder": {
+              "@type": "Person",
+              "name": "Per Brinell"
+            },
+            "sameAs": [
+              "https://github.com/wawawee"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://twistedstacks.com/#website",
+            "url": "https://twistedstacks.com/",
+            "name": "TwistedStacks",
+            "inLanguage": ["en", "sv"],
+            "publisher": { "@id": "https://twistedstacks.com/#organization" }
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -411,6 +411,29 @@ export default function App() {
     };
   }, []);
 
+  // Dynamic document.title for SEO + share preview: reflect the project the user is looking at.
+  // Falls back to the root "TwistedStacks | AI systems showroom" while the showroom itself is mounted.
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const project = CATALOG_PROJECTS.find((p) => p.id === selectedProjectId);
+    const baseTitle = project
+      ? `${project.name} | TwistedStacks`
+      : "TwistedStacks | AI systems showroom";
+    const taglineSuffix = project?.tagline ? ` — ${project.tagline}` : "";
+    document.title = `${baseTitle}${taglineSuffix}`.slice(0, 200);
+  }, [selectedProjectId]);
+
+  // Keep <html lang> in sync with the active showroom project when it is locale-bound.
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const project = CATALOG_PROJECTS.find((p) => p.id === selectedProjectId);
+    const swedishProjects = new Set(["system_skatterevision", "system_laga", "system_anslag", "system_recon"]);
+    const nextLang = project && swedishProjects.has(project.id) ? "sv" : "en";
+    if (document.documentElement.lang !== nextLang) {
+      document.documentElement.lang = nextLang;
+    }
+  }, [selectedProjectId]);
+
   const clearRetryTimer = () => {
     if (retryTimerRef.current) {
       clearInterval(retryTimerRef.current);

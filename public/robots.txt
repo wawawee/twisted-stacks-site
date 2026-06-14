@@ -1,0 +1,14 @@
+# TwistedStacks — robots.txt
+# https://twistedstacks.com/
+
+User-agent: *
+Allow: /
+
+# Crawl-delay is deprecated by most modern crawlers (Google, Bing) — leave default.
+# We do not block /api/ here because Vercel rewrites legitimate pages through it
+# (e.g. skatterevision.twistedstacks.com → /skatterevision.html). Static assets
+# live under /assets/ and are content-bearing (PDF teaser etc.), so allow them.
+
+# Sitemap location — declared as absolute URL so Brave / Bing / Google can
+# discover it without a prior crawl of the root.
+Sitemap: https://twistedstacks.com/sitemap.xml
