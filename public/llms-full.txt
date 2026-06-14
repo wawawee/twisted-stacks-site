@@ -1,0 +1,144 @@
+# TwistedStacks — full
+
+> A clean showroom for TwistedStacks projects — useful AI systems and labs (REVISION, LAGA, Anslag, VR Super-Senses, CymWave, Recon Search Assistant) and selected web work. TwistedStacks builds in the open on a dark warm-brown HUD with baby-blue accent, focused on retroaktiv skatteåtervinning, legal AI workflows, grant discovery, VR sensor overlays, hydro-wellness research, defensive security tooling, and a playable four-paddle arcade front door.
+>
+> This is the long-form variant. For the compact index, see [llms.txt](https://twistedstacks.com/llms.txt).
+
+## Projects
+
+### REVISION — retroactive Swedish tax recovery
+
+URL: https://twistedstacks.com/skatterevision.html
+
+REVISION — internally SkatteRevision / Anlagstavlan — is a retroactive Swedish tax-recovery engine. It analyses historical iXBRL annual reports (2019–2025) from Bolagsverket to identify missed tax positions in R&D deductions (FoU-avdrag), industrial energy tax (energiskatt), vehicle-leasing VAT (leasingmoms) and property VAT (fastighetsmoms). The output is audit-grade PDF dossiers where every number carries a source citation, anchored to the relevant HFD precedent.
+
+The system is a complement to the audit firm, not a replacement. The byrå keeps the customer relationship, the attestation and the final responsibility; REVISION delivers ready-mined intelligence with the legal reasoning attached. The product thesis is direct: 'Nothing is Done until Proven' — every claim has a `source` field, and the system returns `INSUFFICIENT_DATA` rather than estimate.
+
+A squad of seventeen specialised LLM agents runs the analysis: fou-agent for R&D, energirevision-spearhead for industrial energy tax, leasing-auditoren for K3 leasing, fastighetsmomsaren for property VAT, kritikern (red-team) and verifikator (positive-evidence) as a dual-critic gate, mimir for live web/SKV intelligence, plus orchestrator, risk, sentinel, pitch and code-review agents. Models are routed through OpenRouter with Gemini 3.5 Flash as frontier-class for synthesis and lead work.
+
+The business model is success-fee: 20–35% of actually recovered tax, split with the byrå. The customer pays nothing if nothing is recovered. The current pitch focus is Gävleborg/Dalarna manufacturing SMEs, 10–250 anställda, with active Almi, ERUF and Vinnova applications in flight.
+
+Stack: TypeScript, Express, iXBRL pipeline, 17 LLM agents, OpenRouter, SQLite + Qdrant, PDF dossiers.
+
+### LAGA — Swedish legal media to structured review
+
+URL: https://twistedstacks.com/laga.html
+
+LAGA — Legal AI Gateway Architecture — is an experimental Swedish legal workflow platform. Audio and video come in, local MLX transcription runs on Apple Silicon, the system detects inter- and intra-speaker contradictions, and OpenRouter-based review attaches Swedish statutes. The v0.1 MVP is a four-node graph: Media → Transcribe → Analyze → Eval, built in a pnpm monorepo with Vite + React Flow on the web side and Hono on the API side.
+
+The point is not a generic chatbot. Cases move through explicit nodes with a run monitor and traceable artifacts, so a lawyer can see exactly what was transcribed, what was claimed and what was contradicted. The demo audio is a Swedish interrogation clip with intra- and inter-speaker contradictions built in, and the Contradictions panel filters by speaker relationship.
+
+The MLX integration is treated as a duty-budgeted citizen: MLX_GPU_DUTY_TARGET=0.8, MAX_CONCURRENT_MLX=1 and MLX_CHUNK_COOLDOWN_MS keep the GPU cool under sustained loads. OpenRouter is the fallback path for text and multimodal review when local MLX is not enough.
+
+The latest macOS Swift shell lives on a private iMac and is not publicly deployable today. An Almi Verifieringsmedel application is in flight; the primary long-term funding target is Vinnova Innovativa Startups 2026. Future nodes include a Legal RAG layer with source IDs, a Praxis web-browser agent, and a synced macOS shell sharing the same workflow JSON.
+
+Stack: Vite, React Flow, Hono, MLX Whisper, OpenRouter, pnpm monorepo.
+
+### Relay / THE-AI-BUTTON — voice-first iOS
+
+URL: https://twistedstacks.com/ (private)
+
+Relay is a voice-first iOS relay — speak a task, your agent does the rest. The whole point is to skip the chat window: instead of opening an app, composing a message and waiting for a reply, you trigger the agent with a single phrase and hear the answer back via TTS. No subscription, no chat, no copy-paste into a different tool.
+
+The product exposes exactly two commands. Note to AI POSTs the transcript to your own webhook — typically an n8n workflow — which runs the agent and returns a short reply that Relay speaks back. Note to Self saves the same transcript to a Reminders list or to email. Both paths are designed for one-handed use on a construction site, in a workshop, or wherever a Swedish tradesman (hantverkare) is doing real work and shouldn't be fumbling with a chat app.
+
+The integration layer is the part nobody else assembles. Relay connects Apple's own pieces — Hey Siri, the Action Button, Voice Control, and App Intents — into a single installable flow. The setup wizard wires up the webhook URL, the reminders destination and the Swedish STT locale (sv-SE on-device, no cloud upload). The reference n8n workflow pipes the spoken task through an Intent Parser, writes a row to Airtable, and can fan out to 46elks SMS for an acknowledgement.
+
+The build is Swift + SwiftUI on iOS 18+, generated with Xcodegen, bundle id com.perbrinell.relay. Planned monetisation is a one-time purchase (~$0.99) — explicitly anti-subscription. The current funding track is Almi Verifieringsmedel, with Vinnova Innovativa Startups 2026 as the longer-term target.
+
+Stack: Swift, SwiftUI, iOS 18, Hey Siri, n8n webhook, Airtable.
+
+### Recon Search Assistant — defensive cyber workbench
+
+URL: https://twistedstacks.com/recon.html
+
+Recon Search Assistant is a defensive security research workbench — not a public hacking tool, not an offensive framework. The original prototype is a static web app that bundles 115+ Google dorks across file discovery, web application discovery, information gathering, cloud and infrastructure, API and development, and crypto/OSINT, with a SerpAPI-backed in-app search and OpenRouter AI triage for findings.
+
+The current state is paused from the public showroom. The static GitHub Pages deploy is being retired, and the API keys need to move into the Vercel environment before the project is shown again. The user-account layer, dashboard, history and saved-search features from the original prototype remain in the codebase but are not the active product focus.
+
+The framing matters. This is a lab for authorized bug-bounty and defensive research — dork search, target triage, finding tracking — not a tool for use against systems the operator does not own or have permission to test. The Almi/Vinnova sister-project line for the TwistedStacks stack treats Recon as a defensive-cyber companion, not a customer-facing product.
+
+Until the env migration lands, the showroom entry is informational only. For collaboration or research conversations, reach out via the TwistedStacks contact channel.
+
+Stack: Static SPA, SerpAPI, OpenRouter, Supabase, Bug-bounty dorks.
+
+### Anslag — fri svensk anslagssöknings- och utkaststjänst
+
+URL: https://anslag.twistedstacks.com/
+
+Anslag (SITK) is a free Swedish grant-discovery and draft-writing app. It searches across Vinnova, Formas, Forte, VR, Tillväxtverket, EU programmes, Almi and Swedish stiftelser via Exa and the official sources, then helps draft the actual application in Swedish.
+
+The frontend is Vite 7 + Tailwind v3 + shadcn/ui, the backend is Node 20 with an API on port 3001 and Vercel serverless. A multi-account OpenRouter gateway round-robins across up to seven keys for resilience, with `google/gemini-2.5-flash-lite` as the current best free model for structured output.
+
+There are two search modes — bred (wide) and narrow — and a model-tier selector (auto/free/paid) so a small NGO can run on free models while a consultant on a deadline picks a paid model without changing the workflow. An optional Qdrant layer adds vector memory across past searches.
+
+The tool is open and free. It is the same engine used internally to draft the Almi, ERUF and Vinnova applications across REVISION, LAGA, CymWave and Relay, but the public app is open to any Swedish project looking for funding.
+
+Stack: Vite, Tailwind, shadcn/ui, OpenRouter, Exa, Node 20.
+
+### VR Super-Senses — Twisted SuperSenses
+
+URL: https://twistedstacks.com/vr-superpowers
+
+VR Super-Senses — Twisted SuperSenses under the brand book — is an open sensor mesh for VR and iOS AR passthrough. The product surfaces the normally invisible radio, thermal and electromagnetic world around the wearer: RF auroras, thermal heat-vision, WiFi towers, EMF field lines, AC live-wire hints, and CSI presence/motion ghosts. The tagline is 'See the invisible world in VR'.
+
+The system is built as a tiered architecture. ESP32-S3 nodes with NRF24, CC1101, MLX90640, HMC5883L and 50 Hz coil sensors stream into a Python WebSocket hub on port 81. The hub speaks a documented JSON protocol (v1.0 / v1.1 / v1.2) with node roles (wearable / probe / stimulus), position messages, fusion results and gated stimulus states. On the rendering side, Unity 6 + URP + Meta XR SDK paints the scene on Meta Quest, and an ARKit / RealityKit client runs on iPhone 13 Pro+ with LiDAR.
+
+The capability matrix in the project README is intentionally honest: AR passthrough and LiDAR mesh are live; WiFi, RF, thermal, EMF and AC layers are partial (code exists, gaps remain); CSI presence and Flipper bridge are stubs. The privacy posture is receive-only by default — no TX in any uncontrolled context, no CSI on other people's networks, no X-ray claims.
+
+A Flipper Zero with an AIO Multiboard v1.4 acts as the Field Commander for one radio at a time. The funding story (Almi, Vinnova) ties this together with the spatial-computing thesis: 'Materially warm, technically cool. Built for heads-up displays that have to stay readable while you're wearing them.'
+
+Stack: Unity 6, Meta XR SDK, Meta Quest, ESP32-S3, Python WebSocket hub, ARKit + LiDAR.
+
+### CymWave — hydro-wellness
+
+URL: https://github.com/wawawee/CymWave
+
+CymWave is an early-stage Swedish wellness-technology project for immersive bath and float experiences. The combination is warm water, carefully controlled massage or low-frequency vibration, spatial or underwater-safe audio, chromotherapy-style light scenes, and guided journeys for calm, sleep preparation, recovery, romance, seasonal rituals, or premium hotel experiences.
+
+The current goal is explicitly not to overclaim medical effects. The first version is a premium B2B wellness installation for boutique hotels, destination spas, retreat centres and premium wellness studios — focused on relaxation, perceived stress, sleep readiness, comfort and a memorable guest experience. Claims like 'treats anxiety / depression / chronic pain / insomnia / trauma' are deliberately avoided until clinical and regulatory work would justify them.
+
+The technical track is now moving toward measured pressure and vibration design. An aviation vibration-testing specialist is expected to support actuator and motor-side development, so wave intensity, pressure transfer and timing precision can be tuned before publishing deeper technical data. Phase 0 is concept recovery (one-pager, competitive map, IP scan, 10–15 customer interviews). Phase 1 is the proof-of-experience prototype on safe, off-the-shelf components.
+
+Funding is via the Vinnova Test och Demo track (closes 2026-09-08) with Almi Verifieringsmedel as the rolling alternative, all routed through the AnslagSITK engine. The legacy 2020 concept — water as the carrier medium, cymatic visualisation as the design method, 'composed pieces for the body rather than music for the ear' — is the brand hook, but the modern claim set is restricted to wellbeing, not therapy.
+
+Stack: Hydrotherapy, Vibration R&D, Spatial audio, Light scenes, Grant-funded prototype.
+
+### Silversmeden — client site
+
+URL: https://silversmeden.twistedstacks.com/
+
+Silversmeden is a quiet public site for a working silversmith. It is intentionally not a portfolio-app showcase and not a WordPress build — the design language is restrained, the work is the work, and the framework noise is kept out of the way of the customer.
+
+The site is the first shipped TwistedStacks client engagement: built on Vite, deployed on Vercel, and structured to be operated by the silversmith himself after handover. The page layout favours large product imagery, clean typography and minimal chrome. The brand-voice work is the more interesting part: how do you sell hand-made silver online without falling into a 'buy now' shop interface that overwhelms an older customer?
+
+That trade-off drove the layout decisions: the product list is shallow, the photography is the hero, and the checkout is not bolted on as a feature. The site is live at silversmeden.twistedstacks.com and serves as a reference for the type of restrained, customer-respecting site TwistedStacks will build for craft businesses.
+
+Stack: Vite, Vercel, Hand-tuned CSS, Static-first, Client.
+
+### TWISTED PONGG — playable front door
+
+URL: https://twistedstacks.com/
+
+Twisted Pongg is the playable front door of the TwistedStacks showroom. The portfolio sits on top of a working four-paddle arcade game — left, right, top, bottom — running on React, Three.js and WebGL. The game runs in ambient mode by default, so the visitor lands on a live scene before they realise it is interactive.
+
+The game itself is not a wrapper around another library. The physics, the spin, the curve, the corner-combo system, the monster bricks, the centre motif and the audio engine are all hand-rolled. A hardcore arcade boot path skips the intro straight into the court; a casual / hardcore / impossible difficulty picker is held behind the D key. A global top-5 leaderboard syncs through Supabase when configured and falls back to a local scoreboard otherwise.
+
+Pongg is also the testbed for the brand. The showroom grid, the scoreboard, the contact FAB, the easter-vault cabinet and the level badges all share the same warm-brown ramp, baby-blue accent, cherry state, and pearl primary-button language. Cleared all nine levels and the vault opens; the cabin is the dev-mode architecture directory.
+
+The point is not 'look at our game'. The point is 'the front door is the product — quiet, technical, with personality, and the actual systems live behind the cards.'
+
+Stack: React, Three.js, WebGL, Vite, Supabase.
+
+## Documentation
+
+- Brand book (BRAND.md): https://github.com/wawawee/twisted-stacks-site/blob/main/docs/BRAND.md — warm brown + baby-blue + cherry + pearl palette, six sensor accents, hard rules for any Twisted surface.
+- TwistedStacks sitemap: https://twistedstacks.com/sitemap.xml — all public TwistedStacks URLs.
+- Contact: dev@twistedstacks.com — pitch, collaboration, and grant conversations.
+
+## Optional
+
+- wawawee/twisted-stacks-site: https://github.com/wawawee/twisted-stacks-site — this showroom, Vite + React + Three.js, deployed on Vercel.
+- wawawee/SKATTEREVISION-REBOOT: https://github.com/wawawee/SKATTEREVISION-REBOOT — the REVISION engine, TypeScript + Express, 17 specialised LLM agents, iXBRL pipeline.
+- wawawee/CymWave: https://github.com/wawawee/CymWave — hydro-wellness research, grant documents, cymatic-water concept notes.
+- Anslag on the web: https://anslag.twistedstacks.com/ — free Swedish grant discovery and draft-writing app.

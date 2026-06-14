@@ -1,5 +1,82 @@
 # TwistedStacks — robots.txt
 # https://twistedstacks.com/
+#
+# Layout, top-to-bottom:
+#   1. Explicit allow blocks per documented AI / LLM crawler user-agent.
+#      Listing each bot explicitly is the most reliable way to signal that
+#      TwistedStacks content is welcome for retrieval-augmented generation,
+#      training-eligible indexing, and user-triggered browsing. Listing them
+#      before the wildcard * group means a crawler that matches its own
+#      User-agent token gets the explicit allow, regardless of what the
+#      wildcard says later.
+#   2. The wildcard * block — same policy as before, with the sitemap.
+#   3. Notes for humans (this is for us, the next time we edit this file).
+
+# ---------------------------------------------------------------------------
+# 1. AI / LLM crawlers — explicit allow
+# ---------------------------------------------------------------------------
+
+# OpenAI
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+# Anthropic
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+# Google — Gemini / Vertex training opt-in
+User-agent: Google-Extended
+Allow: /
+
+# Apple — Apple Intelligence training
+User-agent: Applebot-Extended
+Allow: /
+
+# Amazon — Alexa / Rufus
+User-agent: Amazonbot
+Allow: /
+
+# Common Crawl — feeds many LLM training pipelines
+User-agent: CCBot
+Allow: /
+
+# Meta — Llama training
+User-agent: Meta-ExternalAgent
+Allow: /
+
+# Mistral
+User-agent: MistralAI-User
+Allow: /
+
+User-agent: MistralAI-Indexer
+Allow: /
+
+# Cohere
+User-agent: Cohere-AI
+Allow: /
+
+# ---------------------------------------------------------------------------
+# 2. Default — everything else
+# ---------------------------------------------------------------------------
 
 User-agent: *
 Allow: /
@@ -12,3 +89,12 @@ Allow: /
 # Sitemap location — declared as absolute URL so Brave / Bing / Google can
 # discover it without a prior crawl of the root.
 Sitemap: https://twistedstacks.com/sitemap.xml
+
+# ---------------------------------------------------------------------------
+# 3. LLM-specific surfaces (not crawlable, but worth advertising)
+# ---------------------------------------------------------------------------
+# - https://twistedstacks.com/llms.txt       compact index for LLM retrieval
+# - https://twistedstacks.com/llms-full.txt  long-form variant with full
+#                                            longDescription for every project
+# These are served by Vercel from public/ at build time, no Vercel config
+# required (Vite hoists public/ to dist/ root).

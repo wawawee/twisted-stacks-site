@@ -1,0 +1,28 @@
+# TwistedStacks
+
+> A clean showroom for TwistedStacks projects — useful AI systems and labs (REVISION, LAGA, Anslag, VR Super-Senses, CymWave, Recon Search Assistant) and selected web work. TwistedStacks builds in the open on a dark warm-brown HUD with baby-blue accent, focused on retroaktiv skatteåtervinning, legal AI workflows, grant discovery, VR sensor overlays, hydro-wellness research, defensive security tooling, and a playable four-paddle arcade front door.
+
+## Projects
+
+- [REVISION](https://twistedstacks.com/skatterevision.html): Lead discovery for retroactive Swedish tax recovery — turns historical iXBRL annual reports into audit-grade dossiers with full source citations.
+- [LAGA](https://twistedstacks.com/laga.html): Swedish legal media to structured review — four-node React Flow workflow (Media, Transcribe, Analyze, Eval) with local MLX Whisper and contradiction analysis.
+- [Relay / THE-AI-BUTTON](https://twistedstacks.com/): Voice-first iOS app that sends a single spoken phrase to a user-owned webhook, runs an agent, and speaks the result back — no chat window.
+- [Recon Search Assistant](https://twistedstacks.com/recon.html): Defensive security research workbench — 115+ Google dorks, SerpAPI search, OpenRouter AI triage for authorized bug-bounty and recon.
+- [Anslag](https://anslag.twistedstacks.com/): Fri svensk anslagssöknings- och utkaststjänst — söker Vinnova, Formas, Forte, VR, Tillväxtverket, EU, Almi och svenska stiftelser, hjälper skriva ansökan.
+- [VR Super-Senses](https://twistedstacks.com/vr-superpowers): See the invisible world — ESP32 sensor mesh streams RF, thermal, WiFi, EMF, AC and CSI presence into Meta Quest passthrough and iOS AR.
+- [CymWave](https://github.com/wawawee/CymWave): Hydro-wellness prototype — programmable warm water, controlled vibration, spatial audio, chromotherapy light scenes, guided relaxation journeys.
+- [Silversmeden](https://silversmeden.twistedstacks.com/): Quiet public site for a working silversmith — restrained design, large product imagery, clean typography, minimal chrome, not a portfolio-app showcase.
+- [TWISTED PONGG](https://twistedstacks.com/): Playable four-paddle arcade game built on React, Three.js and WebGL — hand-rolled physics, spin, curve, corner combos and a global top-5 leaderboard.
+
+## Documentation
+
+- [Brand book (BRAND.md)](https://github.com/wawawee/twisted-stacks-site/blob/main/docs/BRAND.md): Warm brown + baby-blue + cherry + pearl palette, six sensor accents, and the hard rules for any Twisted surface.
+- [TwistedStacks sitemap](https://twistedstacks.com/sitemap.xml): All public TwistedStacks URLs (root, vr-superpowers, skatterevision, laga, recon, plus subdomains).
+- [Contact](mailto:dev@twistedstacks.com): dev@twistedstacks.com — pitch, collaboration, and grant conversations.
+
+## Optional
+
+- [wawawee/twisted-stacks-site](https://github.com/wawawee/twisted-stacks-site): This showroom — Vite + React + Three.js, deployed on Vercel.
+- [wawawee/SKATTEREVISION-REBOOT](https://github.com/wawawee/SKATTEREVISION-REBOOT): The REVISION engine — TypeScript + Express, 17 specialised LLM agents, iXBRL pipeline, audit-grade PDF dossiers.
+- [wawawee/CymWave](https://github.com/wawawee/CymWave): Hydro-wellness research, grant documents, and the cymatic-water concept notes.
+- [Anslag on the web](https://anslag.twistedstacks.com/): Free Swedish grant discovery and draft-writing app — same OpenRouter engine as the TwistedStacks grant work.
