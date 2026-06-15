@@ -185,42 +185,70 @@ export function applyLaunchSpin(ball: BallState): void {
 
 /**
  * Add spin to the ball from a paddle hit. The contact offset is normalised
- * to [-1, 1] (where ±1 = the very edge of the racket, 0 = dead centre). The
- * resulting spin is perpendicular to the incoming velocity, in the play
- * plane — exactly what you'd get from glancing a real spinning ball.
+ * to [-1, 1] (where ±1 = the very edge of the racket, 0 = dead centre).
+ *
+ * The spin is applied on the Z axis (perpendicular to the playfield). This
+ * is the ONLY axis that produces an in-plane Magnus force from the cross
+ * product (angularVelocity × velocity) for a 2D playfield — the X and Y
+ * components of angular velocity produce a force along Z, which is
+ * invisible to the 2D game. Putting the boost on Z means the cross product
+ * actually contributes to the curve the player feels.
+ *
+ * The sign is chosen so that the resulting Magnus force curves the ball
+ * *toward* the contact-offset direction: hit the upper edge of a vertical
+ * paddle and the ball curves up, hit the right edge of a horizontal
+ * paddle and the ball curves right. This is the natural "aim with English"
+ * feel for Pong-style games.
+ *
+ * Math: with ω = (0, 0, ωz) and v = (vx, vy, 0), the cross product gives
+ *   F = ω × v = (-ωz·vy, ωz·vx, 0)
+ *
+ * For a Y-tangent paddle (left/right, ball moving in X): the in-plane
+ * force is Fy = ωz · vx. We want this to have the same sign as the
+ * contact offset, so ωz = +offset · sign(vx).
+ *
+ * For an X-tangent paddle (top/bottom, ball moving in Y): the in-plane
+ * force is Fx = -ωz · vy. We want this to have the same sign as the
+ * contact offset, so ωz = -offset · sign(vy).
  */
 export function addPaddleHitSpin(
   ball: BallState,
   contactOffset: number, // [-1, 1]
   incomingVx: number,
   incomingVy: number,
-  side: "x" | "y",
+  side: "x" | "y", // "y" for left/right paddles (tangent = Y), "x" for top/bottom
 ): void {
   // Magnitude scales with |contactOffset|: dead-centre = 0, edge = max.
   const offsetMag = clamp(Math.abs(contactOffset), 0, 1);
   const direction = contactOffset >= 0 ? 1 : -1;
   const boost = offsetMag * EDGE_SPIN_BOOST * direction;
 
-  // Spin axis is perpendicular to the incoming velocity in the XY plane.
-  // For a velocity (vx, vy) the in-plane perpendicular is (-vy, vx, 0)
-  // (rotated 90° CCW). The sign of `boost` flips the axis.
-  const vLen = Math.sqrt(incomingVx * incomingVx + incomingVy * incomingVy);
-  if (vLen < 1e-6) return;
+  // The sign of ωz depends on which axis is the paddle's tangent. See the
+  // doc comment above for the derivation.
+  let newOmegaZ: number;
+  if (side === "y") {
+    // Tangent is Y; force is in Y = ωz · vx. Match sign of offset → ωz = boost · sign(vx).
+    const signVx = incomingVx >= 0 ? 1 : -1;
+    newOmegaZ = boost * signVx;
+  } else {
+    // Tangent is X; force is in X = -ωz · vy. Match sign of offset → ωz = -boost · sign(vy).
+    const signVy = incomingVy >= 0 ? 1 : -1;
+    newOmegaZ = -boost * signVy;
+  }
 
-  const perpX = -incomingVy / vLen;
-  const perpY = incomingVx / vLen;
+  // Apply on the Z axis (the only one that produces in-plane Magnus force).
+  ball.angularVelocity.x = 0;
+  ball.angularVelocity.y = 0;
+  ball.angularVelocity.z = newOmegaZ;
 
-  ball.angularVelocity.x = perpX * boost;
-  ball.angularVelocity.y = perpY * boost;
-  ball.angularVelocity.z = 0;
-
-  // Keep the legacy curveSpin in sync (z-component scaled to the old range).
-  // For side "x" hits the curve is in the y direction; for "y" hits the curve
-  // is in the x direction. The sign of perpX/perpY combined with direction
-  // gives the right sign for curveSpin.
-  const curveSign = side === "x" ? perpX * direction : perpY * direction;
-  const curveMag = (offsetMag * EDGE_SPIN_BOOST * 0.11) * Math.sign(curveSign || 1);
-  ball.curveSpin = clamp(curveMag, -CURVE_SPIN_MAX, CURVE_SPIN_MAX);
+  // Mirror onto the legacy curveSpin scalar so the existing curve-pipeline
+  // (which reads curveSpin) also gets a boost on edge hits. Sign matches
+  // the new omega-z so they reinforce each other.
+  ball.curveSpin = clamp(
+    newOmegaZ * 0.11,
+    -CURVE_SPIN_MAX,
+    CURVE_SPIN_MAX,
+  );
 
   refreshSpinAxis(ball);
 }
