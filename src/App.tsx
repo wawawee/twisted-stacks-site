@@ -3510,7 +3510,13 @@ export default function App() {
     setShowDifficultyScreen(false);
   };
 
-  const showHud = gameState === GameState.GAMEPLAY && !showDifficultyScreen;
+  // showHud is the single gate for ALL in-game HUD: level badge, point strip,
+  // scoreboard, and (below) the showroom-return button. We require BOTH that
+  // the game state has reached GAMEPLAY AND that the user has explicitly
+  // opted in via the PLAY PONGG button. Before that, even if the underlying
+  // game state has drifted (autoplay in intro, or state leak after end-screen
+  // navigation), the showroom stays clean of game UI.
+  const showHud = showGame && gameState === GameState.GAMEPLAY && !showDifficultyScreen;
   const hudLevelProfile = getLevelProfile(hud.level);
 
   return (
