@@ -20,7 +20,9 @@ import {
 } from "./leaderboard";
 import { BRICK_PIXEL_GAP, BRICK_PIXEL_SIZE } from "./brickPixel";
 import {
+  addPaddleHitSpin,
   applyCornerComboBoost,
+  applyLaunchSpin,
   applyNaturalRacketDeflection,
   applyRacketImpulse,
   advanceBall,
@@ -99,6 +101,19 @@ const SCOREBOARD_LIMIT = 5;
 const PLAYER_NAME_LIMIT = 6;
 const MATCH_LIVES = 3;
 const AI_RACKET_SHOT_SCORE = 1;
+
+/**
+ * LocalStorage key for the once-per-visitor "custom-built" credit hint that
+ * appears the first time the player reaches Level 1 gameplay. Bumping
+ * the version resets the gate.
+ */
+const PONGG_CREDITS_SEEN_KEY = "twisted_pongg_credits_seen_v1";
+/** Delay after Level 1 gameplay begins before the credit line fades in. */
+const PONGG_CREDITS_FADE_IN_MS = 1500;
+/** How long the credit line stays at full opacity before fading out. */
+const PONGG_CREDITS_HOLD_MS = 4500;
+/** Fade-out duration for the credit line. */
+const PONGG_CREDITS_FADE_OUT_MS = 1500;
 
 interface ScoreCandidate {
   score: number;
@@ -1045,6 +1060,11 @@ export default function App() {
       const velocity = randomLaunchVelocity(speed);
       ball.vx = velocity.vx;
       ball.vy = velocity.vy;
+
+      // Subtle default spin on every serve so the ball carries a tiny Magnus
+      // curve from frame one. Direction is randomised so consecutive serves
+      // don't always curve the same way.
+      applyLaunchSpin(ball);
     }
 
     function clearCountdownMeshes() {
@@ -1268,6 +1288,12 @@ export default function App() {
       ball.vx = 0;
       ball.vy = 0;
       ball.curveSpin = 0;
+      ball.angularVelocity.x = 0;
+      ball.angularVelocity.y = 0;
+      ball.angularVelocity.z = 0;
+      ball.spinAxis.x = 0;
+      ball.spinAxis.y = 0;
+      ball.spinAxis.z = 1;
       ball.glint = 0;
       ballMesh.position.set(0, 0, 0);
       ballMesh.rotation.set(0, 0, 0);
@@ -1600,6 +1626,51 @@ export default function App() {
       return [...twistedBricks, ...stacksBricks];
     }
 
+    /**
+     * Level 1 (DRIFT) gameplay brick layout.
+     *
+     * Reuses the same FONT_5X7 bitmap + layOutWordBricks primitive as the
+     * intro "TWISTEDSTACKS" sequence, but the result is sized to fit the
+     * gameplay area (slightly smaller than the intro burst) and rendered
+     * as 1-hit scoreable bricks so the player can clear the brand mark
+     * naturally by playing the round.
+     *
+     * Returns two stacked rows — "TWISTED" on top, "STACKS" below —
+     * centered on (0, 0). The bricks are stable (no motion) and use the
+     * same materials as the existing copper palette, so they read as
+     * part of the field rather than a special layer.
+     */
+    function layOutTextBricks(): Brick[] {
+      // Generous scale that comfortably fits the canvas width.
+      const twistedLayout = measureWordLayout("TWISTED", 0.62);
+      const stacksLayout = measureWordLayout("STACKS", 0.64);
+      const rowGap = Math.max(
+        42,
+        Math.max(twistedLayout.letterBrickH, stacksLayout.letterBrickH) * 2.2,
+      );
+      const twistedCenterY = (twistedLayout.totalHeight + rowGap) / 2;
+      const stacksCenterY = -(stacksLayout.totalHeight + rowGap) / 2;
+      const occupiedCells = new Set<string>();
+      const occupancyCell = {
+        w: Math.max(twistedLayout.letterBrickW, stacksLayout.letterBrickW) + 2,
+        h: Math.max(twistedLayout.letterBrickH, stacksLayout.letterBrickH) + 2,
+      };
+
+      // isHard:false → hitsMax 1, so a single tap clears a brick (gameplay feel,
+      // not intro "smash three times to break").
+      const twistedBricks = layOutWordBricks("TWISTED", 0.62, twistedCenterY, false);
+      registerWordOccupancy(twistedBricks, occupiedCells, occupancyCell.w, occupancyCell.h);
+      const stacksBricks = layOutWordBricks(
+        "STACKS",
+        0.64,
+        stacksCenterY,
+        false,
+        occupiedCells,
+        occupancyCell,
+      );
+      return [...twistedBricks, ...stacksBricks];
+    }
+
     function layOutLevelNineLeaderBricks(): Brick[] {
       const leaderName = normalizePlayerName(highScoresRef.current[0]?.name || "PLAYER") || "PLAYER";
       const beatBricks = layOutWordBricks("BEAT", 0.32, height * 0.18, false);
@@ -1764,14 +1835,22 @@ export default function App() {
         nextMusicTickAt = 0;
         musicStep = 0;
 
-        // Ensure intro-level remains textured inside as background
-        bricks.forEach((b) => {
-          if (b.mesh) {
-            b.mesh.material = materialCache.dead;
-            // Reduce structural mesh scale to make background non-distracting but still bounceable
-            b.mesh.scale.set(0.92, 0.92, 0.5);
-          }
-        });
+        // Level 1 (DRIFT) explicitly lays out a "TWISTED" / "STACKS" text field
+        // as gameplay bricks, so the round is unmistakably custom-built
+        // rather than a generic block wall. The transition cleanup above has
+        // already emptied `bricks`, so this is a fresh layout — no carry-over.
+        if (startProfile.textLayout) {
+          bricks = layOutTextBricks();
+        } else {
+          // Ensure intro-level remains textured inside as background
+          bricks.forEach((b) => {
+            if (b.mesh) {
+              b.mesh.material = materialCache.dead;
+              // Reduce structural mesh scale to make background non-distracting but still bounceable
+              b.mesh.scale.set(0.92, 0.92, 0.5);
+            }
+          });
+        }
 
         rebuildScoreDigits();
         spawnCenterMotif();
@@ -2752,8 +2831,28 @@ export default function App() {
         );
         const spinLift = advanceBall(ball, dt);
         ballMesh.position.set(ball.x, ball.y, spinLift);
-        ballMesh.rotation.z += ball.curveSpin * dt * 9;
-        ballMesh.rotation.x = ball.curveSpin * 0.55;
+        // Visible ball rotation: integrate angular velocity into the mesh
+        // orientation. The body rotates about its own spin axis at the
+        // rate of |angularVelocity| rad/s, scaled up so the spin is
+        // visually obvious (the physics magnitudes are tuned for Magnus
+        // force, not for fast visual rotation).
+        const spinMag = Math.sqrt(
+          ball.angularVelocity.x * ball.angularVelocity.x +
+            ball.angularVelocity.y * ball.angularVelocity.y +
+            ball.angularVelocity.z * ball.angularVelocity.z,
+        );
+        if (spinMag > 0.001) {
+          // Apply incremental rotation each frame about the spin axis.
+          // Multiplying by 4 turns the subtle physics-magnitude rotation
+          // into something the eye can actually see on the box mesh.
+          ballMesh.rotation.x += ball.angularVelocity.x * dt * 4;
+          ballMesh.rotation.y += ball.angularVelocity.y * dt * 4;
+          ballMesh.rotation.z += ball.angularVelocity.z * dt * 4;
+        } else {
+          // No spin: keep a very slow ambient rotation so the ball
+          // doesn't look frozen between hits.
+          ballMesh.rotation.z += dt * 0.6;
+        }
         ballGlintMesh.position.set(ball.x, ball.y, spinLift + 2);
         ballGlintMesh.rotation.x += dt * 5.8;
         ballGlintMesh.rotation.y += dt * 4.2;
@@ -2954,7 +3053,15 @@ export default function App() {
           ball.x = rackets.left.x + rackets.left.thickness / 2 + ballSize / 2;
           const intersectY = (rackets.left.y - ball.y) / (currentLen / 2);
           const realSpeed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
+          const incomingVx = ball.vx;
+          const incomingVy = ball.vy;
           ({ vx: ball.vx, vy: ball.vy } = bounceVelocityOffRacket("left", intersectY, realSpeed));
+          // Edge-hit spin: contact offset (-intersectY, matching the
+          // existing applyNaturalRacketDeflection convention) determines
+          // how much angular velocity gets added. Dead centre = no spin,
+          // edge = max. The spin axis is perpendicular to the incoming
+          // velocity in the play plane.
+          addPaddleHitSpin(ball, -intersectY, incomingVx, incomingVy, "y");
           {
             const power = applyRacketImpulse(ball, "y", racketVelocity.left.y, currentSpeed);
             if (power > 0.14) shakeIntensity = Math.max(shakeIntensity, 2 + power * 4);
@@ -2984,7 +3091,10 @@ export default function App() {
           ball.y = rackets.bottom.y + rackets.bottom.thickness / 2 + ballSize / 2;
           const intersectX = (ball.x - rackets.bottom.x) / (currentLen / 2);
           const realSpeed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
+          const incomingVx = ball.vx;
+          const incomingVy = ball.vy;
           ({ vx: ball.vx, vy: ball.vy } = bounceVelocityOffRacket("bottom", intersectX, realSpeed));
+          addPaddleHitSpin(ball, intersectX, incomingVx, incomingVy, "x");
           {
             const power = applyRacketImpulse(ball, "x", racketVelocity.bottom.x, currentSpeed);
             if (power > 0.14) shakeIntensity = Math.max(shakeIntensity, 2 + power * 4);
@@ -3014,7 +3124,10 @@ export default function App() {
           ball.x = rackets.right.x - rackets.right.thickness / 2 - ballSize / 2;
           const intersectY = (rackets.right.y - ball.y) / (currentLen / 2);
           const realSpeed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
+          const incomingVx = ball.vx;
+          const incomingVy = ball.vy;
           ({ vx: ball.vx, vy: ball.vy } = bounceVelocityOffRacket("right", intersectY, realSpeed));
+          addPaddleHitSpin(ball, -intersectY, incomingVx, incomingVy, "y");
           {
             const power = applyRacketImpulse(ball, "y", racketVelocity.right.y, currentSpeed);
             if (power > 0.14) shakeIntensity = Math.max(shakeIntensity, 2 + power * 4);
@@ -3038,7 +3151,10 @@ export default function App() {
           ball.y = rackets.top.y - rackets.top.thickness / 2 - ballSize / 2;
           const intersectX = (ball.x - rackets.top.x) / (currentLen / 2);
           const realSpeed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
+          const incomingVx = ball.vx;
+          const incomingVy = ball.vy;
           ({ vx: ball.vx, vy: ball.vy } = bounceVelocityOffRacket("top", intersectX, realSpeed));
+          addPaddleHitSpin(ball, intersectX, incomingVx, incomingVy, "x");
           {
             const power = applyRacketImpulse(ball, "x", racketVelocity.top.x, currentSpeed);
             if (power > 0.14) shakeIntensity = Math.max(shakeIntensity, 2 + power * 4);
