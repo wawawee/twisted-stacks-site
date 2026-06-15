@@ -403,6 +403,18 @@ export default function App() {
   const [scoreCandidate, setScoreCandidate] = useState<ScoreCandidate | null>(null);
   const [playerInitials, setPlayerInitials] = useState("");
 
+  /**
+   * "Custom-built" credit overlay for Level 1. Shown once per visitor,
+   * gated by localStorage. `phase` drives the fade lifecycle:
+   *   "hidden"      → not yet eligible
+   *   "fade-in"     → 0 → 1 over PONGG_CREDITS_FADE_IN_MS
+   *   "hold"        → 1 for PONGG_CREDITS_HOLD_MS
+   *   "fade-out"    → 1 → 0 over PONGG_CREDITS_FADE_OUT_MS
+   */
+  const [creditsPhase, setCreditsPhase] = useState<"hidden" | "fade-in" | "hold" | "fade-out">("hidden");
+  const creditsPhaseRef = useRef(creditsPhase);
+  creditsPhaseRef.current = creditsPhase;
+
   const rigStateRef = useRef<"normal" | "autopilot">("autopilot");
   const highScoresRef = useRef(highScores);
   highScoresRef.current = highScores;
@@ -577,6 +589,52 @@ export default function App() {
   });
   const hudSyncRef = useRef(hud);
   const arcadeBootedRef = useRef(false);
+
+  /**
+   * Level 1 (DRIFT) custom-built credit overlay lifecycle.
+   *
+   * Fires once per browser (gated by localStorage) when the user reaches
+   * the first gameplay frame of Level 1. The overlay fades in after a
+   * short delay (so it does not collide with the level intro card), holds
+   * long enough to read, then fades out. The next visit will not see it.
+   */
+  useEffect(() => {
+    if (!showGame) return;
+    if (gameState !== GameState.GAMEPLAY) return;
+    if (hud.level !== 1) return;
+    if (typeof window === "undefined") return;
+    if (window.localStorage.getItem(PONGG_CREDITS_SEEN_KEY) === "1") return;
+
+    const cleanupFns: Array<() => void> = [];
+    setCreditsPhase("hidden");
+
+    const fadeInTimer = window.setTimeout(() => {
+      setCreditsPhase("fade-in");
+      const visibleAt = window.setTimeout(() => {
+        setCreditsPhase("hold");
+        const holdTimer = window.setTimeout(() => {
+          setCreditsPhase("fade-out");
+          const goneAt = window.setTimeout(() => {
+            setCreditsPhase("hidden");
+            try {
+              window.localStorage.setItem(PONGG_CREDITS_SEEN_KEY, "1");
+            } catch {
+              /* localStorage may be unavailable in private mode; that's fine */
+            }
+          }, PONGG_CREDITS_FADE_OUT_MS);
+          cleanupFns.push(() => window.clearTimeout(goneAt));
+        }, PONGG_CREDITS_HOLD_MS);
+        cleanupFns.push(() => window.clearTimeout(holdTimer));
+      }, PONGG_CREDITS_FADE_IN_MS);
+      cleanupFns.push(() => window.clearTimeout(visibleAt));
+    }, PONGG_CREDITS_FADE_IN_MS);
+    cleanupFns.push(() => window.clearTimeout(fadeInTimer));
+
+    return () => {
+      cleanupFns.forEach((fn) => fn());
+      setCreditsPhase("hidden");
+    };
+  }, [showGame, gameState, hud.level]);
 
   // Contact Form State
   const [initError, setInitError] = useState<string | null>(null);
@@ -4351,6 +4409,27 @@ export default function App() {
               </form>
             )}
           </div>
+        </div>
+      )}
+
+      {/*
+        Level 1 (DRIFT) "custom-built" credit overlay.
+        Shown once per visitor (gated by localStorage) at the bottom of
+        the canvas. Opacity is driven by `creditsPhase`:
+          hidden   → 0
+          fade-in  → 0.6 (rises via CSS transition)
+          hold     → 0.6
+          fade-out → 0 (falls via CSS transition)
+      */}
+      {creditsPhase !== "hidden" && (
+        <div
+          className={`pongg-credits-overlay pongg-credits-overlay--${creditsPhase}`}
+          role="status"
+          aria-live="polite"
+        >
+          <span className="pongg-credits-overlay-text">
+            Custom-built for TwistedStacks · Built from scratch · — Per Brinell 2026
+          </span>
         </div>
       )}
     </div>

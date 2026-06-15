@@ -16,10 +16,16 @@ export interface LevelProfile {
   monsterCount: 0 | 2 | 3 | 4;
   monsterShotScale: number;
   wobbleScale: number;
+  /**
+   * If true, the level's brick field is laid out as bitmap text
+   * (e.g. "TWISTED" / "STACKS") instead of a random/dense pattern.
+   * Currently only Level 1 (DRIFT) uses this to brand the opening round.
+   */
+  textLayout?: boolean;
 }
 
 export const LEVEL_PROFILES: LevelProfile[] = [
-  { level: 1, codename: "DRIFT", speedBonus: 0, compoundBonus: 0, aiTrackingBonus: 0, aiSpeedBonus: 0, monsterCount: 0, monsterShotScale: 1, wobbleScale: 1 },
+  { level: 1, codename: "DRIFT", speedBonus: 0, compoundBonus: 0, aiTrackingBonus: 0, aiSpeedBonus: 0, monsterCount: 0, monsterShotScale: 1, wobbleScale: 1, textLayout: true },
   { level: 2, codename: "RALLY", speedBonus: 72, compoundBonus: 0.0028, aiTrackingBonus: 0.02, aiSpeedBonus: 0.06, monsterCount: 2, monsterShotScale: 0.9, wobbleScale: 1.08 },
   { level: 3, codename: "HEAT", speedBonus: 128, compoundBonus: 0.0045, aiTrackingBonus: 0.034, aiSpeedBonus: 0.085, monsterCount: 2, monsterShotScale: 0.84, wobbleScale: 1.16 },
   { level: 4, codename: "PRESSURE", speedBonus: 188, compoundBonus: 0.0062, aiTrackingBonus: 0.045, aiSpeedBonus: 0.105, monsterCount: 3, monsterShotScale: 0.78, wobbleScale: 1.24 },

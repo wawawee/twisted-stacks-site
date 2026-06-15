@@ -804,6 +804,59 @@ body {
 }
 
 /* ----------------------------------------------------------------------------
+   Pongg "custom-built" credit overlay (Level 1 / DRIFT)
+   Shown once per visitor the first time Level 1 gameplay begins, fades
+   out after a short hold. Lives at the bottom of the canvas, monospace,
+   so it reads as a build credit rather than a CTA.
+   -------------------------------------------------------------------------- */
+
+.pongg-credits-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 18px;
+  z-index: 30;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  padding: 0 16px;
+  opacity: 0;
+  transition: opacity 0.6s ease-out;
+}
+.pongg-credits-overlay--fade-in,
+.pongg-credits-overlay--hold {
+  opacity: 0.6;
+}
+.pongg-credits-overlay--fade-out {
+  opacity: 0;
+  transition: opacity 1.5s ease-in;
+}
+.pongg-credits-overlay-text {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 640px) {
+  .pongg-credits-overlay {
+    bottom: 12px;
+    padding: 0 10px;
+  }
+  .pongg-credits-overlay-text {
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    white-space: normal;
+    line-height: 1.4;
+  }
+}
+
+/* ----------------------------------------------------------------------------
    Score entry overlay
    -------------------------------------------------------------------------- */
 
