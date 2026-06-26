@@ -3922,7 +3922,9 @@ export default function App() {
           <div className="ts-mesh" aria-hidden="true" />
 
           <header className="showroom-topbar">
-            <span className="showroom-topbar-mark">TWISTEDSTACKS</span>
+            {/* Topbar carries ONLY the language toggle now — the
+                TWISTEDSTACKS wordmark lives in the hero kicker directly
+                below, so showing it twice would be cake-on-cake. */}
             <nav className="showroom-topbar-actions">
               <button
                 type="button"

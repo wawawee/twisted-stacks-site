@@ -1500,8 +1500,10 @@ body {
 }
 
 /* ----------------------------------------------------------------------------
-   Topbar (brand mark + language toggle) — sits above the showroom hero and
-   stays sticky on the project page so the lang switch is always reachable.
+   Topbar (language toggle only) — sits above the showroom hero and stays
+   sticky on the project page so the lang switch is always reachable.
+   The TWISTEDSTACKS wordmark lives in the hero kicker; we deliberately
+   don't repeat it here.
    --------------------------------------------------------------------------- */
 
 .showroom-topbar {
@@ -1510,18 +1512,11 @@ body {
   z-index: 5;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 14px;
   padding: 6px 0 18px;
   margin-bottom: 10px;
   backdrop-filter: blur(8px);
-}
-.showroom-topbar-mark {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.36em;
-  text-transform: uppercase;
-  color: var(--pearl);
 }
 .showroom-topbar-actions {
   display: flex;
