@@ -83,6 +83,9 @@ import {
 } from "./levelIntro";
 import { monsterShotAngle, monsterShotSpeed } from "./monsterShots";
 import { PROJECTS, getProjectById, type ProjectEntry } from "./data/projects";
+import { useTranslation } from "./i18n/context";
+import { localizeProject, projectHook } from "./i18n/project";
+import type { Lang } from "./i18n/types";
 
 // Theme Palette Configuration
 const COLOR_BLACK = 0x050505;       // Pure near-black background
@@ -94,7 +97,7 @@ const COLOR_AI = 0x06B6D4;           // Cyan for artificial intelligence
 const COLOR_WIN_GREEN = 0x22C55E;    // Neon Green for victory
 const COLOR_LOSS_RED = 0xEF4444;     // Blood Red for defeat
 const COLOR_WHITE = 0xFFFFFF;        // Neutral highlights
-const CONTACT_EMAIL = "dev@twistedstacks.com";
+const CONTACT_EMAIL = "hello@twistedstacks.com";
 const HARMONIC_SCALE = [196.0, 220.0, 246.94, 293.66, 329.63, 392.0, 440.0, 493.88];
 const SCOREBOARD_STORAGE_KEY = "twisted_pongg_scoreboard_v1";
 const SCOREBOARD_LIMIT = 5;
@@ -390,11 +393,56 @@ export default function App() {
   const [selectedProjectId, setSelectedProjectId] = useState<string>("system_skatterevision");
   const [showShowroomModal, setShowShowroomModal] = useState(false);
   const [showGame, setShowGame] = useState(false);
-  // Read-more panel for extended project descriptions (longDescription + keywords).
-  // Independent of `selectedProjectId` (which is just a hover/focus highlight) and
-  // of `openProjectDestination` (which actually navigates). The user can expand
-  // a card to read more without leaving the showroom.
-  const [expandedProjectId, setExpandedProjectId] = useState<string | null>(null);
+
+  // Hash-based SPA route. Two views:
+  //   { kind: "showroom" }      — the landing grid (default)
+  //   { kind: "project", id }   — the dedicated presentation page
+  //
+  // We read the route from `window.location.hash` so deep links survive
+  // a refresh, and update the URL on every navigation so the back button
+  // works. URL shape: "#/projects/<id>". An empty hash means showroom.
+  const { lang, t, toggle: toggleLanguage } = useTranslation();
+  type Route =
+    | { kind: "showroom" }
+    | { kind: "project"; id: string };
+  const parseHashRoute = (): Route => {
+    if (typeof window === "undefined") return { kind: "showroom" };
+    const raw = window.location.hash.replace(/^#/, "");
+    const match = raw.match(/^\/projects\/([a-z0-9_]+)$/i);
+    if (match) return { kind: "project", id: match[1] };
+    return { kind: "showroom" };
+  };
+  const [route, setRoute] = useState<Route>(() => parseHashRoute());
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const onHashChange = () => setRoute(parseHashRoute());
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
+
+  const navigateToProject = (id: string) => {
+    if (typeof window === "undefined") return;
+    if (window.location.hash !== `#/projects/${id}`) {
+      window.location.hash = `/projects/${id}`;
+    } else {
+      setRoute({ kind: "project", id });
+    }
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+    }
+  };
+  const navigateToShowroom = () => {
+    if (typeof window === "undefined") return;
+    if (window.location.hash && window.location.hash !== "#/") {
+      window.location.hash = "";
+    } else {
+      setRoute({ kind: "showroom" });
+    }
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+    }
+  };
+
   const showGameRef = useRef(showGame);
   const [highScores, setHighScores] = useState<ScoreEntry[]>(loadScoreboard);
   const [leaderboardMode, setLeaderboardMode] = useState<"local" | "global">(
@@ -447,28 +495,19 @@ export default function App() {
     };
   }, []);
 
-  // Dynamic document.title for SEO + share preview: reflect the project the user is looking at.
-  // Falls back to the root "TwistedStacks | AI systems showroom" while the showroom itself is mounted.
+  // Dynamic document.title for SEO + share preview: reflect the active
+  // project OR the active language dictionary. The <html lang> attribute
+  // is owned by LanguageProvider (it tracks the language toggle).
   useEffect(() => {
     if (typeof document === "undefined") return;
     const project = CATALOG_PROJECTS.find((p) => p.id === selectedProjectId);
     const baseTitle = project
       ? `${project.name} | TwistedStacks`
-      : "TwistedStacks | AI systems showroom";
-    const taglineSuffix = project?.tagline ? ` — ${project.tagline}` : "";
+      : t.meta.title;
+    const localizedProject = project ? localizeProject(project, lang as Lang) : null;
+    const taglineSuffix = localizedProject?.tagline ? ` — ${localizedProject.tagline}` : "";
     document.title = `${baseTitle}${taglineSuffix}`.slice(0, 200);
-  }, [selectedProjectId]);
-
-  // Keep <html lang> in sync with the active showroom project when it is locale-bound.
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    const project = CATALOG_PROJECTS.find((p) => p.id === selectedProjectId);
-    const swedishProjects = new Set(["system_skatterevision", "system_laga", "system_anslag", "system_recon"]);
-    const nextLang = project && swedishProjects.has(project.id) ? "sv" : "en";
-    if (document.documentElement.lang !== nextLang) {
-      document.documentElement.lang = nextLang;
-    }
-  }, [selectedProjectId]);
+  }, [selectedProjectId, lang, t]);
 
   const clearRetryTimer = () => {
     if (retryTimerRef.current) {
@@ -487,6 +526,9 @@ export default function App() {
     clearRetryTimer();
     setRetryPromptActive(false);
     setEndAction(null);
+    // aiLossSlowMoUntil is cleared in the game loop's "level1" action
+    // handler so the next level 1 start runs at the normal ball speed
+    // instead of inheriting the loss slowdown.
     endActionRequestRef.current = "level1";
   };
 
@@ -636,66 +678,147 @@ export default function App() {
     };
   }, [showGame, gameState, hud.level]);
 
-  // Contact Form State
+  // Contact Form State — must always know WHO is writing. Anon submissions
+  // are rejected by /api/contact. Topic + intent are auto-prefilled when
+  // the form opens from a project CTA / easter vault / hero button.
   const [initError, setInitError] = useState<string | null>(null);
   const [showContactForm, setShowContactForm] = useState(false);
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactCompany, setContactCompany] = useState("");
   const [contactMessage, setContactMessage] = useState("");
-  const [contactType, setContactType] = useState<"FEEDBACK" | "BUG_REPORT" | "QUERY">("FEEDBACK");
+  const [contactTopic, setContactTopic] = useState("General contact");
+  const [contactIntent, setContactIntent] = useState<"demo" | "feedback" | "bug" | "query">("query");
+  const [contactHoneypot, setContactHoneypot] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitSuccess, setIsSubmitSuccess] = useState(false);
+  const [submissionForwarded, setSubmissionForwarded] = useState(false);
+  const [submissionStoredEmail, setSubmissionStoredEmail] = useState<string | null>(null);
   const [formError, setFormError] = useState("");
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  /**
+   * Lightweight email shape check. /api/contact re-validates, so this is
+   * only for instant UX feedback before the round-trip.
+   */
+  const isLikelyValidEmail = (value: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError("");
 
-    if (!contactMessage.trim()) {
-      setFormError("Skriv något först");
+    const trimmedName = contactName.trim();
+    const trimmedEmail = contactEmail.trim();
+    const trimmedMessage = contactMessage.trim();
+
+    if (!trimmedName) {
+      setFormError(t.contact.errors.missingName);
+      return;
+    }
+    if (!trimmedEmail) {
+      setFormError(t.contact.errors.missingEmail);
+      return;
+    }
+    if (!isLikelyValidEmail(trimmedEmail)) {
+      setFormError(t.contact.errors.badEmail);
+      return;
+    }
+    if (!trimmedMessage) {
+      setFormError(t.contact.errors.missingMessage);
+      return;
+    }
+    if (contactHoneypot.trim().length > 0) {
+      // Bot detected — pretend success and bail without hitting the API.
+      setIsSubmitSuccess(true);
       return;
     }
 
     setIsSubmitting(true);
-    const subject = encodeURIComponent(`TWISTED PONGG ${contactType.replace("_", " ")}`);
-    const body = encodeURIComponent(contactMessage.trim());
-    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: trimmedName,
+          email: trimmedEmail,
+          company: contactCompany.trim() || null,
+          topic: contactTopic.trim() || "General contact",
+          intent: contactIntent,
+          message: trimmedMessage,
+          website: contactHoneypot,
+          locale: typeof document !== "undefined" ? document.documentElement.lang : null,
+          sourceUrl: typeof window !== "undefined" ? window.location.href : null,
+          referrer: typeof document !== "undefined" ? document.referrer || null : null,
+          userAgent: typeof navigator !== "undefined" ? navigator.userAgent : null,
+        }),
+      });
+
+      const data: unknown = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        const errorMessage =
+          typeof data === "object" && data !== null && "error" in data
+            ? String((data as { error: unknown }).error)
+            : t.contact.errors.generic;
+        setFormError(errorMessage);
+        return;
+      }
+
+      const payload = data as { ok?: boolean; forwarded?: boolean };
+      setSubmissionForwarded(Boolean(payload.forwarded));
+      setSubmissionStoredEmail(trimmedEmail);
       setIsSubmitSuccess(true);
-    }, 400);
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? t.contact.errors.network(err.message)
+          : t.contact.errors.fallback;
+      setFormError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCloseContact = () => {
     setShowContactForm(false);
+    setContactName("");
+    setContactEmail("");
+    setContactCompany("");
     setContactMessage("");
-    setContactType("FEEDBACK");
+    setContactTopic("General contact");
+    setContactIntent("query");
+    setContactHoneypot("");
     setIsSubmitSuccess(false);
+    setSubmissionForwarded(false);
+    setSubmissionStoredEmail(null);
     setFormError("");
   };
 
-  const openContactForm = (prefill?: { message?: string; type?: "FEEDBACK" | "BUG_REPORT" | "QUERY" }) => {
+  const openContactForm = (prefill?: {
+    message?: string;
+    intent?: "demo" | "feedback" | "bug" | "query";
+    topic?: string;
+  }) => {
     if (prefill?.message) setContactMessage(prefill.message);
-    if (prefill?.type) setContactType(prefill.type);
+    if (prefill?.intent) setContactIntent(prefill.intent);
+    if (prefill?.topic) setContactTopic(prefill.topic);
     setShowContactForm(true);
     setIsSubmitSuccess(false);
+    setSubmissionForwarded(false);
+    setSubmissionStoredEmail(null);
     setFormError("");
   };
 
   const openProjectDestination = (project: ShowroomProject) => {
-    if (project.href) {
-      if (isExternalProjectHref(project.href)) {
-        window.open(project.href, "_blank", "noopener,noreferrer");
-        return;
-      }
-      window.location.assign(project.href);
-      return;
-    }
-    if (project.contactMessage) {
-      openContactForm({ type: "QUERY", message: project.contactMessage });
-      return;
-    }
+    // Cards in the showroom grid now open the in-app project page first
+    // — the user reads the description + FAQ there, then clicks the
+    // primary CTA on the page itself to open the live demo / repo / etc.
+    // This is the trim-first, then-link pattern.
     if (project.id === "system_arena") {
       startTwistedPongg();
+      return;
     }
+    navigateToProject(project.id);
   };
 
   const isProjectActionable = (project: ShowroomProject) =>
@@ -704,7 +827,10 @@ export default function App() {
   const getExtendedFor = (id: string): ProjectEntry | undefined => getProjectById(id);
 
   const toggleProjectExpanded = (id: string) => {
-    setExpandedProjectId((prev) => (prev === id ? null : id));
+    // Cards no longer expand inline — they navigate to the dedicated
+    // presentation page. Kept as a named handler so the JSX still reads
+    // cleanly at the card level.
+    navigateToProject(id);
   };
 
   const championUnlockedRef = useRef(championUnlocked);
@@ -819,6 +945,13 @@ export default function App() {
 
     // Screen Shake Manager
     let shakeIntensity = 0;
+    /**
+     * During the AI-wins "you lost" beat we run a slow-motion window. The
+     * ball is launched at 220 px/s and the drips get the focus. Cleared
+     * automatically when the player accepts a retry or jumps back to
+     * level 1 via the retry prompt.
+     */
+    let aiLossSlowMoUntil = 0;
     let endOutcome: "player" | "ai" | null = null;
     let playerWinLines = ["WELL", "PLAYED", "HOOMAN"];
     let nextWinFlashAt = 0;
@@ -1380,6 +1513,20 @@ export default function App() {
       motifMirrorBurstUntil = 0;
     }
 
+    /**
+     * Quick "hide but keep around" variant used when the center motif
+     * has to be removed from the visible scene without disposing the
+     * underlying meshes (e.g. during a same-frame state transition).
+     * Spawned meshes get `visible = false` so a stray render between
+     * the gameplay state and the END_SCREEN state cannot leak the
+     * purple/cyan/yellow motif behind the red "AI WINS" card.
+     */
+    function hideCenterMotif() {
+      centerMotifBricks.forEach((brick) => {
+        if (brick.mesh) brick.mesh.visible = false;
+      });
+    }
+
     function spawnCenterMotif() {
       clearCenterMotif();
       const layout = getMotifLayoutSpec(currentLevel, width, height);
@@ -1842,6 +1989,10 @@ export default function App() {
       clearPlayerShots();
       clearCenterMotif();
       pendingNextLevelAt = 0;
+      // Clear AI-wins slow-motion state whenever we transition out of
+      // an end screen. Without this, retrying the same level would
+      // inherit the 220 px/s loss speed and feel sluggish.
+      aiLossSlowMoUntil = 0;
       clearServeCountdown();
 
       currentState = targetState;
@@ -2820,6 +2971,7 @@ export default function App() {
           currentLevel = 1;
           championRevealAt = 0;
           championBurstDone = false;
+          aiLossSlowMoUntil = 0;
           explodeEndBricks();
           transitionToNextIntroState(GameState.INTRO_TWISTEDSTACKS);
         } else {
@@ -2880,10 +3032,15 @@ export default function App() {
 
       // --- BALL PHYSICS ---
       if ((currentState !== GameState.END_SCREEN || endBricks.length > 0) && serveResumeAt === 0) {
+        // During the AI-wins slow-motion window we drive the ball at a
+        // fixed 220 px/s instead of `currentSpeed` so the red loss card
+        // and the paint drips stay the focal point. Outside that window
+        // we use `currentSpeed` as before.
+        const ballDriveSpeed = aiLossSlowMoUntil > timeNow ? 220 : currentSpeed;
         integrateBallCurve(
           ball,
           dt,
-          currentSpeed,
+          ballDriveSpeed,
           currentState === GameState.GAMEPLAY,
           currentLevel,
         );
@@ -2943,7 +3100,9 @@ export default function App() {
         }
 
         if (serveResumeAt === 0) {
-          normalizeBallSpeed(ball, currentSpeed);
+          // Don't auto-normalize during the AI-wins slow-mo window.
+          const targetSpeed = aiLossSlowMoUntil > timeNow ? 220 : currentSpeed;
+          normalizeBallSpeed(ball, targetSpeed);
         }
         updatePointMultiplier();
         updateMusicLoop(timeNow);
@@ -3272,16 +3431,53 @@ export default function App() {
 
           if (scorePlayer <= 0) {
             // AI Wins
+            // 1. Defensively clear every visual layer that might still hold
+            //    gameplay art (text-bricks, center motif, score digits,
+            //    countdown meshes, end bricks). renderEndTypography also
+            //    clears these, but a player losing on repeat level 1 used
+            //    to see the "TWISTED/STACKS" rainbow text and the rotating
+            //    motif linger for a frame, which broke the "you lost" beat.
+            bricks.forEach((b) => { if (b.mesh) scene.remove(b.mesh); });
+            bricks = [];
+            scoreBricks.forEach((sb) => { if (sb.mesh) scene.remove(sb.mesh); });
+            scoreBricks = [];
+            hideCenterMotif();
+            clearCenterMotif();
+            endBricks.forEach((eb) => { if (eb.mesh) scene.remove(eb.mesh); });
+            endBricks = [];
+            clearMonsterEntities();
+            clearPlayerShots();
+
             currentState = GameState.END_SCREEN;
             setGameState(GameState.END_SCREEN);
             endOutcome = "ai";
             paintDripAccumulator = 0;
             submitScoreCandidate(playerPoints, currentLevel, "lost");
-            setRetryPromptActive(true);
-            setEndAction("retry");
+            // Slow-motion ball: 220 px/s instead of 560 so the drips and
+            // the red "AI WINS" card are the focal point, not the ball.
+            // The retry prompt waits another 2.5s after this so the loss
+            // actually lands before the player can re-engage.
+            // The retry prompt is delayed via a window.setTimeout below
+            // (set 2.5s after the loss lands) so the React overlay waits
+            // its turn. Slow-motion runs for 3.2s so drips keep falling
+            // even after the prompt appears.
+            aiLossSlowMoUntil = timeNow + 3200;
+            shakeIntensity = 22;
+            setRetryPromptActive(false);
+            setEndAction(null);
             renderEndTypography(["AI", "WINS"], COLOR_LOSS_RED);
-            spawnPaintDrips(18);
-            launchBall(Math.min(currentSpeed, 560));
+            spawnPaintDrips(28);
+            launchBall(220);
+            // Delay the retry prompt 2.5s so the red loss card and the
+            // paint drips land as a single beat before the player can
+            // re-engage. Without this the prompt appears instantly and
+            // the "you lost" moment is interrupted by a "Yes / AI Wins"
+            // overlay. Driven by setTimeout (not React state) so the
+            // game-loop closure already holds the right `endOutcome`.
+            window.setTimeout(() => {
+              setRetryPromptActive(true);
+              setEndAction("retry");
+            }, 2500);
           } else if (scoreAI <= 0) {
             // Player Wins
             currentState = GameState.END_SCREEN;
@@ -3725,205 +3921,126 @@ export default function App() {
         <main className="showroom-shell pointer-events-auto">
           <div className="ts-mesh" aria-hidden="true" />
 
-          <section className="showroom-hero">
-            <div className="showroom-kicker">TWISTEDSTACKS // SANDVIKEN AI LAB</div>
-            <h1 className="showroom-hero-title">
-              <span>Useful systems.</span>
-              <span className="showroom-hero-twist">TWISTED edge.</span>
-            </h1>
-            <p className="showroom-lede">
-              Local AI, legal workflows, grant tooling, voice-first interfaces, defensive research, and small polished
-              sites. Built by Per Brinell as a practical showroom rather than a pitch deck.
-            </p>
-            <div className="showroom-actions">
+          <header className="showroom-topbar">
+            <span className="showroom-topbar-mark">TWISTEDSTACKS</span>
+            <nav className="showroom-topbar-actions">
               <button
                 type="button"
-                className="showroom-action showroom-action-primary"
-                onClick={startTwistedPongg}
+                className="showroom-lang-toggle"
+                onClick={toggleLanguage}
+                aria-label={`Switch language to ${t.topbar.switchTo.toUpperCase()}`}
+                title={`Switch language to ${t.topbar.switchTo.toUpperCase()}`}
               >
-                Play Pongg
+                {t.topbar.languageToggle}
               </button>
-              <button
-                type="button"
-                className="showroom-action"
-                onClick={() => openContactForm({
-                  type: "QUERY",
-                  message: "Hej Per,\n\nJag vill boka en full demonstration av REVISION-systemet.\n\n",
-                })}
-              >
-                Book Demo
-              </button>
-              <a
-                className="showroom-action"
-                href="https://anslag.twistedstacks.com/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Prova Anslag
-              </a>
-              <button
-                type="button"
-                className="showroom-action"
-                onClick={() => openContactForm({ type: "QUERY", message: "Hej Per,\n\n" })}
-              >
-                Contact
-              </button>
-              <a className="showroom-action" href="https://github.com/wawawee" target="_blank" rel="noreferrer">
-                GitHub
-              </a>
-            </div>
-          </section>
+            </nav>
+          </header>
 
-          <section className="showroom-project-grid" aria-label="TwistedStacks projects">
-            {CATALOG_PROJECTS.filter((project) => project.id !== "system_arena").map((project) => {
-              const isExpanded = expandedProjectId === project.id;
-              return (
-              <article
-                key={project.id}
-                className={`showroom-project ${selectedProjectId === project.id ? "is-selected" : ""} ${
-                  isProjectActionable(project) ? "is-actionable" : ""
-                } ${isExpanded ? "is-expanded" : ""}`}
-                onMouseEnter={() => setSelectedProjectId(project.id)}
-                onClick={() => {
-                  if (isProjectActionable(project)) openProjectDestination(project);
-                }}
-                onKeyDown={(event) => {
-                  if (!isProjectActionable(project)) return;
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    openProjectDestination(project);
-                  }
-                }}
-                role={isProjectActionable(project) ? "button" : undefined}
-                tabIndex={isProjectActionable(project) ? 0 : undefined}
-                aria-label={
-                  isProjectActionable(project)
-                    ? `${project.name}: ${project.actionLabel || "Open"}`
-                    : undefined
-                }
-              >
-                <div className="showroom-project-topline">
-                  <span>{project.version}</span>
-                  <span>{project.status}</span>
-                </div>
-                <h2>{project.name}</h2>
-                <p className="showroom-project-tagline">{project.tagline}</p>
-                <p className="showroom-project-description">{project.description}</p>
-                <div className="showroom-project-stack">
-                  {project.techStack.map((tech) => (
-                    <span key={`${project.id}-${tech}`}>{tech}</span>
-                  ))}
-                </div>
-                <div className="showroom-project-footer">
-                  <div className="showroom-project-metric">
-                    {project.telemetry[0]?.label}: <strong>{project.telemetry[0]?.value}</strong>
-                  </div>
-                  {project.href || project.contactMessage || project.id === "system_arena" ? (
-                    <span className="showroom-project-cta">
-                      {project.actionLabel || (project.contactMessage ? "Contact" : "Open")}
-                      <span aria-hidden> →</span>
-                    </span>
-                  ) : (
-                    <span className="showroom-project-pending">{project.actionLabel || "Soon"}</span>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  className={`showroom-project-readmore ${isExpanded ? "is-open" : ""}`}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    toggleProjectExpanded(project.id);
-                  }}
-                  aria-expanded={isExpanded}
-                  aria-controls={`showroom-project-detail-${project.id}`}
-                >
-                  {isExpanded ? "Hide details" : "Read more"}
-                </button>
-              </article>
-              );
-            })}
-          </section>
-
-          {/* Extended project detail panel — shown when a project card is expanded */}
-          {expandedProjectId ? (() => {
-            const ext = getExtendedFor(expandedProjectId);
-            const live = CATALOG_PROJECTS.find((p) => p.id === expandedProjectId);
-            if (!ext || !live) return null;
-            return (
-              <section
-                id={`showroom-project-detail-${ext.id}`}
-                className="showroom-project-detail"
-                aria-label={`${ext.name} details`}
-              >
-                <div className="showroom-project-detail-inner">
-                  <div className="showroom-project-detail-head">
-                    <div>
-                      <div className="showroom-project-detail-kicker">
-                        {ext.status} · {ext.version}
-                      </div>
-                      <h3>{ext.name}</h3>
-                    </div>
+          {route.kind === "project" ? (
+            (() => {
+              const ext = getExtendedFor(route.id);
+              if (!ext) {
+                return (
+                  <section className="showroom-project-page">
                     <button
                       type="button"
-                      className="showroom-project-detail-close"
-                      onClick={() => setExpandedProjectId(null)}
-                      aria-label="Close details"
+                      className="showroom-back-link"
+                      onClick={navigateToShowroom}
                     >
-                      [CLOSE ×]
+                      {t.page.notFoundBack}
                     </button>
+                    <h1 className="showroom-project-page-title">{t.page.notFound}</h1>
+                  </section>
+                );
+              }
+              const loc = localizeProject(ext, lang as Lang);
+              const statusLine = t.showcase.statusLine(loc.status, loc.version);
+              return (
+                <section
+                  id={`showroom-project-detail-${ext.id}`}
+                  className="showroom-project-page"
+                  aria-label={t.showcase.detailAriaLabel(loc.name)}
+                >
+                  <button
+                    type="button"
+                    className="showroom-back-link"
+                    onClick={navigateToShowroom}
+                  >
+                    {t.showcase.backToShowroom}
+                  </button>
+
+                  <div className="showroom-project-detail-kicker">{statusLine}</div>
+                  <h1 className="showroom-project-page-title">{loc.name}</h1>
+                  <p className="showroom-project-page-tagline">{loc.tagline}</p>
+
+                  <div className="showroom-project-page-body">
+                    {loc.longDescription.split(/\n\n+/).map((para, i) => (
+                      <p key={`${ext.id}-p-${i}`} className="showroom-project-detail-para">
+                        {para}
+                      </p>
+                    ))}
                   </div>
-                  {ext.longDescription.split(/\n\n+/).map((para, i) => (
-                    <p key={`${ext.id}-p-${i}`} className="showroom-project-detail-para">
-                      {para}
-                    </p>
-                  ))}
-                  {ext.faq.length > 0 ? (
-                    <div className="showroom-project-detail-faq" aria-label="FAQ">
-                      <div className="showroom-project-detail-faq-kicker">FAQ</div>
-                      {ext.faq.map((item, i) => (
+
+                  {loc.faq.length > 0 ? (
+                    <section className="showroom-project-page-faq" aria-label="FAQ">
+                      <h2 className="showroom-project-page-section-title">{t.showcase.faqKicker}</h2>
+                      {loc.faq.map((item, i) => (
                         <div key={`${ext.id}-faq-${i}`} className="showroom-project-detail-faq-item">
                           <h3 className="showroom-project-detail-faq-q">{item.q}</h3>
                           <p className="showroom-project-detail-faq-a">{item.a}</p>
                         </div>
                       ))}
-                    </div>
+                    </section>
                   ) : null}
-                  <div className="showroom-project-detail-stack">
-                    {ext.stack.map((tech) => (
-                      <span key={`${ext.id}-${tech}`}>{tech}</span>
-                    ))}
-                  </div>
-                  {ext.keywords.length > 0 ? (
-                    <div className="showroom-project-detail-keywords" aria-label="Topics">
-                      {ext.keywords.map((kw) => (
-                        <span key={`${ext.id}-kw-${kw}`}>{kw}</span>
+
+                  <section className="showroom-project-page-stack" aria-label={t.showcase.stackKicker}>
+                    <h2 className="showroom-project-page-section-title">{t.showcase.stackKicker}</h2>
+                    <div className="showroom-project-detail-stack">
+                      {loc.stack.map((tech) => (
+                        <span key={`${ext.id}-${tech}`}>{tech}</span>
                       ))}
                     </div>
+                  </section>
+
+                  {loc.keywords.length > 0 ? (
+                    <section className="showroom-project-page-keywords" aria-label={t.showcase.topicsKicker}>
+                      <h2 className="showroom-project-page-section-title">{t.showcase.topicsKicker}</h2>
+                      <div className="showroom-project-detail-keywords">
+                        {loc.keywords.map((kw) => (
+                          <span key={`${ext.id}-kw-${kw}`}>{kw}</span>
+                        ))}
+                      </div>
+                    </section>
                   ) : null}
+
                   <div className="showroom-project-detail-cta">
-                    {ext.href ? (
-                      isExternalProjectHref(ext.href) ? (
+                    {loc.href ? (
+                      isExternalProjectHref(loc.href) ? (
                         <a
                           className="showroom-action showroom-action-primary"
-                          href={ext.href}
+                          href={loc.href}
                           target="_blank"
                           rel="noreferrer"
                         >
-                          {ext.ctaLabel} →
+                          {loc.ctaLabel} →
                         </a>
                       ) : (
-                        <a className="showroom-action showroom-action-primary" href={ext.href}>
-                          {ext.ctaLabel} →
+                        <a className="showroom-action showroom-action-primary" href={loc.href}>
+                          {loc.ctaLabel} →
                         </a>
                       )
                     ) : null}
-                    {ext.contactMessage ? (
+                    {loc.contactMessage ? (
                       <button
                         type="button"
                         className="showroom-action"
-                        onClick={() => openContactForm({ type: "QUERY", message: ext.contactMessage })}
+                        onClick={() => openContactForm({
+                          intent: "demo",
+                          topic: `${loc.name} demo`,
+                          message: loc.contactMessage,
+                        })}
                       >
-                        Contact
+                        {t.showcase.contactCta}
                       </button>
                     ) : null}
                     <a
@@ -3932,26 +4049,143 @@ export default function App() {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      Source notes
+                      {t.showcase.sourceNotes}
                     </a>
                   </div>
+                </section>
+              );
+            })()
+          ) : (
+            <>
+              <section className="showroom-hero">
+                <div className="showroom-kicker">{t.hero.kicker}</div>
+                <h1 className="showroom-hero-title">
+                  <span>{t.hero.titleLine1}</span>
+                  <span className="showroom-hero-twist">{t.hero.titleLine2}</span>
+                </h1>
+                <p className="showroom-lede">{t.hero.lede}</p>
+                <div className="showroom-actions">
+                  <button
+                    type="button"
+                    className="showroom-action showroom-action-primary"
+                    onClick={startTwistedPongg}
+                  >
+                    {t.hero.actions.playPongg}
+                  </button>
+                  <button
+                    type="button"
+                    className="showroom-action"
+                    onClick={() => openContactForm({
+                      intent: "demo",
+                      topic: "REVISION demo",
+                      message: "Hej Per,\n\nJag vill boka en full demonstration av REVISION-systemet.\n\n",
+                    })}
+                  >
+                    {t.hero.actions.bookDemo}
+                  </button>
+                  <a
+                    className="showroom-action"
+                    href="https://anslag.twistedstacks.com/"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {t.hero.actions.tryAnslag}
+                  </a>
+                  <button
+                    type="button"
+                    className="showroom-action"
+                    onClick={() => openContactForm({
+                      intent: "query",
+                      topic: "Showroom contact",
+                    })}
+                  >
+                    {t.hero.actions.contact}
+                  </button>
+                  <a className="showroom-action" href="https://github.com/wawawee" target="_blank" rel="noreferrer">
+                    {t.hero.actions.github}
+                  </a>
                 </div>
               </section>
-            );
-          })() : null}
 
-          <section className="showroom-note">
-            <p>Pongg runs quietly behind the page as a visual backdrop. Click Play Pongg for sound and full control.</p>
-            <p>Click any project card to open its info page, live demo, or repo link.</p>
-            <p>
-              Runnable demos live on their own subdomains. Info-only pages and PDFs can stay on the main site — see
-              REVISION for that pattern.
-            </p>
-            <p>
-              KryptoArkeologi is intentionally not linked yet. It needs a private-data scrub first, then a stripped
-              public edition.
-            </p>
-          </section>
+              <section className="showroom-project-grid" aria-label={t.showcase.ariaLabel}>
+                {CATALOG_PROJECTS.filter((project) => project.id !== "system_arena").map((project) => {
+                  const loc = localizeProject(project, lang as Lang);
+                  const hook = projectHook(project, lang as Lang);
+                  return (
+                  <article
+                    key={project.id}
+                    className={`showroom-project ${selectedProjectId === project.id ? "is-selected" : ""} ${
+                      isProjectActionable(project) ? "is-actionable" : ""
+                    }`}
+                    onMouseEnter={() => setSelectedProjectId(project.id)}
+                    onClick={() => {
+                      if (isProjectActionable(project)) openProjectDestination(project);
+                    }}
+                    onKeyDown={(event) => {
+                      if (!isProjectActionable(project)) return;
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        openProjectDestination(project);
+                      }
+                    }}
+                    role={isProjectActionable(project) ? "button" : undefined}
+                    tabIndex={isProjectActionable(project) ? 0 : undefined}
+                    aria-label={
+                      isProjectActionable(project)
+                        ? t.showcase.projectAriaLabel(
+                            loc.name,
+                            project.actionLabel || (project.contactMessage ? t.showcase.contactCta : t.showcase.openDemo),
+                          )
+                        : undefined
+                    }
+                  >
+                    <div className="showroom-project-topline">
+                      <span>{loc.version}</span>
+                      <span>{loc.status}</span>
+                    </div>
+                    <h2>{loc.name}</h2>
+                    <p className="showroom-project-tagline">{loc.tagline}</p>
+                    {hook ? <p className="showroom-project-hook">{hook}</p> : null}
+                    <div className="showroom-project-stack">
+                      {project.techStack.slice(0, 4).map((tech) => (
+                        <span key={`${project.id}-${tech}`}>{tech}</span>
+                      ))}
+                    </div>
+                    <div className="showroom-project-footer">
+                      {loc.telemetry[0] ? (
+                        <div className="showroom-project-metric">
+                          {loc.telemetry[0].label}: <strong>{loc.telemetry[0].value}</strong>
+                        </div>
+                      ) : null}
+                      {project.href || project.contactMessage || project.id === "system_arena" ? (
+                        <span className="showroom-project-cta">
+                          {project.actionLabel || (project.contactMessage ? t.showcase.contactCta : t.showcase.openDemo)}
+                          <span aria-hidden> →</span>
+                        </span>
+                      ) : (
+                        <span className="showroom-project-pending">{project.actionLabel || "Soon"}</span>
+                      )}
+                    </div>
+                  </article>
+                  );
+                })}
+              </section>
+
+              <section className="showroom-note">
+                <p>Pongg runs quietly behind the page as a visual backdrop. Click {t.hero.actions.playPongg} for sound and full control.</p>
+                <p>Click any project card to open its info page, live demo, or repo link.</p>
+                <p>
+                  Runnable demos live on their own subdomains. Info-only pages and PDFs can stay on the main site — see
+                  REVISION for that pattern.
+                </p>
+                <p>
+                  The whole Pongg build is hand-rolled — physics, audio, brick layout, brand system. The same crew can
+                  build a playable front door, an interactive showcase, or a custom micro-game for your site from scratch
+                  if the brief warrants it.
+                </p>
+              </section>
+            </>
+          )}
         </main>
       )}
 
@@ -4149,8 +4383,8 @@ export default function App() {
             e.stopPropagation();
             openContactForm();
           }}
-          title={`Contact ${CONTACT_EMAIL}`}
-          aria-label="Contact TwistedStacks"
+          title={t.contact.fabTitle}
+          aria-label={t.contact.fabAria}
         >
           @
         </button>
@@ -4162,12 +4396,9 @@ export default function App() {
             <button type="button" className="easter-vault-close" onClick={closeEasterEgg} aria-label="Close vault">
               [✕]
             </button>
-            <p className="easter-vault-kicker">TWISTED PONGG // CLASSIFIED</p>
-            <h2 className="easter-vault-title">STACK MASTER VAULT</h2>
-            <p className="easter-vault-lede">
-              Du klarade alla 9 nivåer. Courtet öppnar en dold tråd — autopilot-riggen spinner, bollen är guld,
-              och arkivet låser upp sig för dig som pallat hela vägen.
-            </p>
+            <p className="easter-vault-kicker">{t.easter.vaultKicker}</p>
+            <h2 className="easter-vault-title">{t.easter.vaultTitle}</h2>
+            <p className="easter-vault-lede">{t.easter.vaultLede}</p>
             <div className="easter-vault-grid">
               {[
                 { code: "THREAD-09", name: "ENDLESS SELF", note: "Solo endless med twist-ramp — kommer." },
@@ -4182,7 +4413,9 @@ export default function App() {
               ))}
             </div>
             <p className="easter-vault-hint">
-              {championUnlocked ? "Tryck P för arkivkatalogen när du vill." : ""} Skicka en signal till studion — vi vill höra från riktiga stack masters.
+              {t.easter.vaultHint(championUnlocked)} {lang === "sv"
+                ? "Skicka en signal till studion — vi vill höra från riktiga stack masters."
+                : "Send a signal to the studio — we want to hear from real stack masters."}
             </p>
             <div className="easter-vault-actions">
               <button
@@ -4190,14 +4423,15 @@ export default function App() {
                 className="easter-vault-btn easter-vault-btn-primary"
                 onClick={() => {
                   openContactForm({
-                    type: "FEEDBACK",
+                    intent: "feedback",
+                    topic: "STACK MASTER signal",
                     message:
                       "STACK MASTER reporting in — I cleared all 9 levels in TWISTED PONGG.\n\n",
                   });
                   setShowEasterEgg(false);
                 }}
               >
-                Transmit Victory
+                {t.easter.transmitVictory}
               </button>
               <button
                 type="button"
@@ -4207,7 +4441,7 @@ export default function App() {
                   endActionRequestRef.current = "level1";
                 }}
               >
-                Play Again
+                {t.easter.playAgain}
               </button>
               {(isDevMode || championUnlocked) && (
                 <button
@@ -4218,7 +4452,7 @@ export default function App() {
                     setShowShowroomModal(true);
                   }}
                 >
-                  Open Archive
+                  {t.easter.openArchive}
                 </button>
               )}
             </div>
@@ -4352,49 +4586,126 @@ export default function App() {
             </button>
 
             {isSubmitSuccess ? (
-              <button
-                type="button"
-                onClick={handleCloseContact}
-                className="contact-success-mark"
-                aria-label="Stäng"
-              >
-                ✓
-              </button>
+              <div className="contact-success" role="status" aria-live="polite">
+                <div className="contact-success-mark" aria-hidden>✓</div>
+                <h3 className="contact-success-title">
+                  {t.contact.success.title(contactName.trim())}
+                </h3>
+                <p className="contact-success-lede">
+                  {t.contact.success.lede(submissionStoredEmail ?? contactEmail.trim())}
+                </p>
+                <p className="contact-success-meta">
+                  {submissionForwarded ? t.contact.success.forwarded : t.contact.success.stored}
+                </p>
+                <button
+                  type="button"
+                  onClick={handleCloseContact}
+                  className="contact-success-close"
+                  aria-label={t.contact.closeAria}
+                >
+                  {t.contact.success.close}
+                </button>
+              </div>
             ) : (
-              <form onSubmit={handleFormSubmit} className="contact-form">
-                <div className="contact-type-row">
+              <form onSubmit={handleFormSubmit} className="contact-form" noValidate>
+                <div className="contact-type-row contact-type-row-4">
                   {(
                     [
-                      ["FEEDBACK", "FEEDBACK"],
-                      ["BUG_REPORT", "BUG"],
-                      ["QUERY", "QUERY"],
+                      ["demo", t.contact.intent.demo],
+                      ["query", t.contact.intent.query],
+                      ["bug", t.contact.intent.bug],
+                      ["feedback", t.contact.intent.feedback],
                     ] as const
-                  ).map(([t, label]) => (
+                  ).map(([intentKey, label]) => (
                     <button
-                      key={t}
+                      key={intentKey}
                       type="button"
-                      onClick={() => setContactType(t)}
-                      className={`contact-type-btn ${contactType === t ? "is-active" : ""}`}
-                      title={t.replace("_", " ")}
+                      onClick={() => setContactIntent(intentKey)}
+                      className={`contact-type-btn ${contactIntent === intentKey ? "is-active" : ""}`}
+                      title={label.toLowerCase()}
                     >
                       {label}
                     </button>
                   ))}
                 </div>
 
+                <div className="contact-context-row" aria-live="polite">
+                  <span className="contact-context-label">{t.contact.contextLabel}</span>
+                  <span className="contact-context-value">{contactTopic}</span>
+                </div>
+
+                <div className="contact-field-row">
+                  <label className="contact-field">
+                    <span className="contact-field-label">{t.contact.fields.name}</span>
+                    <input
+                      type="text"
+                      value={contactName}
+                      onChange={(e) => setContactName(e.target.value)}
+                      autoComplete="name"
+                      maxLength={120}
+                      required
+                      className="contact-input"
+                      placeholder={t.contact.fields.namePlaceholder}
+                    />
+                  </label>
+                  <label className="contact-field">
+                    <span className="contact-field-label">{t.contact.fields.email}</span>
+                    <input
+                      type="email"
+                      value={contactEmail}
+                      onChange={(e) => setContactEmail(e.target.value)}
+                      autoComplete="email"
+                      maxLength={254}
+                      required
+                      className="contact-input"
+                      placeholder={t.contact.fields.emailPlaceholder}
+                    />
+                  </label>
+                </div>
+
+                <label className="contact-field">
+                  <span className="contact-field-label">{t.contact.fields.company}</span>
+                  <input
+                    type="text"
+                    value={contactCompany}
+                    onChange={(e) => setContactCompany(e.target.value)}
+                    autoComplete="organization"
+                    maxLength={160}
+                    className="contact-input"
+                    placeholder={t.contact.fields.companyPlaceholder}
+                  />
+                </label>
+
+                {/* Honeypot — real users never see this; bots fill it. */}
+                <div className="contact-honeypot" aria-hidden="true">
+                  <label>
+                    {lang === "sv" ? "Lämna detta fält tomt" : "Leave this field empty"}
+                    <input
+                      type="text"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={contactHoneypot}
+                      onChange={(e) => setContactHoneypot(e.target.value)}
+                      name="website"
+                    />
+                  </label>
+                </div>
+
                 <div className="contact-compose-row">
                   <textarea
                     value={contactMessage}
                     onChange={(e) => setContactMessage(e.target.value)}
-                    rows={9}
+                    rows={6}
+                    maxLength={4000}
                     className="contact-textarea select-text"
-                    aria-label="Meddelande"
+                    aria-label={t.contact.fields.name === "Namn *" ? "Meddelande" : "Message"}
+                    placeholder={t.contact.fields.messagePlaceholder}
                   />
                   <button
                     type="submit"
                     disabled={isSubmitting}
                     className="contact-send-btn"
-                    aria-label="Skicka"
+                    aria-label={t.contact.sendAria}
                   >
                     <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden>
                       <path
@@ -4404,6 +4715,8 @@ export default function App() {
                     </svg>
                   </button>
                 </div>
+
+                <p className="contact-form-fineprint">{t.contact.fineprint}</p>
 
                 {formError ? <p className="contact-form-error">{formError}</p> : null}
               </form>

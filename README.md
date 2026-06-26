@@ -45,12 +45,42 @@ Run [supabase/leaderboard.sql](./supabase/leaderboard.sql) once in the Supabase 
 
 Do not expose the Supabase secret/service role key in Vite. Anything with a `VITE_` prefix is bundled into the browser.
 
+## Contact form (`/api/contact`)
+
+The in-app "Book Demo" / "Contact" / per-project CTAs / easter-vault "Transmit Victory" buttons all POST to `/api/contact`. The endpoint:
+
+1. Validates the shape (name + email + topic + intent + message; required, length-bounded, regex-checked email).
+2. Checks a hidden honeypot field (`website`); bots fill it, real users never see it.
+3. Rate-limits per client IP (3 writes / minute).
+4. Stores the row in Supabase (`contact_submissions` table; PII stays server-side, RLS on, no anon policies).
+5. If `RESEND_API_KEY` is set, forwards the message to `hello@twistedstacks.com` (BCC `dev@twistedstacks.com`) and sends an auto-reply to the submitter.
+6. Without the key, the row is still stored and the form returns success — submissions are triaged in Supabase Studio.
+
+Required Vercel env (in addition to the Supabase vars above):
+
+```bash
+# Optional — turn on email forwarding. Without these, the form stores
+# submissions in Supabase and the operator triages them manually.
+RESEND_API_KEY=re_...
+CONTACT_FROM_EMAIL=TwistedStacks <hello@twistedstacks.com>
+CONTACT_TO_EMAIL=hello@twistedstacks.com
+CONTACT_NOTIFY_EMAIL=dev@twistedstacks.com
+```
+
+The Resend domain for `twistedstacks.com` must be verified at
+[resend.com/domains](https://resend.com/domains) before the first send
+succeeds. Free tier: 100 emails/day, 3000/month — more than enough for
+this site.
+
+Run [supabase/contact.sql](./supabase/contact.sql) once in the Supabase
+SQL Editor.
+
 ## Deploy (Vercel)
 
 - Repo: [wawawee/twisted-stacks-site](https://github.com/wawawee/twisted-stacks-site) (public)
 - Project: `twisted-pongg` → [twistedstacks.com](https://www.twistedstacks.com)
 - Build: `npm run build` → `dist`
-- SPA rewrites and `/api/leaderboard`: `vercel.json`
+- SPA rewrites and `/api/leaderboard`, `/api/contact`: `vercel.json`
 
 No API keys in the app. Contact: `mailto:hello@twistedstacks.com`.
 
