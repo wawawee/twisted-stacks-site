@@ -265,8 +265,7 @@ body {
   width: 182px;
   padding: 12px;
   border: 1px solid var(--stroke);
-  background: rgba(26, 14, 12, 0.84);
-  backdrop-filter: blur(18px);
+  background: rgba(26, 14, 12, 0.92);
 }
 .vr-layer-button {
   display: grid;
@@ -311,8 +310,7 @@ body {
   gap: 14px;
   padding: 16px;
   border: 1px solid var(--stroke);
-  background: rgba(26, 14, 12, 0.88);
-  backdrop-filter: blur(18px);
+  background: rgba(26, 14, 12, 0.94);
 }
 .vr-panel-heading strong {
   display: block;
@@ -1507,16 +1505,16 @@ body {
    --------------------------------------------------------------------------- */
 
 .showroom-topbar {
-  position: sticky;
-  top: 0;
-  z-index: 5;
+  /* Plain flow element — no sticky, no backdrop-blur. The previous sticky
+     + blur caused the topbar to "flow over" project pages and made scroll
+     feel janky on subsequent routes. The language toggle doesn't need a
+     permanent header chrome. */
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 14px;
   padding: 6px 0 18px;
   margin-bottom: 10px;
-  backdrop-filter: blur(8px);
 }
 .showroom-topbar-actions {
   display: flex;
