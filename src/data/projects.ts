@@ -49,7 +49,8 @@ export type ProjectId =
   | "system_vr_superpowers"
   | "system_cymwave"
   | "system_silversmeden"
-  | "system_arena";
+  | "system_arena"
+  | "system_tangle";
 
 export interface ProjectEntry {
   id: ProjectId;
@@ -716,7 +717,86 @@ export const PROJECTS: ProjectEntry[] = [
     ],
   },
 
-  /* ---------- 7. CymWave ---------- */
+  /* ---------- 7. TANGLE ---------- */
+  {
+    id: "system_tangle",
+    name: "TANGLE",
+    version: "AI evidence swarm / open beta",
+    status: "ACTIVE DEMO",
+    tagline:
+      "Drop messy evidence. Watch a swarm of AI agents untangle the truth.",
+    description:
+      "TANGLE ingests a messy pile of real-world evidence — PDFs, photos, audio recordings, emails, spreadsheets — and runs it through a coordinated swarm of specialised AI agents that analyse, cross-reference and produce an actionable report. The user never writes a prompt: they describe their situation, drop their files, and watch the swarm collaborate in real time on a React Flow canvas. The frontend is a brutalist monochrome React + Vite + Tailwind v4 canvas; the backend is a FastAPI orchestrator that routes through 16+ agent definitions over an OpenRouter free-model gateway with circuit-breaker retry chaining. A three-tier progression takes the user from Who (describe the problem) through What (drop evidence) to Watch (swarm consensus). An admin dashboard exposes live system health, provider status, token telemetry, vector-store statistics and mission history. The free tier runs on curated OpenRouter free models; a planned pro tier will unlock frontier models (Gemini, DeepSeek, Claude) via a single toggle.",
+    longDescription:
+      "TANGLE är en AI-driven bevisanalysplattform som låter dig dumpa en rörig hög med verkliga bevismaterial — PDF-filer, foton, ljudinspelningar, e-postmeddelanden, kalkylblad — och få en koordinerad svärm av specialiserade AI-agenter att analysera, korsreferera och producera en handlingsrapport. Användaren skriver aldrig en prompt: de beskriver sin situation, släpper sina filer och ser svärmen samarbeta i realtid på en React Flow-canvas.\n\nFrontend är en brutalistisk monokrom React + Vite + Tailwind v4-canvas med ett trestegsflöde: Who (beskriv problemet) → What (släpp bevis) → Watch (svärmkonsensus). Backend är en FastAPI-orchestrator som routes genom 16+ agentdefinitioner över en OpenRouter free-model-gateway med circuit-breaker-retry-kedja.\n\nEn admindashboard visar live systemhälsa, providerstatus, token-telemetri, vector-store-statistik och missionshistorik. Gratis-nivån kör på kuraterade OpenRouter free-modeller; en planerad pro-nivå låser upp frontier-modeller (Gemini, DeepSeek, Claude) med en enda toggle.\n\nTANGLE är designat för situationer där bevisen är röriga, motstridiga och spridda över flera format — perfekt för allt från grann-tvister till juridiska förberedelser. Plattformen är live och demo-ready med ett fullt testbevis-set (Northridge city dispute) som visar hela flödet från uppladdning till slutrapport.",
+    longDescriptionLang: "en",
+    faq: [
+      {
+        q: "What is TANGLE?",
+        a: "TANGLE is an AI evidence analysis platform. You describe a situation, drop your evidence files (PDFs, images, audio, text), and a swarm of AI agents analyses everything and produces an actionable report. No prompt engineering required.",
+      },
+      {
+        q: "What kind of evidence does it support?",
+        a: "PDFs, images (PNG, JPG), audio recordings (WAV, MP3), text files, emails, spreadsheets (CSV). Anything you'd collect when trying to make sense of a messy situation.",
+      },
+      {
+        q: "What makes it different from ChatGPT?",
+        a: "TANGLE uses a coordinated swarm of specialised agents — each with a different role (analyst, critic, strategist, archivist) — that cross-reference each other's work. You see the entire process unfold in real time on a visual canvas, not a single chat response.",
+      },
+      {
+        q: "Is it free?",
+        a: "The beta runs on free OpenRouter models — no API keys needed from the user. A future pro tier will add frontier models (DeepSeek R1, Gemini, Claude) for users who want maximum capability.",
+      },
+      {
+        q: "Vad är TANGLE?",
+        a: "TANGLE är en AI-driven bevismaterial-plattform. Beskriv en situation, släpp dina bevisfiler (PDF, bilder, ljud, text), och en svärm av AI-agenter analyserar allt och producerar en handlingsrapport. Ingen prompt-teknik krävs.",
+      },
+      {
+        q: "Vilka bevisformat stöds?",
+        a: "PDF, bilder, ljudinspelningar, textfiler, e-post, kalkylblad. Allt du skulle samla när du försöker reda ut en rörig situation.",
+      },
+      {
+        q: "Vad gör TANGLE unikt?",
+        a: "TANGLE använder en koordinerad svärm av specialiserade agenter — var med olika roll (analytiker, kritiker, strateg, arkivarie) — som korsrefererar varandras arbete. Du ser hela processen utvecklas i realtid på en visuell canvas, inte ett enda chat-svar.",
+      },
+    ],
+    stack: [
+      "React",
+      "Vite",
+      "Tailwind v4",
+      "React Flow",
+      "FastAPI",
+      "OpenRouter",
+      "Python",
+      "WebSocket",
+    ],
+    href: "https://github.com/wawawee/TANGLE",
+    ctaLabel: "View on GitHub",
+    brandColor: "accent",
+    featured: true,
+    keywords: [
+      "AI evidence analysis",
+      "multi-agent swarm",
+      "legal AI",
+      "document analysis",
+      "OpenRouter",
+      "brutalist design",
+      "React Flow"
+    ],
+    lastUpdated: "2026-06-29",
+    telemetry: [
+      { label: "AGENTS", value: "16+" },
+      { label: "MODELS", value: "FREE" },
+      { label: "STATUS", value: "DEMO" }
+    ],
+    telemetrySv: [
+      { label: "AGENTER", value: "16+" },
+      { label: "MODELLER", value: "GRATIS" },
+      { label: "STATUS", value: "DEMO" }
+    ],
+  },
+
+  /* ---------- 8. CymWave ---------- */
   {
     id: "system_cymwave",
     name: "CymWave",
