@@ -300,6 +300,23 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
     actionLabel: "Visualize"
   },
   {
+    id: "system_tangle",
+    name: "TANGLE",
+    version: "AI evidence swarm / open beta",
+    status: "ACTIVE DEMO",
+    tagline: "Drop messy evidence. Watch a swarm of AI agents untangle the truth.",
+    description:
+      "TANGLE is an AI evidence-analysis platform: you describe a messy situation, drop a pile of real-world evidence (PDFs, photos, audio, emails, spreadsheets) and a coordinated swarm of specialised agents analyses it, cross-references each other's work and produces an actionable report — no prompt engineering required. The frontend is a brutalist monochrome React + Vite + Tailwind v4 canvas with a three-tier flow (Who → What → Watch) over a React Flow graph; the backend is a FastAPI orchestrator that routes through 16+ agent definitions over an OpenRouter free-model gateway with circuit-breaker retry chaining. A Northridge city-dispute test set walks the full upload-to-final-report loop on the live demo. Free today on curated OpenRouter free models; a planned pro tier unlocks frontier models (Gemini, DeepSeek, Claude) behind a single toggle.",
+    techStack: ["React Flow", "FastAPI", "OpenRouter", "Python"],
+    telemetry: [
+      { label: "AGENTS", value: "16+" },
+      { label: "MODELS", value: "FREE" },
+      { label: "STATUS", value: "DEMO" }
+    ],
+    href: "https://github.com/wawawee/TANGLE",
+    actionLabel: "View on GitHub"
+  },
+  {
     id: "system_cymwave",
     name: "CymWave",
     version: "hydro-wellness / prototype planning",
