@@ -266,13 +266,30 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
     contactMessage: "Hej Per,\n\nJag vill veta mer om Recon Search Assistant och eventuell defensiv användning.\n\n"
   },
   {
+    id: "system_anslag",
+    name: "Anslag",
+    version: "svenska fonder & stipendier",
+    status: "LAB / PAUSED",
+    tagline: "Fri svensk anslagssökning över Vinnova, Formas, Almi och stiftelser.",
+    description:
+      "Anslag är en fri svensk anslagssöknings- och utkaststjänst som hittar utlysningar, stipendier och stiftelser åt dig. Tjänsten söker över Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi och svenska stiftelser via Exa och de officiella källorna, och hjälper dig sedan att skriva själva ansökan på svenska. Motorn är samma OpenRouter-gateway som TwistedStacks själva använder för att skriva Almi-, ERUF- och Vinnova-ansökningar. Livesajten är pausad — kortet finns kvar som referens för kapabiliteten.",
+    techStack: ["React", "Vite", "AI", "Svenska utlysningar"],
+    telemetry: [
+      { label: "SÖK", value: "FONDER" },
+      { label: "UTKAST", value: "ANSÖKAN" },
+      { label: "STATUS", value: "PAUSAD" }
+    ],
+    actionLabel: "Read more",
+    contactMessage: "Hej Per,\n\nJag vill veta mer om Anslag och hur det kan användas för våra ansökningar.\n\n"
+  },
+  {
     id: "system_vr_superpowers",
-    name: "VR SUPARAYS",
+    name: "SUPARAYS",
     version: "Meta Quest / sensor array",
     status: "HARDWARE LAB",
     tagline: "See the invisible world: WiFi, heat, RF, and EMF in passthrough VR.",
     description:
-      "VR SUPARAYS — Twisted SUPARAYS under the brand book — is an open sensor mesh for VR and iOS AR passthrough that surfaces the normally invisible radio, thermal and electromagnetic world around the wearer. ESP32-S3 nodes with NRF24, CC1101, MLX90640 and 50 Hz coil sensors stream into a Python WebSocket hub on port 81; Unity 6 + URP + Meta XR SDK renders the scene on Meta Quest, and an ARKit / RealityKit client runs on iPhone 13 Pro+ with LiDAR. The capability matrix is intentionally honest: AR passthrough and LiDAR mesh are live, WiFi / RF / thermal / EMF / AC layers are partial, and CSI presence plus the Flipper bridge are stubs. Privacy posture is receive-only by default — no TX in any uncontrolled context, no CSI on other people's networks, no X-ray claims. Six sensor layers plus a fusion layer and gated stimulus modules.",
+      "SUPARAYS — Twisted SUPARAYS under the brand book — is an open sensor mesh for VR and iOS AR passthrough that surfaces the normally invisible radio, thermal and electromagnetic world around the wearer. ESP32-S3 nodes with NRF24, CC1101, MLX90640 and 50 Hz coil sensors stream into a Python WebSocket hub on port 81; Unity 6 + URP + Meta XR SDK renders the scene on Meta Quest, and an ARKit / RealityKit client runs on iPhone 13 Pro+ with LiDAR. The capability matrix is intentionally honest: AR passthrough and LiDAR mesh are live, WiFi / RF / thermal / EMF / AC layers are partial, and CSI presence plus the Flipper bridge are stubs. Privacy posture is receive-only by default — no TX in any uncontrolled context, no CSI on other people's networks, no X-ray claims. Six sensor layers plus a fusion layer and gated stimulus modules.",
     techStack: ["Unity", "Meta Quest", "ESP32", "Python Hub"],
     telemetry: [
       { label: "LAYERS", value: "6" },

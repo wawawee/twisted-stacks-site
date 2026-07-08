@@ -15,7 +15,7 @@ const en: Dictionary = {
   meta: {
     title: "TwistedStacks | AI systems showroom",
     description:
-      "TwistedStacks builds useful AI systems and labs: REVISION, LAGA, TANGLE, VR SUPARAYS, CymWave, Recon Search Assistant, and selected web work.",
+      "TwistedStacks builds useful AI systems and labs: REVISION, LAGA, TANGLE, SUPARAYS, CymWave, Recon Search Assistant, and selected web work.",
     ogDescription:
       "A clean showroom for TwistedStacks projects: legal AI, multi-agent evidence analysis, VR sensor overlays, hydro-wellness research, OSINT/search support, and playable TWISTED PONGG.",
   },
@@ -122,7 +122,7 @@ const sv: Dictionary = {
   meta: {
     title: "TwistedStacks | AI-system showroom",
     description:
-      "TwistedStacks bygger användbara AI-system och labb: REVISION, LAGA, TANGLE, VR SUPARAYS, CymWave, Recon Search Assistant och utvalda webbprojekt.",
+      "TwistedStacks bygger användbara AI-system och labb: REVISION, LAGA, TANGLE, SUPARAYS, CymWave, Recon Search Assistant och utvalda webbprojekt.",
     ogDescription:
       "En ren showroom för TwistedStacks-projekt: juridisk AI, multi-agent-bevisanalys, VR-sensoroverlay, hydro-wellness-forskning, OSINT/search-stöd och spelbara TWISTED PONGG.",
   },

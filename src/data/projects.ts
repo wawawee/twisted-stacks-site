@@ -45,6 +45,7 @@ export type ProjectId =
   | "system_laga"
   | "system_relay"
   | "system_recon"
+  | "system_anslag"
   | "system_vr_superpowers"
   | "system_cymwave"
   | "system_arena"
@@ -528,22 +529,104 @@ export const PROJECTS: ProjectEntry[] = [
     ],
   },
 
-  /* ---------- 5. VR SUPARAYS ---------- */
+  /* ---------- 5. Anslag (info only, no live demo) ---------- */
+  {
+    id: "system_anslag",
+    name: "Anslag",
+    version: "svenska fonder & stipendier",
+    status: "INFO ONLY",
+    tagline:
+      "Fri svensk anslagssökning över Vinnova, Formas, Almi och stiftelser.",
+    description:
+      "Anslag är en fri svensk anslagssöknings- och utkaststjänst som hittar utlysningar, stipendier och stiftelser åt dig. Tjänsten söker över Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi och svenska stiftelser via Exa och de officiella källorna, och hjälper dig sedan att skriva själva ansökan på svenska. Motorn är samma OpenRouter-gateway som TwistedStacks själva använder för att skriva Almi-, ERUF- och Vinnova-ansökningar. Livesajten är för närvarande pausad — kortet finns kvar som referens för kapabiliteten och framtida releaser.",
+    longDescription:
+      "Anslag (SITK) är en fri svensk anslagssöknings- och utkaststjänst som hittar utlysningar, stipendier och stiftelser och hjälper dig skriva själva ansökan på svenska. It searches across Vinnova, Formas, Forte, VR, Tillväxtverket, EU programmes, Almi and Swedish stiftelser via Exa and the official sources, then helps draft the actual application in Swedish.\n\nThe frontend is Vite 7 + Tailwind v3 + shadcn/ui, the backend is Node 20 with an API on port 3001 and Vercel serverless. A multi-account OpenRouter gateway round-robins across up to seven keys for resilience, with `google/gemini-2.5-flash-lite` as the current best free model for structured output.\n\nThere are two search modes — bred (wide) and narrow — and a model-tier selector (auto/free/paid) so a small NGO can run on free models while a consultant on a deadline picks a paid model without changing the workflow. An optional Qdrant layer adds vector memory across past searches.\n\nThe engine is the same one used internally to draft the Almi, ERUF and Vinnova applications across REVISION, LAGA, CymWave and Relay. The public app is currently offline during a key rotation and a re-key of the model gateway — reopens when the new keys are wired.",
+    faq: [
+      {
+        q: "Vad är Anslag?",
+        a: "Anslag är en fri svensk anslagssöknings- och utkaststjänst som hittar utlysningar, stipendier och stiftelser (Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi, svenska stiftelser) och hjälper dig skriva själva ansökan på svenska.",
+      },
+      {
+        q: "Är livesajten uppe just nu?",
+        a: "Nej — den publika appen är för närvarande pausad under ett nyckelbyte. Motorn används internt för TwistedStacks ansökningar och återöppnas när den nya gatewayen är på plats.",
+      },
+      {
+        q: "Vilka källor söker Anslag i?",
+        a: "Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi och svenska stiftelser — via Exa och de officiella källorna. Inga hemliga datakällor; alla träffar går att spåra.",
+      },
+      {
+        q: "Kan jag köra Anslag på gratis-modeller?",
+        a: "Ja. Det finns en modell-tier-väljare (auto / gratis / betald) så att en liten förening kan köra på gratis-modeller medan en konsult med deadline väljer en betald modell — utan att byta arbetsflöde.",
+      },
+    ],
+    stack: ["Vite", "Tailwind", "shadcn/ui", "OpenRouter", "Exa", "Node 20"],
+    href: null,
+    ctaLabel: "Read more",
+    brandColor: "accent",
+    featured: false,
+    keywords: [
+      "Swedish grants",
+      "Vinnova",
+      "Formas",
+      "Almi",
+      "stipendier",
+      "ansökningsutkast",
+      "free grant search",
+    ],
+    lastUpdated: "2026-07-08",
+    telemetry: [
+      { label: "SÖK", value: "FONDER" },
+      { label: "UTKAST", value: "ANSÖKAN" },
+      { label: "STATUS", value: "PAUSAD" }
+    ],
+    longDescriptionLang: "sv",
+    taglineSv:
+      "Fri svensk anslagssökning över Vinnova, Formas, Almi och stiftelser.",
+    descriptionSv:
+      "Anslag är en fri svensk anslagssöknings- och utkaststjänst som hittar utlysningar, stipendier och stiftelser åt dig. Tjänsten söker över Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi och svenska stiftelser via Exa och de officiella källorna, och hjälper dig sedan att skriva själva ansökan på svenska. Livesajten är pausad under nyckelbyte.",
+    longDescriptionSv:
+      "Anslag (SITK) är en fri svensk anslagssöknings- och utkaststjänst som hittar utlysningar, stipendier och stiftelser och hjälper dig skriva själva ansökan på svenska. Tjänsten söker över Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi och svenska stiftelser via Exa och de officiella källorna, och hjälper dig sedan att skriva själva ansökan på svenska.\n\nFrontend är Vite 7 + Tailwind v3 + shadcn/ui, backend är Node 20 med ett API på port 3001 och Vercel-serverless. En multi-konto OpenRouter-gateway round-robin:ar över upp till sju nycklar för resiliens, med google/gemini-2.5-flash-lite som nuvarande bästa gratis-modell för strukturerad output.\n\nDet finns två söklägen — bred och smal — och en modell-tier-väljare (auto / gratis / betald) så att en liten förening kan köra på gratis-modeller medan en konsult med deadline väljer en betald modell utan att byta arbetsflöde. Ett valfritt Qdrant-lager lägger till vector-minne över tidigare sökningar.\n\nMotorn används internt för att skriva Almi-, ERUF- och Vinnova-ansökningar över REVISION, LAGA, CymWave och Relay. Den publika appen är pausad under nyckelbyte och återöppnas när den nya gatewayen är på plats.",
+    faqSv: [
+      {
+        q: "Vad är Anslag?",
+        a: "Anslag är en fri svensk anslagssöknings- och utkaststjänst som hittar utlysningar, stipendier och stiftelser (Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi, svenska stiftelser) och hjälper dig skriva själva ansökan på svenska.",
+      },
+      {
+        q: "Är livesajten uppe just nu?",
+        a: "Nej — den publika appen är pausad under nyckelbyte. Motorn används internt för TwistedStacks ansökningar och återöppnas när den nya gatewayen är på plats.",
+      },
+      {
+        q: "Vilka källor söker Anslag i?",
+        a: "Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi och svenska stiftelser — via Exa och de officiella källorna. Inga hemliga datakällor; alla träffar går att spåra.",
+      },
+      {
+        q: "Kan jag köra Anslag på gratis-modeller?",
+        a: "Ja. Det finns en modell-tier-väljare (auto / gratis / betald) så att en liten förening kan köra på gratis-modeller medan en konsult med deadline väljer en betald modell — utan att byta arbetsflöde.",
+      },
+    ],
+    telemetrySv: [
+      { label: "SÖK", value: "FONDER" },
+      { label: "UTKAST", value: "ANSÖKAN" },
+      { label: "STATUS", value: "PAUSAD" },
+    ],
+  },
+
+  /* ---------- 6. SUPARAYS ---------- */
   {
     id: "system_vr_superpowers",
-    name: "VR SUPARAYS",
+    name: "SUPARAYS",
     version: "Meta Quest / sensor array",
     status: "HARDWARE LAB",
     tagline:
       "See the invisible world: WiFi, heat, RF, and EMF in passthrough VR.",
     description:
-      "VR SUPARAYS — Twisted SUPARAYS under the brand book — is an open sensor mesh for VR and iOS AR passthrough that surfaces the normally invisible radio, thermal and electromagnetic world around the wearer. ESP32-S3 nodes with NRF24, CC1101, MLX90640 and 50 Hz coil sensors stream into a Python WebSocket hub on port 81; Unity 6 + URP + Meta XR SDK renders the scene on Meta Quest, and an ARKit / RealityKit client runs on iPhone 13 Pro+ with LiDAR. The capability matrix is intentionally honest: AR passthrough and LiDAR mesh are live, WiFi / RF / thermal / EMF / AC layers are partial, and CSI presence plus the Flipper bridge are stubs. Privacy posture is receive-only by default — no TX in any uncontrolled context, no CSI on other people's networks, no X-ray claims. Six sensor layers plus a fusion layer and gated stimulus modules.",
+      "SUPARAYS — Twisted SUPARAYS under the brand book — is an open sensor mesh for VR and iOS AR passthrough that surfaces the normally invisible radio, thermal and electromagnetic world around the wearer. ESP32-S3 nodes with NRF24, CC1101, MLX90640 and 50 Hz coil sensors stream into a Python WebSocket hub on port 81; Unity 6 + URP + Meta XR SDK renders the scene on Meta Quest, and an ARKit / RealityKit client runs on iPhone 13 Pro+ with LiDAR. The capability matrix is intentionally honest: AR passthrough and LiDAR mesh are live, WiFi / RF / thermal / EMF / AC layers are partial, and CSI presence plus the Flipper bridge are stubs. Privacy posture is receive-only by default — no TX in any uncontrolled context, no CSI on other people's networks, no X-ray claims. Six sensor layers plus a fusion layer and gated stimulus modules.",
     longDescription:
-      "VR SUPARAYS (Twisted SUPARAYS) är ett öppet sensor-nätverk för VR och iOS AR-passthrough som gör den osynliga radio-, termiska och elektromagnetiska världen synlig i realtid. The product surfaces the normally invisible radio, thermal and electromagnetic world around the wearer: RF auroras, thermal heat-vision, WiFi towers, EMF field lines, AC live-wire hints, and CSI presence/motion ghosts. The tagline is 'See the invisible world in VR'.\n\nThe system is built as a tiered architecture. ESP32-S3 nodes with NRF24, CC1101, MLX90640, HMC5883L and 50 Hz coil sensors stream into a Python WebSocket hub on port 81. The hub speaks a documented JSON protocol (v1.0 / v1.1 / v1.2) with node roles (wearable / probe / stimulus), position messages, fusion results and gated stimulus states. On the rendering side, Unity 6 + URP + Meta XR SDK paints the scene on Meta Quest, and an ARKit / RealityKit client runs on iPhone 13 Pro+ with LiDAR.\n\nThe capability matrix in the project README is intentionally honest: AR passthrough and LiDAR mesh are live; WiFi, RF, thermal, EMF and AC layers are partial (code exists, gaps remain); CSI presence and Flipper bridge are stubs. The privacy posture is receive-only by default — no TX in any uncontrolled context, no CSI on other people's networks, no X-ray claims.\n\nA Flipper Zero with an AIO Multiboard v1.4 acts as the Field Commander for one radio at a time. The funding story (Almi, Vinnova) ties this together with the spatial-computing thesis: 'Materially warm, technically cool. Built for heads-up displays that have to stay readable while you're wearing them.'",
+      "SUPARAYS (Twisted SUPARAYS) är ett öppet sensor-nätverk för VR och iOS AR-passthrough som gör den osynliga radio-, termiska och elektromagnetiska världen synlig i realtid. The product surfaces the normally invisible radio, thermal and electromagnetic world around the wearer: RF auroras, thermal heat-vision, WiFi towers, EMF field lines, AC live-wire hints, and CSI presence/motion ghosts. The tagline is 'See the invisible world in VR'.\n\nThe system is built as a tiered architecture. ESP32-S3 nodes with NRF24, CC1101, MLX90640, HMC5883L and 50 Hz coil sensors stream into a Python WebSocket hub on port 81. The hub speaks a documented JSON protocol (v1.0 / v1.1 / v1.2) with node roles (wearable / probe / stimulus), position messages, fusion results and gated stimulus states. On the rendering side, Unity 6 + URP + Meta XR SDK paints the scene on Meta Quest, and an ARKit / RealityKit client runs on iPhone 13 Pro+ with LiDAR.\n\nThe capability matrix in the project README is intentionally honest: AR passthrough and LiDAR mesh are live; WiFi, RF, thermal, EMF and AC layers are partial (code exists, gaps remain); CSI presence and Flipper bridge are stubs. The privacy posture is receive-only by default — no TX in any uncontrolled context, no CSI on other people's networks, no X-ray claims.\n\nA Flipper Zero with an AIO Multiboard v1.4 acts as the Field Commander for one radio at a time. The funding story (Almi, Vinnova) ties this together with the spatial-computing thesis: 'Materially warm, technically cool. Built for heads-up displays that have to stay readable while you're wearing them.'",
     faq: [
       {
-        q: "Vad är VR SUPARAYS?",
-        a: "VR SUPARAYS (Twisted SUPARAYS) är ett öppet sensor-nätverk för VR och iOS AR-passthrough som visar den osynliga radio-, termiska och elektromagnetiska världen i realtid: RF-aurora, värmesyn, WiFi-master, EMF-fältlinjer, AC-live-wire och CSI-rörelsesignaler.",
+        q: "Vad är SUPARAYS?",
+        a: "SUPARAYS (Twisted SUPARAYS) är ett öppet sensor-nätverk för VR och iOS AR-passthrough som visar den osynliga radio-, termiska och elektromagnetiska världen i realtid: RF-aurora, värmesyn, WiFi-master, EMF-fältlinjer, AC-live-wire och CSI-rörelsesignaler.",
       },
       {
         q: "Vilken hårdvara kör systemet?",
@@ -593,13 +676,13 @@ export const PROJECTS: ProjectEntry[] = [
     taglineSv:
       "Se den osynliga världen: WiFi, värme, RF och EMF i passthrough-VR.",
     descriptionSv:
-      "VR SUPARAYS — Twisted SUPARAYS under brand-manualen — är ett öppet sensor-nätverk för VR och iOS AR-passthrough som visar den normalt osynliga radio-, termiska och elektromagnetiska världen runt bäraren. ESP32-S3-noder med NRF24, CC1101, MLX90640 och 50 Hz-coil-sensorer strömmar till en Python WebSocket-hub på port 81.",
+      "SUPARAYS — Twisted SUPARAYS under brand-manualen — är ett öppet sensor-nätverk för VR och iOS AR-passthrough som visar den normalt osynliga radio-, termiska och elektromagnetiska världen runt bäraren. ESP32-S3-noder med NRF24, CC1101, MLX90640 och 50 Hz-coil-sensorer strömmar till en Python WebSocket-hub på port 81.",
     longDescriptionSv:
-      "VR SUPARAYS (Twisted SUPARAYS) är ett öppet sensor-nätverk för VR och iOS AR-passthrough som gör den osynliga radio-, termiska och elektromagnetiska världen synlig i realtid. Produkten visar den normalt osynliga radio-, termiska och elektromagnetiska världen runt bäraren: RF-aurora, termisk värmesyn, WiFi-master, EMF-fältlinjer, AC-live-wire-hint och CSI-presence/rörelse-spöken. Tagline är 'See the invisible world in VR'.\n\nSystemet är byggt som en tierad arkitektur. ESP32-S3-noder med NRF24, CC1101, MLX90640, HMC5883L och 50 Hz coil-sensorer strömmar till en Python WebSocket-hub på port 81. Hubsen talar ett dokumenterat JSON-protokoll (v1.0 / v1.1 / v1.2) med nod-roller (wearable / probe / stimulus), positions-meddelanden, fusion-resultat och gated stimulus-states. På renderings-sidan målar Unity 6 + URP + Meta XR SDK scenen på Meta Quest, och en ARKit / RealityKit-klient körs på iPhone 13 Pro+ med LiDAR.\n\nKapacitets-matrisen i projektets README är medvetet ärlig: AR-passthrough och LiDAR-mesh är live; WiFi-, RF-, termiska, EMF- och AC-lager är partial (kod finns, gap kvarstår); CSI-presence och Flipper-bridge är stubs. Integritetslinjen är receive-only som standard — ingen TX i okontrollerad kontext, ingen CSI på andras nätverk, inga X-ray-påståenden.\n\nEn Flipper Zero med ett AIO Multiboard v1.4 agerar Field Commander för en radio i taget. Finansierings-storyn (Almi, Vinnova) knyter ihop detta med spatial-computing-thesen: 'Materially warm, technically cool. Built for heads-up displays that have to stay readable while you're wearing them.'",
+      "SUPARAYS (Twisted SUPARAYS) är ett öppet sensor-nätverk för VR och iOS AR-passthrough som gör den osynliga radio-, termiska och elektromagnetiska världen synlig i realtid. Produkten visar den normalt osynliga radio-, termiska och elektromagnetiska världen runt bäraren: RF-aurora, termisk värmesyn, WiFi-master, EMF-fältlinjer, AC-live-wire-hint och CSI-presence/rörelse-spöken. Tagline är 'See the invisible world in VR'.\n\nSystemet är byggt som en tierad arkitektur. ESP32-S3-noder med NRF24, CC1101, MLX90640, HMC5883L och 50 Hz coil-sensorer strömmar till en Python WebSocket-hub på port 81. Hubsen talar ett dokumenterat JSON-protokoll (v1.0 / v1.1 / v1.2) med nod-roller (wearable / probe / stimulus), positions-meddelanden, fusion-resultat och gated stimulus-states. På renderings-sidan målar Unity 6 + URP + Meta XR SDK scenen på Meta Quest, och en ARKit / RealityKit-klient körs på iPhone 13 Pro+ med LiDAR.\n\nKapacitets-matrisen i projektets README är medvetet ärlig: AR-passthrough och LiDAR-mesh är live; WiFi-, RF-, termiska, EMF- och AC-lager är partial (kod finns, gap kvarstår); CSI-presence och Flipper-bridge är stubs. Integritetslinjen är receive-only som standard — ingen TX i okontrollerad kontext, ingen CSI på andras nätverk, inga X-ray-påståenden.\n\nEn Flipper Zero med ett AIO Multiboard v1.4 agerar Field Commander för en radio i taget. Finansierings-storyn (Almi, Vinnova) knyter ihop detta med spatial-computing-thesen: 'Materially warm, technically cool. Built for heads-up displays that have to stay readable while you're wearing them.'",
     faqSv: [
       {
-        q: "Vad är VR SUPARAYS?",
-        a: "VR SUPARAYS (Twisted SUPARAYS) är ett öppet sensor-nätverk för VR och iOS AR-passthrough som visar den osynliga radio-, termiska och elektromagnetiska världen i realtid: RF-aurora, värmesyn, WiFi-master, EMF-fältlinjer, AC-live-wire och CSI-rörelsesignaler.",
+        q: "Vad är SUPARAYS?",
+        a: "SUPARAYS (Twisted SUPARAYS) är ett öppet sensor-nätverk för VR och iOS AR-passthrough som visar den osynliga radio-, termiska och elektromagnetiska världen i realtid: RF-aurora, värmesyn, WiFi-master, EMF-fältlinjer, AC-live-wire och CSI-rörelsesignaler.",
       },
       {
         q: "Vilken hårdvara kör systemet?",

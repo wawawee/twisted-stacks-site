@@ -36,7 +36,8 @@
   --pearl-warm:    #e6dbd0;
 
   /* Status — warm, not radioactive. */
-  --ok:    #7fc4a0;
+  --ok:    #15ff00;   /* strong green: 100% G, ~8% R, 0% B — kept off the
+                         baseline brand accent (baby blue) per brand rules */
   --warn:  #e6c07f;
   --err:   #e6887f;
 

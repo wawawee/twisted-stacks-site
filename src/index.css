@@ -582,7 +582,7 @@ body {
 
 .showroom-project-description {
   margin: 10px 0 0;
-  color: var(--text-dim);
+  color: var(--ok);
   font-size: 12px;
   line-height: 1.48;
 }

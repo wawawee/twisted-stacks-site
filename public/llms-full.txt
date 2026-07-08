@@ -1,6 +1,6 @@
 # TwistedStacks — full
 
-> A clean showroom for TwistedStacks projects — useful AI systems and labs (REVISION, LAGA, VR SUPARAYS, CymWave, Recon Search Assistant) and selected web work. TwistedStacks builds in the open on a dark warm-brown HUD with baby-blue accent, focused on retroaktiv skatteåtervinning, legal AI workflows, VR sensor overlays, hydro-wellness research, defensive security tooling, and a playable four-paddle arcade front door.
+> A clean showroom for TwistedStacks projects — useful AI systems and labs (REVISION, LAGA, Anslag, SUPARAYS, CymWave, Recon Search Assistant) and selected web work. TwistedStacks builds in the open on a dark warm-brown HUD with baby-blue accent, focused on retroaktiv skatteåtervinning, legal AI workflows, VR sensor overlays, hydro-wellness research, defensive security tooling, and a playable four-paddle arcade front door.
 >
 > This is the long-form variant. For the compact index, see [llms.txt](https://twistedstacks.com/llms.txt).
 
@@ -62,11 +62,25 @@ Until the env migration lands, the showroom entry is informational only. For col
 
 Stack: Static SPA, SerpAPI, OpenRouter, Supabase, Bug-bounty dorks.
 
-### VR SUPARAYS — open sensor mesh for VR / AR passthrough
+### Anslag — fri svensk anslagssöknings- och utkaststjänst (pausad)
+
+URL: https://twistedstacks.com/ (engine internal — public app offline)
+
+Anslag (SITK) is a free Swedish grant-discovery and draft-writing app. It searches across Vinnova, Formas, Forte, VR, Tillväxtverket, EU programmes, Almi and Swedish stiftelser via Exa and the official sources, then helps draft the actual application in Swedish.
+
+The frontend is Vite 7 + Tailwind v3 + shadcn/ui, the backend is Node 20 with an API on port 3001 and Vercel serverless. A multi-account OpenRouter gateway round-robins across up to seven keys for resilience, with `google/gemini-2.5-flash-lite` as the current best free model for structured output.
+
+There are two search modes — bred (wide) and narrow — and a model-tier selector (auto/free/paid) so a small NGO can run on free models while a consultant on a deadline picks a paid model without changing the workflow. An optional Qdrant layer adds vector memory across past searches.
+
+The engine is the same one used internally to draft the Almi, ERUF and Vinnova applications across REVISION, LAGA, CymWave and Relay. The public app at anslag.twistedstacks.com is currently offline during a key rotation; it reopens when the new model gateway is wired up.
+
+Stack: Vite, Tailwind, shadcn/ui, OpenRouter, Exa, Node 20.
+
+### SUPARAYS — open sensor mesh for VR / AR passthrough
 
 URL: https://twistedstacks.com/vr-superpowers
 
-VR SUPARAYS — Twisted SUPARAYS under the brand book — is an open sensor mesh for VR and iOS AR passthrough. The product surfaces the normally invisible radio, thermal and electromagnetic world around the wearer: RF auroras, thermal heat-vision, WiFi towers, EMF field lines, AC live-wire hints, and CSI presence/motion ghosts. The tagline is 'See the invisible world in VR'.
+SUPARAYS — Twisted SUPARAYS under the brand book — is an open sensor mesh for VR and iOS AR passthrough. The product surfaces the normally invisible radio, thermal and electromagnetic world around the wearer: RF auroras, thermal heat-vision, WiFi towers, EMF field lines, AC live-wire hints, and CSI presence/motion ghosts. The tagline is 'See the invisible world in VR'.
 
 The system is built as a tiered architecture. ESP32-S3 nodes with NRF24, CC1101, MLX90640, HMC5883L and 50 Hz coil sensors stream into a Python WebSocket hub on port 81. The hub speaks a documented JSON protocol (v1.0 / v1.1 / v1.2) with node roles (wearable / probe / stimulus), position messages, fusion results and gated stimulus states. On the rendering side, Unity 6 + URP + Meta XR SDK paints the scene on Meta Quest, and an ARKit / RealityKit client runs on iPhone 13 Pro+ with LiDAR.
 
@@ -115,3 +129,4 @@ Stack: React, Three.js, WebGL, Vite, Supabase.
 - wawawee/twisted-stacks-site: https://github.com/wawawee/twisted-stacks-site — this showroom, Vite + React + Three.js, deployed on Vercel.
 - wawawee/SKATTEREVISION-REBOOT: https://github.com/wawawee/SKATTEREVISION-REBOOT — the REVISION engine, TypeScript + Express, 17 specialised LLM agents, iXBRL pipeline.
 - wawawee/CymWave: https://github.com/wawawee/CymWave — hydro-wellness research, grant documents, cymatic-water concept notes.
+- Anslag engine: same OpenRouter multi-key gateway used internally for REVISION / LAGA / CymWave applications. The public app is currently offline during a key rotation.
