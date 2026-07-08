@@ -44,8 +44,6 @@ import {
 import { computeCameraTilt } from "./cameraTilt";
 import { clamp } from "./math";
 import { computeMusicTick } from "./gameplayMusic";
-import { ColorDevPanel } from "./dev/ColorDevPanel";
-import "./dev/ColorDevPanel.css";
 import {
   computeAiTargetOffset,
   computeAiTrackingParams,
@@ -4741,7 +4739,6 @@ export default function App() {
           </span>
         </div>
       )}
-      <ColorDevPanel />
     </div>
   );
 }
