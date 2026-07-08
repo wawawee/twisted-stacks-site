@@ -1,12 +1,8 @@
 /**
- * TwistedStacks i18n dictionaries — EN and SV.
- *
- * Everything that lands in the user-facing UI lives here. Project
- * content (tagline, description, longDescription, FAQ) lives in
- * projects.ts and is selected at render time via pickProjectStrings().
+ * TwistedStacks i18n dictionaries — English only (since 2026-07-08).
  *
  * Brand language (e.g. "TWISTED PONGG", sensor accent names) is kept
- * English in both languages — these are proper nouns / brand terms.
+ * English. These are proper nouns / brand terms.
  */
 
 import type { Dictionary, Lang } from "./types";
@@ -15,14 +11,14 @@ const en: Dictionary = {
   meta: {
     title: "TwistedStacks | AI systems showroom",
     description:
-      "TwistedStacks builds useful AI systems and labs: REVISION, LAGA, TANGLE, SUPARAYS, CymWave, Recon Search Assistant, and selected web work.",
+      "TwistedStacks builds useful AI systems and labs: REVISION, LAGA, TANGLE, Anslag, SUPARAYS, CymWave, Recon Search Assistant, and selected web work.",
     ogDescription:
       "A clean showroom for TwistedStacks projects: legal AI, multi-agent evidence analysis, VR sensor overlays, hydro-wellness research, OSINT/search support, and playable TWISTED PONGG.",
   },
   topbar: {
     languageToggle: "EN",
     languageName: "en",
-    switchTo: "sv",
+    switchTo: "en",
   },
   hero: {
     kicker: "TWISTEDSTACKS // SANDVIKEN AI LAB",
@@ -118,114 +114,8 @@ const en: Dictionary = {
   },
 };
 
-const sv: Dictionary = {
-  meta: {
-    title: "TwistedStacks | AI-system showroom",
-    description:
-      "TwistedStacks bygger användbara AI-system och labb: REVISION, LAGA, TANGLE, SUPARAYS, CymWave, Recon Search Assistant och utvalda webbprojekt.",
-    ogDescription:
-      "En ren showroom för TwistedStacks-projekt: juridisk AI, multi-agent-bevisanalys, VR-sensoroverlay, hydro-wellness-forskning, OSINT/search-stöd och spelbara TWISTED PONGG.",
-  },
-  topbar: {
-    languageToggle: "SV",
-    languageName: "sv",
-    switchTo: "en",
-  },
-  hero: {
-    kicker: "TWISTEDSTACKS // SANDVIKEN AI-LABB",
-    titleLine1: "Användbara system.",
-    titleLine2: "TWISTED kant.",
-    titleAccent: "Twistad kant.",
-    lede:
-      "Lokal AI, juridiska workflows, röst-först-gränssnitt, defensiv forskning och små polerade siter. Byggt av Per Brinell som en praktisk showroom — inte en pitch-deck.",
-    actions: {
-      playPongg: "Spela Pongg",
-      bookDemo: "Boka demo",
-      contact: "Kontakt",
-      github: "GitHub",
-    },
-  },
-  showcase: {
-    ariaLabel: "TwistedStacks-projekt",
-    readMore: "Läs mer",
-    hideDetails: "Stäng",
-    stackKicker: "Stack",
-    topicsKicker: "Ämnen",
-    faqKicker: "FAQ",
-    sourceNotes: "Källnotiser",
-    openDemo: "Öppna",
-    contactCta: "Kontakt",
-    backToShowroom: "← Tillbaka till showroom",
-    detailAriaLabel: (name) => `${name} — detaljer`,
-    projectAriaLabel: (name, action) => `${name}: ${action}`,
-    statusLine: (status, version) => `${status} · ${version}`,
-  },
-  contact: {
-    fabTitle: "Kontakta hello@twistedstacks.com",
-    fabAria: "Kontakta TwistedStacks",
-    intent: {
-      demo: "DEMO",
-      query: "FRÅGA",
-      bug: "BUGG",
-      feedback: "FEEDBACK",
-    },
-    contextLabel: "Ämne",
-    fields: {
-      name: "Namn *",
-      email: "E-post *",
-      company: "Företag / organisation (valfritt)",
-      companyPlaceholder: "T.ex. revisionsbyrå, hotell, studio",
-      namePlaceholder: "För- och efternamn",
-      emailPlaceholder: "vi@svarar.här",
-      messagePlaceholder: "Vad gäller det — demo, fråga, samarbete, felrapport…",
-    },
-    requiredHint: "*",
-    fineprint:
-      "Vi sparar ditt namn och e-post i studions kö och använder dem bara för att svara dig. Inga nyhetsbrev, inga spårningar.",
-    sendAria: "Skicka",
-    closeAria: "Stäng",
-    errors: {
-      missingName: "Skriv ditt namn först.",
-      missingEmail: "Skriv din e-post så vi kan svara dig.",
-      badEmail: "Den e-posten ser inte rätt ut — kolla stavningen.",
-      missingMessage: "Skriv något först.",
-      network: (err) =>
-        `Nätverket svarade inte: ${err}. Maila hello@twistedstacks.com direkt om det fortsätter.`,
-      generic:
-        "Kunde inte skicka meddelandet. Försök igen eller maila hello@twistedstacks.com direkt.",
-      fallback:
-        "Kunde inte skicka meddelandet. Maila hello@twistedstacks.com direkt.",
-    },
-    success: {
-      title: (name) => `Tack, ${name || "vi hörs"}!`,
-      lede: (email) =>
-        `Ditt meddelande är sparat och vi svarar inom 1–2 arbetsdagar till ${email}.`,
-      forwarded:
-        "Skickat till hello@twistedstacks.com och en bekräftelse är på väg till din inbox.",
-      stored:
-        "Sparat i studions kö. Vi svarar manuellt — om du inte hört av oss inom 2 arbetsdagar, maila hello@twistedstacks.com direkt.",
-      close: "Stäng",
-    },
-  },
-  easter: {
-    vaultKicker: "TWISTED PONGG // KLASSIFICERAD",
-    vaultTitle: "STACK MASTER-VALVET",
-    vaultLede:
-      "Du klarade alla 9 nivåer. Courtet öppnar en dold tråd — autopilot-riggen spinner, bollen blir guld och arkivet låser upp sig för dig.",
-    vaultHint: (champion) =>
-      champion ? "Tryck P för arkivkatalogen när du vill." : "",
-    transmitVictory: "Sänd seger",
-    playAgain: "Spela igen",
-    openArchive: "Öppna arkiv",
-  },
-  page: {
-    notFound: "Sidan finns inte.",
-    notFoundBack: "← Tillbaka till showroom",
-  },
-};
+const DICTIONARY: Dictionary = en;
 
-export const DICTIONARIES: Record<Lang, Dictionary> = { en, sv };
-
-export function getDictionary(lang: Lang): Dictionary {
-  return DICTIONARIES[lang] ?? DICTIONARIES.en;
+export function getDictionary(_lang?: Lang): Dictionary {
+  return DICTIONARY;
 }

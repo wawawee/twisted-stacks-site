@@ -1,26 +1,20 @@
 /**
  * TwistedStacks i18n — language + dictionary types.
  *
- * Two languages ship in the bundle (en, sv). The language toggle is a
- * pure UI switch — both dictionaries are always present so we never
- * lazy-load and never fall back to a "wrong" language mid-render.
+ * The showroom is English-only as of 2026-07-08. `Lang` is kept as a
+ * type alias so the rest of the code can keep using `t.*` access
+ * patterns, but the runtime always resolves to English.
  */
 
-export type Lang = "en" | "sv";
-
-export const SUPPORTED_LANGS: readonly Lang[] = ["en", "sv"] as const;
-export const DEFAULT_LANG: Lang = "en";
+export type Lang = "en";
 
 /**
- * Best-effort mapping from a BCP-47 navigator language to our short codes.
- * Anything starting with `sv` becomes Swedish; everything else English.
- * The user can always override with the in-app toggle.
+ * Resolve the active language. Currently a hard-coded English.
+ * Kept as a function so call sites don't need to know the wiring
+ * has been simplified.
  */
-export function detectLang(navigatorLang: string | undefined): Lang {
-  if (!navigatorLang) return DEFAULT_LANG;
-  const lower = navigatorLang.toLowerCase();
-  if (lower.startsWith("sv")) return "sv";
-  return DEFAULT_LANG;
+export function detectLang(_navigatorLang?: string): Lang {
+  return "en";
 }
 
 export interface Dictionary {

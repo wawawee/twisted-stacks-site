@@ -85,7 +85,6 @@ import { monsterShotAngle, monsterShotSpeed } from "./monsterShots";
 import { PROJECTS, getProjectById, type ProjectEntry } from "./data/projects";
 import { useTranslation } from "./i18n/context";
 import { localizeProject, projectHook } from "./i18n/project";
-import type { Lang } from "./i18n/types";
 
 // Theme Palette Configuration
 const COLOR_BLACK = 0x050505;       // Pure near-black background
@@ -401,7 +400,7 @@ export default function App() {
   // We read the route from `window.location.hash` so deep links survive
   // a refresh, and update the URL on every navigation so the back button
   // works. URL shape: "#/projects/<id>". An empty hash means showroom.
-  const { lang, t, toggle: toggleLanguage } = useTranslation();
+  const { t } = useTranslation();
   type Route =
     | { kind: "showroom" }
     | { kind: "project"; id: string };
@@ -504,10 +503,10 @@ export default function App() {
     const baseTitle = project
       ? `${project.name} | TwistedStacks`
       : t.meta.title;
-    const localizedProject = project ? localizeProject(project, lang as Lang) : null;
+    const localizedProject = project ? localizeProject(project) : null;
     const taglineSuffix = localizedProject?.tagline ? ` — ${localizedProject.tagline}` : "";
     document.title = `${baseTitle}${taglineSuffix}`.slice(0, 200);
-  }, [selectedProjectId, lang, t]);
+  }, [selectedProjectId, t]);
 
   const clearRetryTimer = () => {
     if (retryTimerRef.current) {
@@ -3922,19 +3921,13 @@ export default function App() {
           <div className="ts-mesh" aria-hidden="true" />
 
           <header className="showroom-topbar">
-            {/* Topbar carries ONLY the language toggle now — the
-                TWISTEDSTACKS wordmark lives in the hero kicker directly
-                below, so showing it twice would be cake-on-cake. */}
+            {/* Topbar intentionally minimal — the TWISTEDSTACKS wordmark
+                lives in the hero kicker directly below, so showing it
+                twice would be cake-on-cake. */}
             <nav className="showroom-topbar-actions">
-              <button
-                type="button"
-                className="showroom-lang-toggle"
-                onClick={toggleLanguage}
-                aria-label={`Switch language to ${t.topbar.switchTo.toUpperCase()}`}
-                title={`Switch language to ${t.topbar.switchTo.toUpperCase()}`}
-              >
-                {t.topbar.languageToggle}
-              </button>
+              <span className="showroom-lang-toggle" aria-hidden="true">
+                EN
+              </span>
             </nav>
           </header>
 
@@ -3955,7 +3948,7 @@ export default function App() {
                   </section>
                 );
               }
-              const loc = localizeProject(ext, lang as Lang);
+              const loc = localizeProject(ext);
               const statusLine = t.showcase.statusLine(loc.status, loc.version);
               return (
                 <section
@@ -4103,8 +4096,8 @@ export default function App() {
 
               <section className="showroom-project-grid" aria-label={t.showcase.ariaLabel}>
                 {CATALOG_PROJECTS.filter((project) => project.id !== "system_arena").map((project) => {
-                  const loc = localizeProject(project, lang as Lang);
-                  const hook = projectHook(project, lang as Lang);
+                  const loc = localizeProject(project);
+                  const hook = projectHook(project);
                   return (
                   <article
                     key={project.id}
@@ -4407,9 +4400,7 @@ export default function App() {
               ))}
             </div>
             <p className="easter-vault-hint">
-              {t.easter.vaultHint(championUnlocked)} {lang === "sv"
-                ? "Skicka en signal till studion — vi vill höra från riktiga stack masters."
-                : "Send a signal to the studio — we want to hear from real stack masters."}
+              {t.easter.vaultHint(championUnlocked)} Send a signal to the studio — we want to hear from real stack masters.
             </p>
             <div className="easter-vault-actions">
               <button
@@ -4673,7 +4664,7 @@ export default function App() {
                 {/* Honeypot — real users never see this; bots fill it. */}
                 <div className="contact-honeypot" aria-hidden="true">
                   <label>
-                    {lang === "sv" ? "Lämna detta fält tomt" : "Leave this field empty"}
+                    Leave this field empty
                     <input
                       type="text"
                       tabIndex={-1}
