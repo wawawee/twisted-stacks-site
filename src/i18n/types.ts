@@ -44,7 +44,6 @@ export interface Dictionary {
     actions: {
       playPongg: string;
       bookDemo: string;
-      tryAnslag: string;
       contact: string;
       github: string;
     };

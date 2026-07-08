@@ -404,7 +404,7 @@ export default function VRSuperPowers() {
         </a>
         <div className="vr-title-block">
           <span>TwistedStacks hardware lab</span>
-          <h1>VR Super-Senses</h1>
+          <h1>VR SUPARAYS</h1>
         </div>
         <a className="vr-github-link" href="https://github.com/wawawee/VR-SuperPowers" target="_blank" rel="noreferrer">
           GitHub

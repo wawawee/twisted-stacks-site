@@ -15,9 +15,9 @@ const en: Dictionary = {
   meta: {
     title: "TwistedStacks | AI systems showroom",
     description:
-      "TwistedStacks builds useful AI systems and labs: REVISION, LAGA, TANGLE, Anslag, VR Super-Senses, CymWave, Recon Search Assistant, and selected web work.",
+      "TwistedStacks builds useful AI systems and labs: REVISION, LAGA, TANGLE, VR SUPARAYS, CymWave, Recon Search Assistant, and selected web work.",
     ogDescription:
-      "A clean showroom for TwistedStacks projects: legal AI, multi-agent evidence analysis, grant discovery, VR sensor overlays, hydro-wellness research, OSINT/search support, and playable TWISTED PONGG.",
+      "A clean showroom for TwistedStacks projects: legal AI, multi-agent evidence analysis, VR sensor overlays, hydro-wellness research, OSINT/search support, and playable TWISTED PONGG.",
   },
   topbar: {
     languageToggle: "EN",
@@ -30,11 +30,10 @@ const en: Dictionary = {
     titleLine2: "TWISTED edge.",
     titleAccent: "Twisted edge.",
     lede:
-      "Local AI, legal workflows, grant tooling, voice-first interfaces, defensive research, and small polished sites. Built by Per Brinell as a practical showroom rather than a pitch deck.",
+      "Local AI, legal workflows, voice-first interfaces, defensive research, and small polished sites. Built by Per Brinell as a practical showroom rather than a pitch deck.",
     actions: {
       playPongg: "Play Pongg",
       bookDemo: "Book Demo",
-      tryAnslag: "Try Anslag",
       contact: "Contact",
       github: "GitHub",
     },
@@ -123,9 +122,9 @@ const sv: Dictionary = {
   meta: {
     title: "TwistedStacks | AI-system showroom",
     description:
-      "TwistedStacks bygger användbara AI-system och labb: REVISION, LAGA, TANGLE, Anslag, VR Super-Senses, CymWave, Recon Search Assistant och utvalda webbprojekt.",
+      "TwistedStacks bygger användbara AI-system och labb: REVISION, LAGA, TANGLE, VR SUPARAYS, CymWave, Recon Search Assistant och utvalda webbprojekt.",
     ogDescription:
-      "En ren showroom för TwistedStacks-projekt: juridisk AI, multi-agent-bevisanalys, anslagssökning, VR-sensoroverlay, hydro-wellness-forskning, OSINT/search-stöd och spelbara TWISTED PONGG.",
+      "En ren showroom för TwistedStacks-projekt: juridisk AI, multi-agent-bevisanalys, VR-sensoroverlay, hydro-wellness-forskning, OSINT/search-stöd och spelbara TWISTED PONGG.",
   },
   topbar: {
     languageToggle: "SV",
@@ -138,11 +137,10 @@ const sv: Dictionary = {
     titleLine2: "TWISTED kant.",
     titleAccent: "Twistad kant.",
     lede:
-      "Lokal AI, juridiska workflows, anslagsverktyg, röst-först-gränssnitt, defensiv forskning och små polerade siter. Byggt av Per Brinell som en praktisk showroom — inte en pitch-deck.",
+      "Lokal AI, juridiska workflows, röst-först-gränssnitt, defensiv forskning och små polerade siter. Byggt av Per Brinell som en praktisk showroom — inte en pitch-deck.",
     actions: {
       playPongg: "Spela Pongg",
       bookDemo: "Boka demo",
-      tryAnslag: "Prova Anslag",
       contact: "Kontakt",
       github: "GitHub",
     },

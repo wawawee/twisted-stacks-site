@@ -1,6 +1,6 @@
 # TwistedStacks — full
 
-> A clean showroom for TwistedStacks projects — useful AI systems and labs (REVISION, LAGA, Anslag, VR Super-Senses, CymWave, Recon Search Assistant) and selected web work. TwistedStacks builds in the open on a dark warm-brown HUD with baby-blue accent, focused on retroaktiv skatteåtervinning, legal AI workflows, grant discovery, VR sensor overlays, hydro-wellness research, defensive security tooling, and a playable four-paddle arcade front door.
+> A clean showroom for TwistedStacks projects — useful AI systems and labs (REVISION, LAGA, VR SUPARAYS, CymWave, Recon Search Assistant) and selected web work. TwistedStacks builds in the open on a dark warm-brown HUD with baby-blue accent, focused on retroaktiv skatteåtervinning, legal AI workflows, VR sensor overlays, hydro-wellness research, defensive security tooling, and a playable four-paddle arcade front door.
 >
 > This is the long-form variant. For the compact index, see [llms.txt](https://twistedstacks.com/llms.txt).
 
@@ -62,25 +62,11 @@ Until the env migration lands, the showroom entry is informational only. For col
 
 Stack: Static SPA, SerpAPI, OpenRouter, Supabase, Bug-bounty dorks.
 
-### Anslag — fri svensk anslagssöknings- och utkaststjänst
-
-URL: https://anslag.twistedstacks.com/
-
-Anslag (SITK) is a free Swedish grant-discovery and draft-writing app. It searches across Vinnova, Formas, Forte, VR, Tillväxtverket, EU programmes, Almi and Swedish stiftelser via Exa and the official sources, then helps draft the actual application in Swedish.
-
-The frontend is Vite 7 + Tailwind v3 + shadcn/ui, the backend is Node 20 with an API on port 3001 and Vercel serverless. A multi-account OpenRouter gateway round-robins across up to seven keys for resilience, with `google/gemini-2.5-flash-lite` as the current best free model for structured output.
-
-There are two search modes — bred (wide) and narrow — and a model-tier selector (auto/free/paid) so a small NGO can run on free models while a consultant on a deadline picks a paid model without changing the workflow. An optional Qdrant layer adds vector memory across past searches.
-
-The tool is open and free. It is the same engine used internally to draft the Almi, ERUF and Vinnova applications across REVISION, LAGA, CymWave and Relay, but the public app is open to any Swedish project looking for funding.
-
-Stack: Vite, Tailwind, shadcn/ui, OpenRouter, Exa, Node 20.
-
-### VR Super-Senses — Twisted SuperSenses
+### VR SUPARAYS — open sensor mesh for VR / AR passthrough
 
 URL: https://twistedstacks.com/vr-superpowers
 
-VR Super-Senses — Twisted SuperSenses under the brand book — is an open sensor mesh for VR and iOS AR passthrough. The product surfaces the normally invisible radio, thermal and electromagnetic world around the wearer: RF auroras, thermal heat-vision, WiFi towers, EMF field lines, AC live-wire hints, and CSI presence/motion ghosts. The tagline is 'See the invisible world in VR'.
+VR SUPARAYS — Twisted SUPARAYS under the brand book — is an open sensor mesh for VR and iOS AR passthrough. The product surfaces the normally invisible radio, thermal and electromagnetic world around the wearer: RF auroras, thermal heat-vision, WiFi towers, EMF field lines, AC live-wire hints, and CSI presence/motion ghosts. The tagline is 'See the invisible world in VR'.
 
 The system is built as a tiered architecture. ESP32-S3 nodes with NRF24, CC1101, MLX90640, HMC5883L and 50 Hz coil sensors stream into a Python WebSocket hub on port 81. The hub speaks a documented JSON protocol (v1.0 / v1.1 / v1.2) with node roles (wearable / probe / stimulus), position messages, fusion results and gated stimulus states. On the rendering side, Unity 6 + URP + Meta XR SDK paints the scene on Meta Quest, and an ARKit / RealityKit client runs on iPhone 13 Pro+ with LiDAR.
 
@@ -100,21 +86,9 @@ The current goal is explicitly not to overclaim medical effects. The first versi
 
 The technical track is now moving toward measured pressure and vibration design. An aviation vibration-testing specialist is expected to support actuator and motor-side development, so wave intensity, pressure transfer and timing precision can be tuned before publishing deeper technical data. Phase 0 is concept recovery (one-pager, competitive map, IP scan, 10–15 customer interviews). Phase 1 is the proof-of-experience prototype on safe, off-the-shelf components.
 
-Funding is via the Vinnova Test och Demo track (closes 2026-09-08) with Almi Verifieringsmedel as the rolling alternative, all routed through the AnslagSITK engine. The legacy 2020 concept — water as the carrier medium, cymatic visualisation as the design method, 'composed pieces for the body rather than music for the ear' — is the brand hook, but the modern claim set is restricted to wellbeing, not therapy.
+Funding is via the Vinnova Test och Demo track (closes 2026-09-08) with Almi Verifieringsmedel as the rolling alternative. The legacy 2020 concept — water as the carrier medium, cymatic visualisation as the design method, 'composed pieces for the body rather than music for the ear' — is the brand hook, but the modern claim set is restricted to wellbeing, not therapy.
 
 Stack: Hydrotherapy, Vibration R&D, Spatial audio, Light scenes, Grant-funded prototype.
-
-### Silversmeden — client site
-
-URL: https://silversmeden.twistedstacks.com/
-
-Silversmeden is a quiet public site for a working silversmith. It is intentionally not a portfolio-app showcase and not a WordPress build — the design language is restrained, the work is the work, and the framework noise is kept out of the way of the customer.
-
-The site is the first shipped TwistedStacks client engagement: built on Vite, deployed on Vercel, and structured to be operated by the silversmith himself after handover. The page layout favours large product imagery, clean typography and minimal chrome. The brand-voice work is the more interesting part: how do you sell hand-made silver online without falling into a 'buy now' shop interface that overwhelms an older customer?
-
-That trade-off drove the layout decisions: the product list is shallow, the photography is the hero, and the checkout is not bolted on as a feature. The site is live at silversmeden.twistedstacks.com and serves as a reference for the type of restrained, customer-respecting site TwistedStacks will build for craft businesses.
-
-Stack: Vite, Vercel, Hand-tuned CSS, Static-first, Client.
 
 ### TWISTED PONGG — playable front door
 
@@ -141,4 +115,3 @@ Stack: React, Three.js, WebGL, Vite, Supabase.
 - wawawee/twisted-stacks-site: https://github.com/wawawee/twisted-stacks-site — this showroom, Vite + React + Three.js, deployed on Vercel.
 - wawawee/SKATTEREVISION-REBOOT: https://github.com/wawawee/SKATTEREVISION-REBOOT — the REVISION engine, TypeScript + Express, 17 specialised LLM agents, iXBRL pipeline.
 - wawawee/CymWave: https://github.com/wawawee/CymWave — hydro-wellness research, grant documents, cymatic-water concept notes.
-- Anslag on the web: https://anslag.twistedstacks.com/ — free Swedish grant discovery and draft-writing app.

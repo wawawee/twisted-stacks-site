@@ -45,10 +45,8 @@ export type ProjectId =
   | "system_laga"
   | "system_relay"
   | "system_recon"
-  | "system_anslag"
   | "system_vr_superpowers"
   | "system_cymwave"
-  | "system_silversmeden"
   | "system_arena"
   | "system_tangle";
 
@@ -530,112 +528,22 @@ export const PROJECTS: ProjectEntry[] = [
     ],
   },
 
-  /* ---------- 5. Anslag ---------- */
-  {
-    id: "system_anslag",
-    name: "Anslag",
-    version: "gratis fonder & stipendier",
-    status: "SHIPPED",
-    tagline:
-      "Hitta fonder, stipendier och andra anslag till ditt projekt.",
-    description:
-      "Anslag är en fri svensk anslagssöknings- och utkaststjänst som hittar utlysningar, stipendier och stiftelser åt dig. Tjänsten söker över Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi och svenska stiftelser via Exa och de officiella källorna, och hjälper dig sedan att skriva själva ansökan på svenska. Det finns två söklägen (bred och smal) och en modell-tier-väljare (auto / gratis / betald) så att en liten förening kan köra på gratis-modeller medan en konsult med deadline väljer en betald modell utan att byta arbetsflöde. Motorn är samma OpenRouter-gateway med sju nycklar som TwistedStacks själva använder för att skriva Almi-, ERUF- och Vinnova-ansökningar — men den publika appen är öppen och gratis för alla svenska projekt som söker finansiering.",
-    longDescription:
-      "Anslag är en fri svensk anslagssöknings- och utkaststjänst som hittar utlysningar, stipendier och stiftelser och hjälper dig skriva själva ansökan på svenska. Internally known as SITK, it searches across Vinnova, Formas, Forte, VR, Tillväxtverket, EU programmes, Almi and Swedish stiftelser via Exa and the official sources, then helps draft the actual application in Swedish.\n\nThe frontend is Vite 7 + Tailwind v3 + shadcn/ui, the backend is Node 20 with an API on port 3001 and Vercel serverless. A multi-account OpenRouter gateway round-robins across up to seven keys for resilience, with `google/gemini-2.5-flash-lite` as the current best free model for structured output.\n\nThere are two search modes — bred (wide) and narrow — and a model-tier selector (auto/free/paid) so a small NGO can run on free models while a consultant on a deadline picks a paid model without changing the workflow. An optional Qdrant layer adds vector memory across past searches.\n\nThe tool is open and free. It is the same engine used internally to draft the Almi, ERUF and Vinnova applications across REVISION, LAGA, CymWave and Relay, but the public app is open to any Swedish project looking for funding.",
-    faq: [
-      {
-        q: "Vad är Anslag?",
-        a: "Anslag är en fri svensk anslagssöknings- och utkaststjänst som hittar utlysningar, stipendier och stiftelser (Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi, svenska stiftelser) och hjälper dig skriva själva ansökan på svenska.",
-      },
-      {
-        q: "Vilka källor söker Anslag i?",
-        a: "Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi och svenska stiftelser — via Exa och de officiella källorna. Inga hemliga datakällor; alla träffar går att spåra.",
-      },
-      {
-        q: "Vad kostar Anslag?",
-        a: "Anslag är öppet och gratis att använda. Det är samma motor som TwistedStacks själva använder för Almi-, ERUF- och Vinnova-ansökningar, men den publika appen är öppen för alla svenska projekt som söker finansiering.",
-      },
-      {
-        q: "Kan jag köra Anslag på gratis-modeller?",
-        a: "Ja. Det finns en modell-tier-väljare (auto / gratis / betald) så att en liten förening kan köra på gratis-modeller medan en konsult med deadline väljer en betald modell — utan att byta arbetsflöde.",
-      },
-      {
-        q: "Hur kommer jag igång?",
-        a: "Gå till anslag.twistedstacks.com och sök på ditt ämne. Två söklägen: bred (utforskande) och smal (precis). Utkast skrivs på svenska direkt i appen.",
-      },
-    ],
-    stack: ["Vite", "Tailwind", "shadcn/ui", "OpenRouter", "Exa", "Node 20"],
-    href: "https://anslag.twistedstacks.com/",
-    ctaLabel: "Live Demo",
-    brandColor: "accent",
-    featured: true,
-    keywords: [
-      "Swedish grants",
-      "Vinnova",
-      "Formas",
-      "Almi",
-      "stipendier",
-      "ansökningsutkast",
-      "free grant search",
-    ],
-    lastUpdated: "2026-06-14",
-    telemetry: [
-      { label: "SÖK", value: "FONDER" },
-      { label: "UTKAST", value: "ANSÖKAN" },
-      { label: "STATUS", value: "LIVE" }
-    ],
-    longDescriptionLang: "sv",
-    taglineSv:
-      "Hitta fonder, stipendier och andra anslag till ditt projekt.",
-    descriptionSv:
-      "Anslag är en fri svensk anslagssöknings- och utkaststjänst som hittar utlysningar, stipendier och stiftelser åt dig. Tjänsten söker över Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi och svenska stiftelser via Exa och de officiella källorna, och hjälper dig sedan att skriva själva ansökan på svenska.",
-    longDescriptionSv:
-      "Anslag är en fri svensk anslagssöknings- och utkaststjänst som hittar utlysningar, stipendier och stiftelser och hjälper dig skriva själva ansökan på svenska. Internt känd som SITK. Tjänsten söker över Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi och svenska stiftelser via Exa och de officiella källorna, och hjälper dig sedan att skriva själva ansökan på svenska.\n\nFrontend är Vite 7 + Tailwind v3 + shadcn/ui, backend är Node 20 med ett API på port 3001 och Vercel-serverless. En multi-konto OpenRouter-gateway round-robin:ar över upp till sju nycklar för resiliens, med google/gemini-2.5-flash-lite som nuvarande bästa gratis-modell för strukturerad output.\n\nDet finns två söklägen — bred och smal — och en modell-tier-väljare (auto / gratis / betald) så att en liten förening kan köra på gratis-modeller medan en konsult med deadline väljer en betald modell utan att byta arbetsflöde. Ett valfritt Qdrant-lager lägger till vector-minne över tidigare sökningar.\n\nVerktyget är öppet och gratis. Det är samma motor som används internt för att skriva Almi-, ERUF- och Vinnova-ansökningar över REVISION, LAGA, CymWave och Relay — men den publika appen är öppen för alla svenska projekt som söker finansiering.",
-    faqSv: [
-      {
-        q: "Vad är Anslag?",
-        a: "Anslag är en fri svensk anslagssöknings- och utkaststjänst som hittar utlysningar, stipendier och stiftelser (Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi, svenska stiftelser) och hjälper dig skriva själva ansökan på svenska.",
-      },
-      {
-        q: "Vilka källor söker Anslag i?",
-        a: "Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi och svenska stiftelser — via Exa och de officiella källorna. Inga hemliga datakällor; alla träffar går att spåra.",
-      },
-      {
-        q: "Vad kostar Anslag?",
-        a: "Anslag är öppet och gratis att använda. Det är samma motor som TwistedStacks själva använder för Almi-, ERUF- och Vinnova-ansökningar, men den publika appen är öppen för alla svenska projekt som söker finansiering.",
-      },
-      {
-        q: "Kan jag köra Anslag på gratis-modeller?",
-        a: "Ja. Det finns en modell-tier-väljare (auto / gratis / betald) så att en liten förening kan köra på gratis-modeller medan en konsult med deadline väljer en betald modell — utan att byta arbetsflöde.",
-      },
-      {
-        q: "Hur kommer jag igång?",
-        a: "Gå till anslag.twistedstacks.com och sök på ditt ämne. Två söklägen: bred (utforskande) och smal (precis). Utkast skrivs på svenska direkt i appen.",
-      },
-    ],
-    telemetrySv: [
-      { label: "SÖK", value: "FONDER" },
-      { label: "UTKAST", value: "ANSÖKAN" },
-      { label: "STATUS", value: "LIVE" },
-    ],
-  },
-
-  /* ---------- 6. VR Super-Senses ---------- */
+  /* ---------- 5. VR SUPARAYS ---------- */
   {
     id: "system_vr_superpowers",
-    name: "VR Super-Senses",
+    name: "VR SUPARAYS",
     version: "Meta Quest / sensor array",
     status: "HARDWARE LAB",
     tagline:
       "See the invisible world: WiFi, heat, RF, and EMF in passthrough VR.",
     description:
-      "VR Super-Senses — Twisted SuperSenses under the brand book — is an open sensor mesh for VR and iOS AR passthrough that surfaces the normally invisible radio, thermal and electromagnetic world around the wearer. ESP32-S3 nodes with NRF24, CC1101, MLX90640 and 50 Hz coil sensors stream into a Python WebSocket hub on port 81; Unity 6 + URP + Meta XR SDK renders the scene on Meta Quest, and an ARKit / RealityKit client runs on iPhone 13 Pro+ with LiDAR. The capability matrix is intentionally honest: AR passthrough and LiDAR mesh are live, WiFi / RF / thermal / EMF / AC layers are partial, and CSI presence plus the Flipper bridge are stubs. Privacy posture is receive-only by default — no TX in any uncontrolled context, no CSI on other people's networks, no X-ray claims. Six sensor layers plus a fusion layer and gated stimulus modules.",
+      "VR SUPARAYS — Twisted SUPARAYS under the brand book — is an open sensor mesh for VR and iOS AR passthrough that surfaces the normally invisible radio, thermal and electromagnetic world around the wearer. ESP32-S3 nodes with NRF24, CC1101, MLX90640 and 50 Hz coil sensors stream into a Python WebSocket hub on port 81; Unity 6 + URP + Meta XR SDK renders the scene on Meta Quest, and an ARKit / RealityKit client runs on iPhone 13 Pro+ with LiDAR. The capability matrix is intentionally honest: AR passthrough and LiDAR mesh are live, WiFi / RF / thermal / EMF / AC layers are partial, and CSI presence plus the Flipper bridge are stubs. Privacy posture is receive-only by default — no TX in any uncontrolled context, no CSI on other people's networks, no X-ray claims. Six sensor layers plus a fusion layer and gated stimulus modules.",
     longDescription:
-      "VR Super-Senses (Twisted SuperSenses) är ett öppet sensor-nätverk för VR och iOS AR-passthrough som gör den osynliga radio-, termiska och elektromagnetiska världen synlig i realtid. The product surfaces the normally invisible radio, thermal and electromagnetic world around the wearer: RF auroras, thermal heat-vision, WiFi towers, EMF field lines, AC live-wire hints, and CSI presence/motion ghosts. The tagline is 'See the invisible world in VR'.\n\nThe system is built as a tiered architecture. ESP32-S3 nodes with NRF24, CC1101, MLX90640, HMC5883L and 50 Hz coil sensors stream into a Python WebSocket hub on port 81. The hub speaks a documented JSON protocol (v1.0 / v1.1 / v1.2) with node roles (wearable / probe / stimulus), position messages, fusion results and gated stimulus states. On the rendering side, Unity 6 + URP + Meta XR SDK paints the scene on Meta Quest, and an ARKit / RealityKit client runs on iPhone 13 Pro+ with LiDAR.\n\nThe capability matrix in the project README is intentionally honest: AR passthrough and LiDAR mesh are live; WiFi, RF, thermal, EMF and AC layers are partial (code exists, gaps remain); CSI presence and Flipper bridge are stubs. The privacy posture is receive-only by default — no TX in any uncontrolled context, no CSI on other people's networks, no X-ray claims.\n\nA Flipper Zero with an AIO Multiboard v1.4 acts as the Field Commander for one radio at a time. The funding story (Almi, Vinnova) ties this together with the spatial-computing thesis: 'Materially warm, technically cool. Built for heads-up displays that have to stay readable while you're wearing them.'",
+      "VR SUPARAYS (Twisted SUPARAYS) är ett öppet sensor-nätverk för VR och iOS AR-passthrough som gör den osynliga radio-, termiska och elektromagnetiska världen synlig i realtid. The product surfaces the normally invisible radio, thermal and electromagnetic world around the wearer: RF auroras, thermal heat-vision, WiFi towers, EMF field lines, AC live-wire hints, and CSI presence/motion ghosts. The tagline is 'See the invisible world in VR'.\n\nThe system is built as a tiered architecture. ESP32-S3 nodes with NRF24, CC1101, MLX90640, HMC5883L and 50 Hz coil sensors stream into a Python WebSocket hub on port 81. The hub speaks a documented JSON protocol (v1.0 / v1.1 / v1.2) with node roles (wearable / probe / stimulus), position messages, fusion results and gated stimulus states. On the rendering side, Unity 6 + URP + Meta XR SDK paints the scene on Meta Quest, and an ARKit / RealityKit client runs on iPhone 13 Pro+ with LiDAR.\n\nThe capability matrix in the project README is intentionally honest: AR passthrough and LiDAR mesh are live; WiFi, RF, thermal, EMF and AC layers are partial (code exists, gaps remain); CSI presence and Flipper bridge are stubs. The privacy posture is receive-only by default — no TX in any uncontrolled context, no CSI on other people's networks, no X-ray claims.\n\nA Flipper Zero with an AIO Multiboard v1.4 acts as the Field Commander for one radio at a time. The funding story (Almi, Vinnova) ties this together with the spatial-computing thesis: 'Materially warm, technically cool. Built for heads-up displays that have to stay readable while you're wearing them.'",
     faq: [
       {
-        q: "Vad är VR Super-Senses?",
-        a: "VR Super-Senses (Twisted SuperSenses) är ett öppet sensor-nätverk för VR och iOS AR-passthrough som visar den osynliga radio-, termiska och elektromagnetiska världen i realtid: RF-aurora, värmesyn, WiFi-master, EMF-fältlinjer, AC-live-wire och CSI-rörelsesignaler.",
+        q: "Vad är VR SUPARAYS?",
+        a: "VR SUPARAYS (Twisted SUPARAYS) är ett öppet sensor-nätverk för VR och iOS AR-passthrough som visar den osynliga radio-, termiska och elektromagnetiska världen i realtid: RF-aurora, värmesyn, WiFi-master, EMF-fältlinjer, AC-live-wire och CSI-rörelsesignaler.",
       },
       {
         q: "Vilken hårdvara kör systemet?",
@@ -673,7 +581,7 @@ export const PROJECTS: ProjectEntry[] = [
       "RF visualisation",
       "WiFi CSI motion",
       "thermal heat vision AR",
-      "Twisted SuperSenses",
+      "Twisted SUPARAYS",
     ],
     lastUpdated: "2026-06-14",
     telemetry: [
@@ -685,13 +593,13 @@ export const PROJECTS: ProjectEntry[] = [
     taglineSv:
       "Se den osynliga världen: WiFi, värme, RF och EMF i passthrough-VR.",
     descriptionSv:
-      "VR Super-Senses — Twisted SuperSenses under brand-manualen — är ett öppet sensor-nätverk för VR och iOS AR-passthrough som visar den normalt osynliga radio-, termiska och elektromagnetiska världen runt bäraren. ESP32-S3-noder med NRF24, CC1101, MLX90640 och 50 Hz-coil-sensorer strömmar till en Python WebSocket-hub på port 81.",
+      "VR SUPARAYS — Twisted SUPARAYS under brand-manualen — är ett öppet sensor-nätverk för VR och iOS AR-passthrough som visar den normalt osynliga radio-, termiska och elektromagnetiska världen runt bäraren. ESP32-S3-noder med NRF24, CC1101, MLX90640 och 50 Hz-coil-sensorer strömmar till en Python WebSocket-hub på port 81.",
     longDescriptionSv:
-      "VR Super-Senses (Twisted SuperSenses) är ett öppet sensor-nätverk för VR och iOS AR-passthrough som gör den osynliga radio-, termiska och elektromagnetiska världen synlig i realtid. Produkten visar den normalt osynliga radio-, termiska och elektromagnetiska världen runt bäraren: RF-aurora, termisk värmesyn, WiFi-master, EMF-fältlinjer, AC-live-wire-hint och CSI-presence/rörelse-spöken. Tagline är 'See the invisible world in VR'.\n\nSystemet är byggt som en tierad arkitektur. ESP32-S3-noder med NRF24, CC1101, MLX90640, HMC5883L och 50 Hz coil-sensorer strömmar till en Python WebSocket-hub på port 81. Hubsen talar ett dokumenterat JSON-protokoll (v1.0 / v1.1 / v1.2) med nod-roller (wearable / probe / stimulus), positions-meddelanden, fusion-resultat och gated stimulus-states. På renderings-sidan målar Unity 6 + URP + Meta XR SDK scenen på Meta Quest, och en ARKit / RealityKit-klient körs på iPhone 13 Pro+ med LiDAR.\n\nKapacitets-matrisen i projektets README är medvetet ärlig: AR-passthrough och LiDAR-mesh är live; WiFi-, RF-, termiska, EMF- och AC-lager är partial (kod finns, gap kvarstår); CSI-presence och Flipper-bridge är stubs. Integritetslinjen är receive-only som standard — ingen TX i okontrollerad kontext, ingen CSI på andras nätverk, inga X-ray-påståenden.\n\nEn Flipper Zero med ett AIO Multiboard v1.4 agerar Field Commander för en radio i taget. Finansierings-storyn (Almi, Vinnova) knyter ihop detta med spatial-computing-thesen: 'Materially warm, technically cool. Built for heads-up displays that have to stay readable while you're wearing them.'",
+      "VR SUPARAYS (Twisted SUPARAYS) är ett öppet sensor-nätverk för VR och iOS AR-passthrough som gör den osynliga radio-, termiska och elektromagnetiska världen synlig i realtid. Produkten visar den normalt osynliga radio-, termiska och elektromagnetiska världen runt bäraren: RF-aurora, termisk värmesyn, WiFi-master, EMF-fältlinjer, AC-live-wire-hint och CSI-presence/rörelse-spöken. Tagline är 'See the invisible world in VR'.\n\nSystemet är byggt som en tierad arkitektur. ESP32-S3-noder med NRF24, CC1101, MLX90640, HMC5883L och 50 Hz coil-sensorer strömmar till en Python WebSocket-hub på port 81. Hubsen talar ett dokumenterat JSON-protokoll (v1.0 / v1.1 / v1.2) med nod-roller (wearable / probe / stimulus), positions-meddelanden, fusion-resultat och gated stimulus-states. På renderings-sidan målar Unity 6 + URP + Meta XR SDK scenen på Meta Quest, och en ARKit / RealityKit-klient körs på iPhone 13 Pro+ med LiDAR.\n\nKapacitets-matrisen i projektets README är medvetet ärlig: AR-passthrough och LiDAR-mesh är live; WiFi-, RF-, termiska, EMF- och AC-lager är partial (kod finns, gap kvarstår); CSI-presence och Flipper-bridge är stubs. Integritetslinjen är receive-only som standard — ingen TX i okontrollerad kontext, ingen CSI på andras nätverk, inga X-ray-påståenden.\n\nEn Flipper Zero med ett AIO Multiboard v1.4 agerar Field Commander för en radio i taget. Finansierings-storyn (Almi, Vinnova) knyter ihop detta med spatial-computing-thesen: 'Materially warm, technically cool. Built for heads-up displays that have to stay readable while you're wearing them.'",
     faqSv: [
       {
-        q: "Vad är VR Super-Senses?",
-        a: "VR Super-Senses (Twisted SuperSenses) är ett öppet sensor-nätverk för VR och iOS AR-passthrough som visar den osynliga radio-, termiska och elektromagnetiska världen i realtid: RF-aurora, värmesyn, WiFi-master, EMF-fältlinjer, AC-live-wire och CSI-rörelsesignaler.",
+        q: "Vad är VR SUPARAYS?",
+        a: "VR SUPARAYS (Twisted SUPARAYS) är ett öppet sensor-nätverk för VR och iOS AR-passthrough som visar den osynliga radio-, termiska och elektromagnetiska världen i realtid: RF-aurora, värmesyn, WiFi-master, EMF-fältlinjer, AC-live-wire och CSI-rörelsesignaler.",
       },
       {
         q: "Vilken hårdvara kör systemet?",
@@ -807,7 +715,7 @@ export const PROJECTS: ProjectEntry[] = [
     description:
       "CymWave is an early-stage Swedish wellness-technology project for immersive bath and float experiences — warm water, controlled massage or low-frequency vibration, spatial or underwater-safe audio, chromotherapy-style light scenes, and guided journeys for calm, sleep preparation, recovery, romance, seasonal rituals, or premium hotel experiences. The current goal is explicitly not to overclaim medical effects: the first version is a premium B2B wellness installation for boutique hotels, destination spas, retreat centres and premium wellness studios, focused on relaxation, perceived stress, sleep readiness, comfort and memorable guest experience. The technical track is moving toward measured pressure and vibration design, with an aviation vibration-testing specialist supporting actuator and motor-side development. Phase 0 covers concept recovery, IP mapping and 10–15 customer interviews; Phase 1 is the proof-of-experience prototype on safe, off-the-shelf components. Funding runs through the Vinnova Test och Demo track with Almi Verifieringsmedel as the rolling alternative.",
     longDescription:
-      "CymWave är ett tidigt svenskt wellness-teknologiprojekt för immersiva bad- och flytupplevelser med programmerbart vatten, ljud, ljus och guidade resor. The combination is warm water, carefully controlled massage or low-frequency vibration, spatial or underwater-safe audio, chromotherapy-style light scenes, and guided journeys for calm, sleep preparation, recovery, romance, seasonal rituals, or premium hotel experiences.\n\nThe current goal is explicitly not to overclaim medical effects. The first version is a premium B2B wellness installation for boutique hotels, destination spas, retreat centres and premium wellness studios — focused on relaxation, perceived stress, sleep readiness, comfort and a memorable guest experience. Claims like 'treats anxiety / depression / chronic pain / insomnia / trauma' are deliberately avoided until clinical and regulatory work would justify them.\n\nThe technical track is now moving toward measured pressure and vibration design. An aviation vibration-testing specialist is expected to support actuator and motor-side development, so wave intensity, pressure transfer and timing precision can be tuned before publishing deeper technical data. Phase 0 is concept recovery (one-pager, competitive map, IP scan, 10–15 customer interviews). Phase 1 is the proof-of-experience prototype on safe, off-the-shelf components.\n\nFunding is via the Vinnova Test och Demo track (closes 2026-09-08) with Almi Verifieringsmedel as the rolling alternative, all routed through the AnslagSITK engine. The legacy 2020 concept — water as the carrier medium, cymatic visualisation as the design method, 'composed pieces for the body rather than music for the ear' — is the brand hook, but the modern claim set is restricted to wellbeing, not therapy.",
+      "CymWave är ett tidigt svenskt wellness-teknologiprojekt för immersiva bad- och flytupplevelser med programmerbart vatten, ljud, ljus och guidade resor. The combination is warm water, carefully controlled massage or low-frequency vibration, spatial or underwater-safe audio, chromotherapy-style light scenes, and guided journeys for calm, sleep preparation, recovery, romance, seasonal rituals, or premium hotel experiences.\n\nThe current goal is explicitly not to overclaim medical effects. The first version is a premium B2B wellness installation for boutique hotels, destination spas, retreat centres and premium wellness studios — focused on relaxation, perceived stress, sleep readiness, comfort and a memorable guest experience. Claims like 'treats anxiety / depression / chronic pain / insomnia / trauma' are deliberately avoided until clinical and regulatory work would justify them.\n\nThe technical track is now moving toward measured pressure and vibration design. An aviation vibration-testing specialist is expected to support actuator and motor-side development, so wave intensity, pressure transfer and timing precision can be tuned before publishing deeper technical data. Phase 0 is concept recovery (one-pager, competitive map, IP scan, 10–15 customer interviews). Phase 1 is the proof-of-experience prototype on safe, off-the-shelf components.\n\nFunding is via the Vinnova Test och Demo track (closes 2026-09-08) with Almi Verifieringsmedel as the rolling alternative. The legacy 2020 concept — water as the carrier medium, cymatic visualisation as the design method, 'composed pieces for the body rather than music for the ear' — is the brand hook, but the modern claim set is restricted to wellbeing, not therapy.",
     faq: [
       {
         q: "Vad är CymWave?",
@@ -827,7 +735,7 @@ export const PROJECTS: ProjectEntry[] = [
       },
       {
         q: "Hur finansieras CymWave?",
-        a: "Vinnova Test och Demo (stänger 2026-09-08) med Almi Verifieringsmedel som rullande alternativ — allt routat genom AnslagSITK-motorn.",
+        a: "Vinnova Test och Demo (stänger 2026-09-08) med Almi Verifieringsmedel som rullande alternativ.",
       },
     ],
     stack: [
@@ -861,7 +769,7 @@ export const PROJECTS: ProjectEntry[] = [
     descriptionSv:
       "CymWave är ett tidigt svenskt wellness-teknologiprojekt för immersiva bad- och flytupplevelser — varmt vatten, kontrollerad massage eller lågfrekvent vibration, rumsligt eller vattensäkert ljud, kromoterapi-ljusscener och guidade resor för lugn, sömnförberedelse, återhämtning, romantik, säsongsritualer eller premiumupplevelser.",
     longDescriptionSv:
-      "CymWave är ett tidigt svenskt wellness-teknologiprojekt för immersiva bad- och flytupplevelser med programmerbart vatten, ljud, ljus och guidade resor. Kombinationen är varmt vatten, kontrollerad massage eller lågfrekvent vibration, rumsligt eller vattensäkert ljud, kromoterapi-ljusscener och guidade resor för lugn, sömnförberedelse, återhämtning, romantik, säsongsritualer eller premiumupplevelser.\n\nNuvarande mål är uttryckligen att inte överclaima medicinska effekter. Första versionen är en premium B2B-wellness-installation för boutique-hotell, destination-spa, retreat-center och premium wellness-studior — fokuserad på avslappning, upplevd stress, sömnberedskap, komfort och minnesvärd gästupplevelse. Påståenden som 'behandlar ångest / depression / kronisk smärta / sömnlöshet / trauma' undviks medvetet tills kliniskt och regulatoriskt arbete motiverar dem.\n\nDet tekniska spåret rör sig nu mot uppmätt tryck- och vibrationsdesign. En specialist på flygvapen-vibrationstestning förväntas stödja aktuator- och motor-sidans utveckling, så våg-intensitet, trycköverföring och tidsprecision kan stämmas innan djupare tekniska data publiceras. Fas 0 är konceptåterhämtning (one-pager, konkurrentkarta, IP-skanning, 10–15 kundintervjuer). Fas 1 är proof-of-experience-prototyp på säkra standardkomponenter.\n\nFinansiering via Vinnova Test och Demo-spåret (stänger 2026-09-08) med Almi Verifieringsmedel som rullande alternativ, allt routat genom AnslagSITK-motorn. Det legacy 2020-konceptet — vatten som bärar-medium, cymatic-visualisering som designmetod, 'composed pieces for the body rather than music for the ear' — är brand-kroken, men den moderna claim-set är begränsad till wellbeing, inte terapi.",
+      "CymWave är ett tidigt svenskt wellness-teknologiprojekt för immersiva bad- och flytupplevelser med programmerbart vatten, ljud, ljus och guidade resor. Kombinationen är varmt vatten, kontrollerad massage eller lågfrekvent vibration, rumsligt eller vattensäkert ljud, kromoterapi-ljusscener och guidade resor för lugn, sömnförberedelse, återhämtning, romantik, säsongsritualer eller premiumupplevelser.\n\nNuvarande mål är uttryckligen att inte överclaima medicinska effekter. Första versionen är en premium B2B-wellness-installation för boutique-hotell, destination-spa, retreat-center och premium wellness-studior — fokuserad på avslappning, upplevd stress, sömnberedskap, komfort och minnesvärd gästupplevelse. Påståenden som 'behandlar ångest / depression / kronisk smärta / sömnlöshet / trauma' undviks medvetet tills kliniskt och regulatoriskt arbete motiverar dem.\n\nDet tekniska spåret rör sig nu mot uppmätt tryck- och vibrationsdesign. En specialist på flygvapen-vibrationstestning förväntas stödja aktuator- och motor-sidans utveckling, så våg-intensitet, trycköverföring och tidsprecision kan stämmas innan djupare tekniska data publiceras. Fas 0 är konceptåterhämtning (one-pager, konkurrentkarta, IP-skanning, 10–15 kundintervjuer). Fas 1 är proof-of-experience-prototyp på säkra standardkomponenter.\n\nFinansiering via Vinnova Test och Demo-spåret (stänger 2026-09-08) med Almi Verifieringsmedel som rullande alternativ. Det legacy 2020-konceptet — vatten som bärar-medium, cymatic-visualisering som designmetod, 'composed pieces for the body rather than music for the ear' — är brand-kroken, men den moderna claim-set är begränsad till wellbeing, inte terapi.",
     faqSv: [
       {
         q: "Vad är CymWave?",
@@ -881,7 +789,7 @@ export const PROJECTS: ProjectEntry[] = [
       },
       {
         q: "Hur finansieras CymWave?",
-        a: "Vinnova Test och Demo (stänger 2026-09-08) med Almi Verifieringsmedel som rullande alternativ — allt routat genom AnslagSITK-motorn.",
+        a: "Vinnova Test och Demo (stänger 2026-09-08) med Almi Verifieringsmedel som rullande alternativ.",
       },
     ],
     telemetrySv: [
@@ -891,94 +799,7 @@ export const PROJECTS: ProjectEntry[] = [
     ],
   },
 
-  /* ---------- 8. Silversmeden ---------- */
-  {
-    id: "system_silversmeden",
-    name: "Silversmeden",
-    version: "client site",
-    status: "SHIPPED",
-    tagline: "Clean craft site for a working silversmith.",
-    description:
-      "Silversmeden is a quiet public site for a working silversmith — intentionally not a portfolio-app showcase and not a WordPress build. The design language is restrained, the work is the work, and the framework noise is kept out of the way of the customer. The page layout favours large product imagery, clean typography and minimal chrome, with a shallow product list and a checkout that is not bolted on as a feature. The brand-voice work is the more interesting part of the engagement: how do you sell hand-made silver online without falling into a 'buy now' shop interface that overwhelms an older customer? The site is the first shipped TwistedStacks client engagement — built on Vite, deployed on Vercel, structured to be operated by the silversmith himself after handover. It serves as a reference for the type of restrained, customer-respecting site TwistedStacks will build for craft businesses.",
-    longDescription:
-      "Silversmeden är en lugn publik webbplats för en arbetande silversmed — medvetet varken portfolio-app eller WordPress-byggd. The design language is restrained, the work is the work, and the framework noise is kept out of the way of the customer.\n\nThe site is the first shipped TwistedStacks client engagement: built on Vite, deployed on Vercel, and structured to be operated by the silversmith himself after handover. The page layout favours large product imagery, clean typography and minimal chrome. The brand-voice work is the more interesting part: how do you sell hand-made silver online without falling into a 'buy now' shop interface that overwhelms an older customer?\n\nThat trade-off drove the layout decisions: the product list is shallow, the photography is the hero, and the checkout is not bolted on as a feature. The site is live at silversmeden.twistedstacks.com and serves as a reference for the type of restrained, customer-respecting site TwistedStacks will build for craft businesses.",
-    faq: [
-      {
-        q: "Vad är Silversmeden-projektet?",
-        a: "Silversmeden är en lugn publik webbplats för en arbetande silversmed — den första levererade TwistedStacks-kundengagemanget. Byggd på Vite, deployad på Vercel, strukturerad för att silversmeden själv ska kunna sköta den efter överlämning.",
-      },
-      {
-        q: "Är det en portfolio eller en e-handelssida?",
-        a: "Varken en portfolio-app eller en WordPress-byggnad. Designspråket är återhållet; fotografiet är hjälten; produktlistan är grund; kassan är inte påklistrad som en feature. Målet är att sälja handsmyckat silver utan att överväldiga en äldre kund.",
-      },
-      {
-        q: "Är sidan live?",
-        a: "Ja, på silversmeden.twistedstacks.com. Tjänar som referens för den typ av återhållen, kundrespekterande site TwistedStacks bygger för hantverksföretag.",
-      },
-      {
-        q: "Vem passar Silversmeden-modellen för?",
-        a: "Hantverksföretag och enskilda hantverkare som vill ha en webbplats de själva kan driva, där produkten är i centrum och gränssnittet inte tar över.",
-      },
-      {
-        q: "Kan jag få en liknande site av TwistedStacks?",
-        a: "Kontakta dev@twistedstacks.com för ett scopet samtal. Första steget är alltid: vad säljer du, vem är kunden, vilken känsla vill du att sidan ska förmedla.",
-      },
-    ],
-    stack: ["Vite", "Vercel", "Hand-tuned CSS", "Static-first", "Client"],
-    href: "https://silversmeden.twistedstacks.com/",
-    ctaLabel: "Live",
-    brandColor: "pearl",
-    featured: false,
-    keywords: [
-      "silversmith site",
-      "craft e-commerce",
-      "restrained design",
-      "Vercel static",
-      "TwistedStacks client work",
-    ],
-    lastUpdated: "2026-06-14",
-    telemetry: [
-      { label: "MODE", value: "CRAFT" },
-      { label: "STATUS", value: "LIVE" },
-      { label: "TEXTURE", value: "CLEAN" }
-    ],
-    longDescriptionLang: "en",
-    taglineSv:
-      "Ren hantverkssajt för en arbetande silversmed.",
-    descriptionSv:
-      "Silversmeden är en lugn publik webbplats för en arbetande silversmed — medvetet varken portfolio-app eller WordPress-byggd. Designspråket är återhållet, arbetet är arbetet, och ramverks-bullret hålls borta från kunden.",
-    longDescriptionSv:
-      "Silversmeden är en lugn publik webbplats för en arbetande silversmed — medvetet varken portfolio-app eller WordPress-byggd. Designspråket är återhållet, arbetet är arbetet, och ramverks-bullret hålls borta från kundens väg.\n\nSajten är den första levererade TwistedStacks-kundengagemanget: byggd på Vite, deployad på Vercel, strukturerad för att silversmeden själv ska kunna sköta den efter överlämning. Sidlayouten favoriserar stor produktbild, ren typografi och minimal chrome. Brand-röst-arbetet är den intressantare delen: hur säljer man handsmyckat silver online utan att falla i en 'köp nu'-shop som överväldigar en äldre kund?\n\nDen trade-off:en drev layout-besluten: produktlistan är grund, fotografiet är hjälten, kassan är inte påklistrad som en feature. Sajten är live på silversmeden.twistedstacks.com och fungerar som referens för den typ av återhållen, kundrespekterande site TwistedStacks bygger för hantverksföretag.",
-    faqSv: [
-      {
-        q: "Vad är Silversmeden-projektet?",
-        a: "Silversmeden är en lugn publik webbplats för en arbetande silversmed — den första levererade TwistedStacks-kundengagemanget. Byggd på Vite, deployad på Vercel, strukturerad för att silversmeden själv ska kunna sköta den efter överlämning.",
-      },
-      {
-        q: "Är det en portfolio eller en e-handelssajt?",
-        a: "Varken en portfolio-app eller en WordPress-byggnad. Designspråket är återhållet; fotografiet är hjälten; produktlistan är grund; kassan är inte påklistrad som en feature. Målet är att sälja handsmyckat silver utan att överväldiga en äldre kund.",
-      },
-      {
-        q: "Är sajten live?",
-        a: "Ja, på silversmeden.twistedstacks.com. Tjänar som referens för den typ av återhållen, kundrespekterande sajt TwistedStacks bygger för hantverksföretag.",
-      },
-      {
-        q: "Vem passar Silversmeden-modellen för?",
-        a: "Hantverksföretag och enskilda hantverkare som vill ha en webbplats de själva kan driva, där produkten är i centrum och gränssnittet inte tar över.",
-      },
-      {
-        q: "Kan jag få en liknande sajt av TwistedStacks?",
-        a: "Kontakta hello@twistedstacks.com för ett scopat samtal. Första steget är alltid: vad säljer du, vem är kunden, vilken känsla vill du att sajten ska förmedla.",
-      },
-    ],
-    telemetrySv: [
-      { label: "LÄGE", value: "HANTVERK" },
-      { label: "STATUS", value: "LIVE" },
-      { label: "TEXTUR", value: "REN" },
-    ],
-  },
-
-  /* ---------- 9. Twisted Pongg ---------- */
+  /* ---------- 8. Twisted Pongg ---------- */
   {
     id: "system_arena",
     name: "TWISTED PONGG",
