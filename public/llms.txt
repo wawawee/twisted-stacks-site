@@ -8,7 +8,7 @@
 - [LAGA](https://twistedstacks.com/laga.html): Swedish legal media to structured review — four-node React Flow workflow (Media, Transcribe, Analyze, Eval) with local MLX Whisper and contradiction analysis.
 - [Relay / THE-AI-BUTTON](https://twistedstacks.com/): Voice-first iOS app that sends a single spoken phrase to a user-owned webhook, runs an agent, and speaks the result back — no chat window.
 - [Recon Search Assistant](https://twistedstacks.com/recon.html): Defensive security research workbench — 115+ Google dorks, SerpAPI search, OpenRouter AI triage for authorized bug-bounty and recon.
-- [Anslag](https://twistedstacks.com/): Fri svensk anslagssöknings- och utkaststjänst — söker Vinnova, Formas, Forte, VR, Tillväxtverket, EU, Almi och svenska stiftelser, hjälper skriva ansökan. (Live app currently offline — engine still in use internally.)
+- [Anslag](https://twistedstacks.com/): Fri svensk anslagssöknings- och utkaststjänst — söker Vinnova, Formas, Forte, VR, Tillväxtverket, EU, Almi och svenska stiftelser, hjälper skriva ansökan. (Live app currently offline.)
 - [SUPARAYS](https://twistedstacks.com/vr-superpowers): See the invisible world — ESP32 sensor mesh streams RF, thermal, WiFi, EMF, AC and CSI presence into Meta Quest passthrough and iOS AR.
 - [CymWave](https://github.com/wawawee/CymWave): Hydro-wellness prototype — programmable warm water, controlled vibration, spatial audio, chromotherapy light scenes, guided relaxation journeys.
 - [TWISTED PONGG](https://twistedstacks.com/): Playable four-paddle arcade game built on React, Three.js and WebGL — hand-rolled physics, spin, curve, corner combos and a global top-5 leaderboard.

@@ -16,7 +16,7 @@ The system is a complement to the audit firm, not a replacement. The byrå keeps
 
 A squad of seventeen specialised LLM agents runs the analysis: fou-agent for R&D, energirevision-spearhead for industrial energy tax, leasing-auditoren for K3 leasing, fastighetsmomsaren for property VAT, kritikern (red-team) and verifikator (positive-evidence) as a dual-critic gate, mimir for live web/SKV intelligence, plus orchestrator, risk, sentinel, pitch and code-review agents. Models are routed through OpenRouter with Gemini 3.5 Flash as frontier-class for synthesis and lead work.
 
-The business model is success-fee: 20–35% of actually recovered tax, split with the byrå. The customer pays nothing if nothing is recovered. The current pitch focus is Gävleborg/Dalarna manufacturing SMEs, 10–250 anställda, with active Almi, ERUF and Vinnova applications in flight.
+The business model is success-fee: 20–35% of actually recovered tax, split with the byrå. The customer pays nothing if nothing is recovered. The current pitch focus is Gävleborg/Dalarna manufacturing SMEs, 10–250 anställda.
 
 Stack: TypeScript, Express, iXBRL pipeline, 17 LLM agents, OpenRouter, SQLite + Qdrant, PDF dossiers.
 
@@ -30,7 +30,7 @@ The point is not a generic chatbot. Cases move through explicit nodes with a run
 
 The MLX integration is treated as a duty-budgeted citizen: MLX_GPU_DUTY_TARGET=0.8, MAX_CONCURRENT_MLX=1 and MLX_CHUNK_COOLDOWN_MS keep the GPU cool under sustained loads. OpenRouter is the fallback path for text and multimodal review when local MLX is not enough.
 
-The latest macOS Swift shell lives on a private iMac and is not publicly deployable today. An Almi Verifieringsmedel application is in flight; the primary long-term funding target is Vinnova Innovativa Startups 2026. Future nodes include a Legal RAG layer with source IDs, a Praxis web-browser agent, and a synced macOS shell sharing the same workflow JSON.
+The latest macOS Swift shell lives on a private iMac and is not publicly deployable today. Future nodes include a Legal RAG layer with source IDs, a Praxis web-browser agent, and a synced macOS shell sharing the same workflow JSON.
 
 Stack: Vite, React Flow, Hono, MLX Whisper, OpenRouter, pnpm monorepo.
 
@@ -44,7 +44,7 @@ The product exposes exactly two commands. Note to AI POSTs the transcript to you
 
 The integration layer is the part nobody else assembles. Relay connects Apple's own pieces — Hey Siri, the Action Button, Voice Control, and App Intents — into a single installable flow. The setup wizard wires up the webhook URL, the reminders destination and the Swedish STT locale (sv-SE on-device, no cloud upload). The reference n8n workflow pipes the spoken task through an Intent Parser, writes a row to Airtable, and can fan out to 46elks SMS for an acknowledgement.
 
-The build is Swift + SwiftUI on iOS 18+, generated with Xcodegen, bundle id com.perbrinell.relay. Planned monetisation is a one-time purchase (~$0.99) — explicitly anti-subscription. The current funding track is Almi Verifieringsmedel, with Vinnova Innovativa Startups 2026 as the longer-term target.
+The build is Swift + SwiftUI on iOS 18+, generated with Xcodegen, bundle id com.perbrinell.relay. Planned monetisation is a one-time purchase (~$0.99) — explicitly anti-subscription.
 
 Stack: Swift, SwiftUI, iOS 18, Hey Siri, n8n webhook, Airtable.
 
@@ -56,7 +56,7 @@ Recon Search Assistant is a defensive security research workbench — not a publ
 
 The current state is paused from the public showroom. The static GitHub Pages deploy is being retired, and the API keys need to move into the Vercel environment before the project is shown again. The user-account layer, dashboard, history and saved-search features from the original prototype remain in the codebase but are not the active product focus.
 
-The framing matters. This is a lab for authorized bug-bounty and defensive research — dork search, target triage, finding tracking — not a tool for use against systems the operator does not own or have permission to test. The Almi/Vinnova sister-project line for the TwistedStacks stack treats Recon as a defensive-cyber companion, not a customer-facing product.
+The framing matters. This is a lab for authorized bug-bounty and defensive research — dork search, target triage, finding tracking — not a tool for use against systems the operator does not own or have permission to test. Recon is a defensive-cyber companion to the TwistedStacks stack, not a customer-facing product.
 
 Until the env migration lands, the showroom entry is informational only. For collaboration or research conversations, reach out via the TwistedStacks contact channel.
 
@@ -72,7 +72,7 @@ The frontend is Vite 7 + Tailwind v3 + shadcn/ui, the backend is Node 20 with an
 
 There are two search modes — bred (wide) and narrow — and a model-tier selector (auto/free/paid) so a small NGO can run on free models while a consultant on a deadline picks a paid model without changing the workflow. An optional Qdrant layer adds vector memory across past searches.
 
-The engine is the same one used internally to draft the Almi, ERUF and Vinnova applications across REVISION, LAGA, CymWave and Relay. The public app at anslag.twistedstacks.com is currently offline during a key rotation; it reopens when the new model gateway is wired up.
+The engine is the same one used internally to draft grant applications across the TwistedStacks stack. The public app at anslag.twistedstacks.com is currently offline during a key rotation; it reopens when the new model gateway is wired up.
 
 Stack: Vite, Tailwind, shadcn/ui, OpenRouter, Exa, Node 20.
 
@@ -84,9 +84,9 @@ SUPARAYS — Twisted SUPARAYS under the brand book — is an open sensor mesh fo
 
 The system is built as a tiered architecture. ESP32-S3 nodes with NRF24, CC1101, MLX90640, HMC5883L and 50 Hz coil sensors stream into a Python WebSocket hub on port 81. The hub speaks a documented JSON protocol (v1.0 / v1.1 / v1.2) with node roles (wearable / probe / stimulus), position messages, fusion results and gated stimulus states. On the rendering side, Unity 6 + URP + Meta XR SDK paints the scene on Meta Quest, and an ARKit / RealityKit client runs on iPhone 13 Pro+ with LiDAR.
 
-The capability matrix in the project README is intentionally honest: AR passthrough and LiDAR mesh are live; WiFi, RF, thermal, EMF and AC layers are partial (code exists, gaps remain); CSI presence and Flipper bridge are stubs. The privacy posture is receive-only by default — no TX in any uncontrolled context, no CSI on other people's networks, no X-ray claims.
+The capability matrix in the project README is intentionally honest: AR passthrough and LiDAR mesh are live; WiFi, RF, thermal, EMF and AC layers are partial (code exists, gaps remain); CSI presence and Flipper bridge are stubs. All sensors are receive-only by design — passive observation, no transmission.
 
-A Flipper Zero with an AIO Multiboard v1.4 acts as the Field Commander for one radio at a time. The funding story (Almi, Vinnova) ties this together with the spatial-computing thesis: 'Materially warm, technically cool. Built for heads-up displays that have to stay readable while you're wearing them.'
+A Flipper Zero with an AIO Multiboard v1.4 acts as the Field Commander for one radio at a time. The brand thesis carries through: 'Materially warm, technically cool. Built for heads-up displays that have to stay readable while you're wearing them.'
 
 Stack: Unity 6, Meta XR SDK, Meta Quest, ESP32-S3, Python WebSocket hub, ARKit + LiDAR.
 
@@ -100,9 +100,9 @@ The current goal is explicitly not to overclaim medical effects. The first versi
 
 The technical track is now moving toward measured pressure and vibration design. An aviation vibration-testing specialist is expected to support actuator and motor-side development, so wave intensity, pressure transfer and timing precision can be tuned before publishing deeper technical data. Phase 0 is concept recovery (one-pager, competitive map, IP scan, 10–15 customer interviews). Phase 1 is the proof-of-experience prototype on safe, off-the-shelf components.
 
-Funding is via the Vinnova Test och Demo track (closes 2026-09-08) with Almi Verifieringsmedel as the rolling alternative. The legacy 2020 concept — water as the carrier medium, cymatic visualisation as the design method, 'composed pieces for the body rather than music for the ear' — is the brand hook, but the modern claim set is restricted to wellbeing, not therapy.
+The legacy 2020 concept — water as the carrier medium, cymatic visualisation as the design method, 'composed pieces for the body rather than music for the ear' — is the brand hook, but the modern claim set is restricted to wellbeing, not therapy.
 
-Stack: Hydrotherapy, Vibration R&D, Spatial audio, Light scenes, Grant-funded prototype.
+Stack: Hydrotherapy, Vibration R&D, Spatial audio, Light scenes, Proof-of-experience prototype.
 
 ### TWISTED PONGG — playable front door
 
