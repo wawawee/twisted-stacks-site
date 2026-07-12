@@ -31,7 +31,18 @@ export function buildMenuItems(
     { id: "focus", label: "Nuvarande fokus", slug: "tasklist-focus", kind: "focus", section: "progress" },
   ];
 
+  const hasUseCases = wikiPages.some((p) => p.slug === "use-cases");
   const hasCompetitors = wikiPages.some((p) => p.slug === "competitors");
+
+  if (hasUseCases) {
+    items.push({
+      id: "wiki-use-cases",
+      label: mode === "company" ? "Kunder & segment" : "Användningsfall & kunder",
+      slug: "use-cases",
+      kind: "topic",
+      section: "wiki",
+    });
+  }
 
   if (mode === "company" && hasCompetitors) {
     items.push({
@@ -63,7 +74,8 @@ export function buildMenuItems(
   );
 
   for (const page of wikiPages) {
-    if (mode === "company" && page.slug === "competitors") continue;
+    if (page.slug === "competitors" && mode === "company") continue;
+    if (page.slug === "use-cases") continue;
     if (mode === "company" && !COMPANY_WIKI_SLUGS.has(page.slug)) continue;
     items.push({
       id: `wiki-${page.slug}`,
@@ -108,6 +120,7 @@ export function buildGridSections(
   const wikiPages = manifest.pages.filter(
     (p) => mode === "dev" || COMPANY_WIKI_SLUGS.has(p.slug),
   );
+  const hasUseCases = wikiPages.some((p) => p.slug === "use-cases");
 
   const sections: GridSection[] = [
     {
@@ -125,35 +138,55 @@ export function buildGridSections(
     },
   ];
 
+  if (hasUseCases) {
+    sections.push({
+      id: "customers",
+      title: mode === "company" ? "Användningsområden & kunder" : "Kunder & segment (prioriterat)",
+      items: [
+        {
+          id: "wiki-use-cases",
+          label: mode === "company" ? "Kunder & segment" : "Användningsfall & kunder",
+          sublabel: "Bygg, brand, försäkring, DHH, m.fl.",
+          slug: "use-cases",
+          kind: "topic" as const,
+        },
+      ],
+    });
+  }
+
   if (mode === "company") {
     const hasCompetitors = wikiPages.some((p) => p.slug === "competitors");
-    const marketItems = [
+    const hasPartnerships = wikiPages.some((p) => p.slug === "partnerships");
+
+    const ecosystemItems = [
+      ...(hasPartnerships
+        ? [
+            {
+              id: "wiki-partnerships",
+              label: "Partnerskap",
+              sublabel: "Partner vs konkurrent",
+              slug: "partnerships",
+              kind: "topic" as const,
+            },
+          ]
+        : []),
       ...(hasCompetitors
         ? [
             {
               id: "wiki-competitors",
               label: "Konkurrenter & jämförelser",
-              sublabel: "FLIR, Ekahau, nami, liknande projekt",
+              sublabel: "FLIR, Ekahau, nami — uppdateras när segment växer",
               slug: "competitors",
               kind: "topic" as const,
             },
           ]
         : []),
-      ...wikiPages
-        .filter((p) => p.slug === "partnerships" || p.slug === "use-cases")
-        .map((p) => ({
-          id: `wiki-${p.slug}`,
-          label: p.title,
-          sublabel: p.slug === "partnerships" ? "Partner vs konkurrent" : "Segment & kunder",
-          slug: p.slug,
-          kind: "topic" as const,
-        })),
     ];
-    if (marketItems.length > 0) {
+    if (ecosystemItems.length > 0) {
       sections.push({
-        id: "market",
-        title: "Marknad & konkurrens",
-        items: marketItems,
+        id: "ecosystem",
+        title: "Marknad & ekosystem",
+        items: ecosystemItems,
       });
     }
   }
@@ -162,7 +195,7 @@ export function buildGridSections(
     id: "wiki",
     title: mode === "company" ? "Mer wiki" : "Wiki & idéer",
     items: wikiPages
-      .filter((p) => mode === "dev" || !["competitors", "partnerships", "use-cases"].includes(p.slug))
+      .filter((p) => !["competitors", "partnerships", "use-cases"].includes(p.slug))
       .map((p) => ({
         id: `wiki-${p.slug}`,
         label: p.title,
