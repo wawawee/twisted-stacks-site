@@ -98,7 +98,7 @@ Vercel env:
 
 ```bash
 SUPARAYS_ROOM_PASSWORD=baha123   # team shared password
-GITHUB_TOKEN_WAWAWEE=...         # idébox → wiki/IDEAS.md auto-sync (repo write)
+GITHUB_TOKEN_WAWAWEE=...         # idébox/chat → wiki sync + Vercel build wiki pull (needs repo read)
 # SUPARAYS_ROOM_SECRET=...       # optional HMAC override
 ```
 
