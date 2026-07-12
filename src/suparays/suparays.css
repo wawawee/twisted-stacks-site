@@ -57,6 +57,82 @@
   font-size: 0.75rem;
 }
 
+.room-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: 2rem;
+}
+
+.room-login-card {
+  width: min(400px, 100%);
+  border: 3px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+}
+
+.room-login-card h1 {
+  margin: 0 0 0.35rem;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.room-login-lede {
+  margin: 0 0 1.25rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.room-login-field {
+  margin-bottom: 0.85rem;
+}
+
+.room-login-field label {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.room-login-field input,
+.room-login-field select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  color: var(--fg);
+  padding: 0.55rem 0.65rem;
+  font: inherit;
+}
+
+.room-login-submit {
+  appearance: none;
+  width: 100%;
+  margin-top: 0.35rem;
+  border: 2px solid var(--border);
+  background: var(--accent);
+  color: #000;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.55rem 0.75rem;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--border);
+}
+
+.room-login-submit:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 .room-layout {
   display: flex;
   height: 100%;
@@ -236,6 +312,11 @@
 .room-btn:active {
   transform: translate(1px, 1px);
   box-shadow: none;
+}
+
+.room-btn-muted {
+  background: var(--bg);
+  color: var(--muted);
 }
 
 /* --- Main grid --- */

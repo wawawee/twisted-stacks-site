@@ -5,7 +5,7 @@ import {
   requireSession,
   type VercelRequest,
   type VercelResponse,
-} from "./_session";
+} from "./session.js";
 
 const WIKI_ROOT = path.join(process.cwd(), "suparays-wiki");
 const ALLOWED = /^(IDEAS\.md|TASKLIST\.md|HISTORY\.md|by-topic\/[a-zA-Z0-9_-]+\.md)$/;

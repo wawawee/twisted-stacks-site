@@ -6,7 +6,7 @@ import {
   requireSession,
   type VercelRequest,
   type VercelResponse,
-} from "./_session";
+} from "./session.js";
 
 const TABLE = "suparays_messages";
 const VALID_MEMBERS = new Set(["baha", "kris", "joachim", "per"]);

@@ -16,6 +16,97 @@ import "./suparays.css";
 
 const SKIP_AUTH = import.meta.env.DEV;
 
+const MEMBERS = [
+  { id: "baha", label: "Baha" },
+  { id: "kris", label: "Kris" },
+  { id: "joachim", label: "Joachim" },
+  { id: "per", label: "Per" },
+] as const;
+
+interface AuthState {
+  authenticated: boolean;
+  member: string | null;
+}
+
+function LoginPanel({ onSuccess }: { onSuccess: (member: string) => void }) {
+  const [password, setPassword] = useState("");
+  const [member, setMember] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const { isDark } = useTheme();
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setBusy(true);
+    try {
+      const res = await fetch("/api/suparays/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password, member }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Inloggning misslyckades");
+        return;
+      }
+      onSuccess(data.member);
+    } catch {
+      setError("Kunde inte nå servern");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className={`suparays-root${isDark ? " theme-dark" : ""}`}>
+      <div className="room-login">
+        <form className="room-login-card" onSubmit={submit}>
+          <h1>SUPARAYS</h1>
+          <p className="room-login-lede">
+            Projektrum för teamet — wiki, progress och samarbete.
+          </p>
+
+          <div className="room-login-field">
+            <label htmlFor="suparays-member">Vem är du?</label>
+            <select
+              id="suparays-member"
+              value={member}
+              onChange={(e) => setMember(e.target.value)}
+              required
+            >
+              <option value="">Välj namn…</option>
+              {MEMBERS.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="room-login-field">
+            <label htmlFor="suparays-password">Lösenord</label>
+            <input
+              id="suparays-password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              required
+            />
+          </div>
+
+          {error ? <p className="room-error">{error}</p> : null}
+
+          <button type="submit" className="room-login-submit" disabled={busy}>
+            {busy ? "Loggar in…" : "Gå in"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 interface ProjectPayload {
   manifest: {
     syncedAt: string;
@@ -46,6 +137,7 @@ interface Selection {
 }
 
 export default function SuparaysRoom() {
+  const [auth, setAuth] = useState<AuthState | null>(SKIP_AUTH ? { authenticated: true, member: "per" } : null);
   const [project, setProject] = useState<ProjectPayload | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("company");
   const [selection, setSelection] = useState<Selection | null>(null);
@@ -76,6 +168,27 @@ export default function SuparaysRoom() {
   }, []);
 
   useEffect(() => {
+    if (SKIP_AUTH) {
+      setBooting(false);
+      return;
+    }
+    fetch("/api/suparays/auth")
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Auth check failed");
+        setAuth({ authenticated: data.authenticated, member: data.member });
+      })
+      .catch((err: Error) => setError(err.message))
+      .finally(() => setBooting(false));
+  }, []);
+
+  useEffect(() => {
+    if (!auth?.authenticated) return;
+    loadProject()
+      .catch((err: Error) => setError(err.message));
+  }, [auth?.authenticated, loadProject]);
+
+  useEffect(() => {
     document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
     return () => {
@@ -84,11 +197,13 @@ export default function SuparaysRoom() {
     };
   }, []);
 
-  useEffect(() => {
-    loadProject()
-      .catch((err: Error) => setError(err.message))
-      .finally(() => setBooting(false));
-  }, [loadProject]);
+  async function logout() {
+    await fetch("/api/suparays/auth", { method: "DELETE" });
+    setAuth({ authenticated: false, member: null });
+    setProject(null);
+    setSelection(null);
+    setActiveId(null);
+  }
 
   useEffect(() => {
     setSelection(null);
@@ -154,9 +269,22 @@ export default function SuparaysRoom() {
     );
   }
 
+  if (!SKIP_AUTH && auth && !auth.authenticated) {
+    return (
+      <LoginPanel
+        onSuccess={(member) => {
+          setAuth({ authenticated: true, member });
+          setError("");
+        }}
+      />
+    );
+  }
+
+  const memberId = SKIP_AUTH ? "per" : auth?.member ?? null;
+
   const panelContent =
     selection?.slug === "chat" ? (
-      <ChatPanel memberId={SKIP_AUTH ? "per" : null} />
+      <ChatPanel memberId={memberId} />
     ) : selection?.slug === "files" ? (
       <FilesPanel />
     ) : (
@@ -185,6 +313,7 @@ export default function SuparaysRoom() {
           onSelect={handleMenuSelect}
           onToggleView={() => setViewMode((m) => (m === "dev" ? "company" : "dev"))}
           onRefresh={loadProject}
+          onLogout={SKIP_AUTH ? undefined : logout}
           syncedAt={project?.manifest.syncedAt || null}
         />
 

@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-import { requireSession, type VercelRequest, type VercelResponse } from "./_session";
+import { requireSession, type VercelRequest, type VercelResponse } from "./session.js";
 
 const ROOT = path.join(process.cwd(), "suparays-wiki");
 

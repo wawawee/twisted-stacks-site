@@ -10,6 +10,7 @@ interface SideMenuProps {
   onSelect: (item: MenuItem) => void;
   onToggleView: () => void;
   onRefresh: () => void;
+  onLogout?: () => void;
   syncedAt: string | null;
 }
 
@@ -22,6 +23,7 @@ export default function SideMenu({
   onSelect,
   onToggleView,
   onRefresh,
+  onLogout,
   syncedAt,
 }: SideMenuProps) {
   const sections = [
@@ -88,6 +90,11 @@ export default function SideMenu({
         <button type="button" className="room-btn" onClick={onRefresh}>
           Synka
         </button>
+        {onLogout ? (
+          <button type="button" className="room-btn room-btn-muted" onClick={onLogout}>
+            Logga ut
+          </button>
+        ) : null}
       </div>
     </aside>
   );
