@@ -54,10 +54,44 @@ async function copyIfExists(srcRoot, rel) {
   return rel;
 }
 
-async function fetchRaw(repoPath) {
+function githubToken() {
+  return process.env.GITHUB_TOKEN_WAWAWEE || process.env.GITHUB_TOKEN || process.env.GH_TOKEN || "";
+}
+
+function githubHeaders() {
+  const headers = {
+    Accept: "application/vnd.github+json",
+    "User-Agent": "suparays-sync",
+    "X-GitHub-Api-Version": "2022-11-28",
+  };
+  const token = githubToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
+}
+
+async function fetchRepoFile(repoPath) {
+  const token = githubToken();
+  if (token) {
+    const url = `https://api.github.com/repos/${GITHUB.owner}/${GITHUB.repo}/contents/${repoPath}?ref=${GITHUB.branch}`;
+    const res = await fetch(url, { headers: githubHeaders() });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.content && data.encoding === "base64") {
+        return Buffer.from(data.content, "base64").toString("utf8");
+      }
+    }
+    if (res.status !== 404) {
+      throw new Error(`${repoPath}: GitHub API ${res.status}`);
+    }
+  }
+
   const url = `https://raw.githubusercontent.com/${GITHUB.owner}/${GITHUB.repo}/${GITHUB.branch}/${repoPath}`;
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`${repoPath}: ${res.status}`);
+  if (!res.ok) {
+    throw new Error(
+      `${repoPath}: ${res.status}${token ? "" : " (private repo? set GITHUB_TOKEN_WAWAWEE for Vercel build)"}`,
+    );
+  }
   return res.text();
 }
 
@@ -65,7 +99,7 @@ async function syncWiki(repoRoot, fromGitHub) {
   const copied = [];
   for (const rel of ["README.md", "IDEAS.md", "COLLAB-CHAT.md"]) {
     const c = fromGitHub
-      ? await writeFile(rel, await fetchRaw(`wiki/${rel}`)).catch(() => null)
+      ? await writeFile(rel, await fetchRepoFile(`wiki/${rel}`)).catch(() => null)
       : await copyIfExists(path.join(repoRoot, "wiki"), rel);
     if (c) copied.push(c);
   }
@@ -75,8 +109,10 @@ async function syncWiki(repoRoot, fromGitHub) {
   if (topicDir && (await pathExists(topicDir))) {
     topicNames = (await fs.readdir(topicDir)).filter((n) => n.endsWith(".md") && n !== "README.md");
   } else if (fromGitHub) {
-    const url = `https://api.github.com/repos/${GITHUB.owner}/${GITHUB.repo}/contents/wiki/by-topic?ref=${GITHUB.branch}`;
-    const res = await fetch(url, { headers: { Accept: "application/vnd.github+json", "User-Agent": "suparays-sync" } });
+    const res = await fetch(
+      `https://api.github.com/repos/${GITHUB.owner}/${GITHUB.repo}/contents/wiki/by-topic?ref=${GITHUB.branch}`,
+      { headers: githubHeaders() },
+    );
     if (res.ok) {
       topicNames = (await res.json())
         .filter((i) => i.type === "file" && i.name.endsWith(".md") && i.name !== "README.md")
@@ -87,7 +123,7 @@ async function syncWiki(repoRoot, fromGitHub) {
   for (const name of topicNames) {
     const rel = `by-topic/${name}`;
     if (fromGitHub) {
-      await writeFile(rel, await fetchRaw(`wiki/${rel}`));
+      await writeFile(rel, await fetchRepoFile(`wiki/${rel}`));
     } else {
       await copyIfExists(path.join(repoRoot, "wiki"), rel);
     }
@@ -152,8 +188,8 @@ async function main() {
   let tasklistMd;
   let historyMd;
   if (fromGitHub) {
-    tasklistMd = await fetchRaw("TASKLIST.md");
-    historyMd = await fetchRaw("docs/HISTORY.md");
+    tasklistMd = await fetchRepoFile("TASKLIST.md");
+    historyMd = await fetchRepoFile("docs/HISTORY.md");
   } else {
     tasklistMd = await fs.readFile(path.join(repoRoot, "TASKLIST.md"), "utf8");
     historyMd = await fs.readFile(path.join(repoRoot, "docs/HISTORY.md"), "utf8");
