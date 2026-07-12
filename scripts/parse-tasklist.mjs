@@ -32,10 +32,34 @@ function priorityFromHeading(heading) {
   return "other";
 }
 
+export function parseFocusQueue(md) {
+  const block = md.split("## Current focus")[1]?.split(/^## /m)[0] || "";
+  const line = block.match(/\*\*Focus queue[^*]*\*\*[:\s]*(.+)/i)?.[1] || "";
+  const seen = new Set();
+  const ids = [];
+  for (const match of line.matchAll(/T-\d+/g)) {
+    if (!seen.has(match[0])) {
+      seen.add(match[0]);
+      ids.push(match[0]);
+    }
+  }
+  return ids;
+}
+
+export function openFocusTasks(tasks, focusQueue) {
+  const open = tasks.filter((t) => !t.done);
+  if (focusQueue.length === 0) {
+    return open.filter((t) => t.priority === "P0");
+  }
+  const byId = new Map(open.map((t) => [t.id, t]));
+  return focusQueue.map((id) => byId.get(id)).filter(Boolean);
+}
+
 export function parseTasklist(md) {
   const lastUpdated = md.match(/\*\*Last updated:\*\*\s*(.+)/)?.[1]?.trim() || null;
   const focusBlock = md.match(/## Current focus[^]*?\n>\s*\*\*([^*]+)\*\*/);
   const currentFocus = focusBlock?.[1]?.trim() || "";
+  const focusQueue = parseFocusQueue(md);
 
   const tasks = [];
   const sectionParts = md.split(/^### /m).slice(1);
@@ -101,9 +125,13 @@ export function parseTasklist(md) {
     p1Open: tasks.filter((t) => t.priority === "P1" && !t.done).length,
   };
 
+  const focusTasks = openFocusTasks(tasks, focusQueue);
+
   return {
     lastUpdated,
     currentFocus,
+    focusQueue,
+    focusTasks,
     tasks,
     gates,
     activity,
@@ -197,7 +225,7 @@ export function buildGraph(manifestPages, tasklist, history) {
     edges.push({ from: "core", to: `wiki-${page.slug}` });
   }
 
-  for (const task of tasklist.tasks.filter((t) => !t.done && t.priority === "P0").slice(0, 6)) {
+  for (const task of tasklist.focusTasks.slice(0, 8)) {
     nodes.push({
       id: task.id,
       kind: "task-p0",

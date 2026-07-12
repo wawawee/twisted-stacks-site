@@ -13,6 +13,8 @@ interface Task {
 
 interface TasklistData {
   currentFocus: string;
+  focusQueue?: string[];
+  focusTasks?: Task[];
   lastUpdated: string | null;
   tasks: Task[];
   gates: Array<{ id: string; requirement: string; done: boolean }>;
@@ -153,8 +155,16 @@ export default function DetailPanel({
       {!loading && slug === "tasklist-focus" && tasklist ? (
         <div className="detail-scroll">
           <blockquote className="focus-quote">{tasklist.currentFocus}</blockquote>
-          <h3>Öppna P0 ({tasklist.stats.p0Open})</h3>
-          <TaskTable tasks={tasklist.tasks.filter((t) => t.priority === "P0" && !t.done)} />
+          <h3>
+            Prioriterad kö (
+            {(tasklist.focusTasks ?? tasklist.tasks.filter((t) => t.priority === "P0" && !t.done)).length})
+          </h3>
+          <TaskTable
+            tasks={
+              tasklist.focusTasks ??
+              tasklist.tasks.filter((t) => t.priority === "P0" && !t.done)
+            }
+          />
         </div>
       ) : null}
 

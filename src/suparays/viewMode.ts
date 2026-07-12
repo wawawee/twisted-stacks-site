@@ -153,7 +153,7 @@ export function buildGridSections(
     if (p0.length > 0) {
       sections.push({
         id: "p0",
-        title: "P0 — öppna",
+        title: "Focus-kö",
         items: p0.map((n) => ({
           id: n.id,
           label: n.label,
