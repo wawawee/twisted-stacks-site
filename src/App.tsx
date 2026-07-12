@@ -494,9 +494,7 @@ export default function App() {
     };
   }, []);
 
-  // Dynamic document.title for SEO + share preview: reflect the active
-  // project OR the active language dictionary. The <html lang> attribute
-  // is owned by LanguageProvider (it tracks the language toggle).
+  // Dynamic document.title for SEO + share preview: reflect the active project.
   useEffect(() => {
     if (typeof document === "undefined") return;
     const project = CATALOG_PROJECTS.find((p) => p.id === selectedProjectId);
@@ -3919,17 +3917,6 @@ export default function App() {
       {!showGame && (
         <main className="showroom-shell pointer-events-auto">
           <div className="ts-mesh" aria-hidden="true" />
-
-          <header className="showroom-topbar">
-            {/* Topbar intentionally minimal — the TWISTEDSTACKS wordmark
-                lives in the hero kicker directly below, so showing it
-                twice would be cake-on-cake. */}
-            <nav className="showroom-topbar-actions">
-              <span className="showroom-lang-toggle" aria-hidden="true">
-                EN
-              </span>
-            </nav>
-          </header>
 
           {route.kind === "project" ? (
             (() => {

@@ -1498,51 +1498,6 @@ body {
 }
 
 /* ----------------------------------------------------------------------------
-   Topbar (language toggle only) — sits above the showroom hero and stays
-   sticky on the project page so the lang switch is always reachable.
-   The TWISTEDSTACKS wordmark lives in the hero kicker; we deliberately
-   don't repeat it here.
-   --------------------------------------------------------------------------- */
-
-.showroom-topbar {
-  /* Plain flow element — no sticky, no backdrop-blur. The previous sticky
-     + blur caused the topbar to "flow over" project pages and made scroll
-     feel janky on subsequent routes. The language toggle doesn't need a
-     permanent header chrome. */
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 14px;
-  padding: 6px 0 18px;
-  margin-bottom: 10px;
-}
-.showroom-topbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.showroom-lang-toggle {
-  display: inline-grid;
-  place-items: center;
-  min-width: 44px;
-  height: 30px;
-  padding: 0 10px;
-  border: 1px solid var(--stroke);
-  background: rgba(26, 14, 12, 0.7);
-  color: var(--pearl);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.32em;
-  cursor: pointer;
-  transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
-}
-.showroom-lang-toggle:hover {
-  border-color: var(--pearl);
-  color: var(--accent);
-  background: rgba(67, 43, 37, 0.78);
-}
-
-/* ----------------------------------------------------------------------------
    Dedicated project presentation page (route: #/projects/<id>)
    Bigger title, vertical layout, reads like a long-form page rather than
    a card. Reuses .showroom-project-detail-* primitives where possible so
