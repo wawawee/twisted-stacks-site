@@ -236,7 +236,7 @@ export default function SuparaysRoom() {
     const slug = selection.slug;
     if (
       slug === "chat" ||
-      slug === "ideas" ||
+      slug === "ideabox" ||
       slug === "files" ||
       ["tasklist", "tasklist-focus", "activity", "history", "progress-summary"].includes(slug) ||
       slug.startsWith("task-")
@@ -304,7 +304,7 @@ export default function SuparaysRoom() {
   const panelContent =
     selection?.slug === "chat" ? (
       <ChatPanel memberId={memberId} />
-    ) : selection?.slug === "ideas" ? (
+    ) : selection?.slug === "ideabox" ? (
       <IdeasPanel memberId={memberId} />
     ) : selection?.slug === "files" ? (
       <FilesPanel />

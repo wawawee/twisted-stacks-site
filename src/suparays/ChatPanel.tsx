@@ -75,6 +75,9 @@ export default function ChatPanel({ memberId }: { memberId: string | null }) {
       const msg = data.message as ChatMessage;
       setMessages((prev) => (prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]));
       setDraft("");
+      if (data.wiki && !data.wiki.synced && data.wiki.reason && !data.wiki.skipped) {
+        setError(`Sparat i chat (#${msg.id}), men wiki-sync misslyckades: ${data.wiki.reason}`);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Kunde inte skicka");
     } finally {
@@ -86,7 +89,7 @@ export default function ChatPanel({ memberId }: { memberId: string | null }) {
     <div className="suparays-chat">
       <header className="suparays-chat-header">
         <h2>Chat</h2>
-        <p>Gemensam tråd — korta förslag och frågor om projektet.</p>
+        <p>Gemensam tråd — investerare, teknik, design och dev. Synkas till wiki/COLLAB-CHAT.md.</p>
       </header>
 
       <div className="suparays-chat-feed" ref={scrollRef} aria-live="polite">

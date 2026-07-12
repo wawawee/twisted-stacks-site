@@ -8,7 +8,7 @@ import {
 } from "./session.js";
 
 const WIKI_ROOT = path.join(process.cwd(), "suparays-wiki");
-const ALLOWED = /^(IDEAS\.md|TASKLIST\.md|HISTORY\.md|by-topic\/[a-zA-Z0-9_-]+\.md)$/;
+const ALLOWED = /^(IDEAS\.md|COLLAB-CHAT\.md|TASKLIST\.md|HISTORY\.md|by-topic\/[a-zA-Z0-9_-]+\.md)$/;
 
 interface WikiPage {
   id: string;
@@ -48,6 +48,7 @@ function resolvePagePath(entry: { path?: string; slug?: string } | undefined, pa
     tasklist: "TASKLIST.md",
     history: "HISTORY.md",
     ideas: "IDEAS.md",
+    "collab-chat": "COLLAB-CHAT.md",
   };
   if (slugMap[pagePath]) return slugMap[pagePath];
   if (pagePath && !pagePath.includes("/") && !pagePath.endsWith(".md")) {

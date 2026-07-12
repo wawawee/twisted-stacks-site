@@ -2,6 +2,7 @@ export type ViewMode = "dev" | "company";
 
 /** Wiki topics visible in company / external view */
 export const COMPANY_WIKI_SLUGS = new Set([
+  "collab-chat",
   "competitors",
   "ideas",
   "sensors",
@@ -74,8 +75,8 @@ export function buildMenuItems(
   }
 
   items.push(
-    { id: "chat", label: "Chat", slug: "chat", kind: "tool", section: "tools", devOnly: true },
-    { id: "ideas", label: "Idébox", slug: "ideas", kind: "tool", section: "tools" },
+    { id: "chat", label: "Chat", slug: "chat", kind: "tool", section: "tools" },
+    { id: "ideabox", label: "Idébox", slug: "ideabox", kind: "tool", section: "tools" },
     { id: "files", label: "Filer", slug: "files", kind: "tool", section: "tools", devOnly: true },
   );
 
@@ -225,8 +226,8 @@ export function buildGridSections(
     id: "tools",
     title: "Verktyg",
     items: [
-      ...(mode === "dev" ? [{ id: "chat", label: "Chat", slug: "chat", kind: "tool" as const }] : []),
-      { id: "ideas", label: "Idébox", slug: "ideas", kind: "tool" as const },
+      { id: "chat", label: "Chat", slug: "chat", kind: "tool" as const },
+      { id: "ideabox", label: "Idébox", slug: "ideabox", kind: "tool" as const },
       ...(mode === "dev"
         ? [{ id: "files", label: "Delade filer", slug: "files", kind: "tool" as const }]
         : []),

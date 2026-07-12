@@ -63,7 +63,7 @@ async function fetchRaw(repoPath) {
 
 async function syncWiki(repoRoot, fromGitHub) {
   const copied = [];
-  for (const rel of ["README.md", "IDEAS.md"]) {
+  for (const rel of ["README.md", "IDEAS.md", "COLLAB-CHAT.md"]) {
     const c = fromGitHub
       ? await writeFile(rel, await fetchRaw(`wiki/${rel}`)).catch(() => null)
       : await copyIfExists(path.join(repoRoot, "wiki"), rel);
@@ -108,6 +108,17 @@ function buildPages(copied) {
       path: "IDEAS.md",
       category: "ideas",
       icon: "💡",
+    });
+  }
+  if (copied.includes("COLLAB-CHAT.md")) {
+    pages.push({
+      id: "collab-chat",
+      slug: "collab-chat",
+      title: "Colab chat (logg)",
+      description: "Teamchat synkad från colab-rummet",
+      path: "COLLAB-CHAT.md",
+      category: "progress",
+      icon: "💬",
     });
   }
   for (const rel of copied) {
