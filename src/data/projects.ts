@@ -78,6 +78,9 @@ export interface ProjectEntry {
   href: string | null;
   /** CTA button label. */
   ctaLabel: string;
+  /** Optional second CTA — e.g. password-protected team room. */
+  collabHref?: string | null;
+  collabLabel?: string;
   /** Accent to highlight the card with (for sensor-themed projects). */
   brandColor: SensorAccent;
   /** True for the 5-6 hero projects; controls ordering. */
@@ -462,6 +465,8 @@ export const PROJECTS: ProjectEntry[] = [
     ],
     href: "/vr-superpowers",
     ctaLabel: "Visualize",
+    collabHref: "/suparays",
+    collabLabel: "Collab space",
     brandColor: "rf",
     featured: true,
     keywords: [

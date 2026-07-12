@@ -19,6 +19,8 @@ type LocalizableProject = {
   status: string;
   href?: string | null;
   ctaLabel?: string;
+  collabHref?: string | null;
+  collabLabel?: string;
   brandColor?: ProjectEntry["brandColor"];
   featured?: boolean;
   lastUpdated?: string;
@@ -39,6 +41,8 @@ export interface LocalizedProject {
   status: string;
   href: string | null;
   ctaLabel: string;
+  collabHref: string | null;
+  collabLabel: string | null;
   brandColor: ProjectEntry["brandColor"];
   featured: boolean;
   lastUpdated: string;
@@ -73,6 +77,8 @@ export function localizeProject(
     status: p.status,
     href: p.href ?? null,
     ctaLabel: p.ctaLabel ?? "Open",
+    collabHref: p.collabHref ?? null,
+    collabLabel: p.collabLabel ?? null,
     brandColor: p.brandColor ?? "accent",
     featured: p.featured ?? false,
     lastUpdated: p.lastUpdated ?? "",

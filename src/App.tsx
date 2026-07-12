@@ -4025,6 +4025,11 @@ export default function App() {
                         </a>
                       )
                     ) : null}
+                    {loc.collabHref ? (
+                      <a className="showroom-action" href={loc.collabHref}>
+                        {loc.collabLabel ?? "Collab space"} →
+                      </a>
+                    ) : null}
                     {loc.contactMessage ? (
                       <button
                         type="button"
