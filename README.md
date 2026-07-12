@@ -104,7 +104,8 @@ Auto-update: push to `VR-SuperPowers` `wiki/**` on `main` triggers a Vercel
 deploy hook (see `.github/workflows/sync-wiki-room.yml` in that repo). Set
 secret `VERCEL_DEPLOY_HOOK_URL` on the VR-SuperPowers GitHub repo.
 
-Local full stack (API routes): `npx vercel dev` after `npm run sync:wiki`.
+Local full stack (API routes): `npm run dev:suparays` → http://localhost:3010/suparays  
+See [docs/suparays-local-dev.md](./docs/suparays-local-dev.md). Plain `npm run dev` (port 3000) does **not** serve `/api/suparays/*`.
 
 ## Deploy (Vercel)
 

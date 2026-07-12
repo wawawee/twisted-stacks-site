@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
+    "dev:suparays": "bash scripts/dev-suparays.sh",
     "sync:wiki": "node scripts/sync-suparays-wiki.mjs",
     "build": "npm run sync:wiki && vite build",
     "preview": "vite preview",

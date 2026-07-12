@@ -1,26 +1,18 @@
 #!/usr/bin/env node
 /**
- * Sync SUPARAYS team wiki (wiki/ only — ideas + by-topic) into suparays-wiki/
- * for the password-protected room on twistedstacks.com/suparays.
- *
- * Sources (first match wins):
- *   1. SUPARAYS_WIKI_LOCAL env or ../VR-SuperPowers/wiki
- *   2. GitHub raw (wawawee/VR-SuperPowers@main)
+ * Sync SUPARAYS project surface: wiki/, TASKLIST.md, HISTORY.md → suparays-wiki/
  */
 
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { buildGraph, parseHistory, parseTasklist } from "./parse-tasklist.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const OUT_DIR = path.join(ROOT, "suparays-wiki");
 
-const GITHUB = {
-  owner: "wawawee",
-  repo: "VR-SuperPowers",
-  branch: "main",
-};
+const GITHUB = { owner: "wawawee", repo: "VR-SuperPowers", branch: "main" };
 
 const TOPIC_LABELS = {
   sensors: "Sensorer & hårdvara",
@@ -32,6 +24,12 @@ const TOPIC_LABELS = {
   misc: "Övrigt",
 };
 
+function localRepoRoot() {
+  const fromEnv = process.env.SUPARAYS_REPO_LOCAL?.trim();
+  if (fromEnv) return path.resolve(fromEnv);
+  return path.resolve(ROOT, "../VR-SuperPowers");
+}
+
 async function pathExists(p) {
   try {
     await fs.access(p);
@@ -41,102 +39,76 @@ async function pathExists(p) {
   }
 }
 
-function localWikiRoot() {
-  const fromEnv = process.env.SUPARAYS_WIKI_LOCAL?.trim();
-  if (fromEnv) return path.resolve(fromEnv);
-  return path.resolve(ROOT, "../VR-SuperPowers/wiki");
-}
-
-async function copyLocalFile(srcRoot, rel, destRoot) {
-  const src = path.join(srcRoot, rel);
-  const dest = path.join(destRoot, rel);
-  await fs.mkdir(path.dirname(dest), { recursive: true });
-  await fs.copyFile(src, dest);
-  return rel;
-}
-
-async function syncFromLocal(srcRoot) {
-  const copied = [];
-  for (const rel of ["README.md", "IDEAS.md"]) {
-    if (await pathExists(path.join(srcRoot, rel))) {
-      copied.push(await copyLocalFile(srcRoot, rel, OUT_DIR));
-    }
-  }
-
-  const topicDir = path.join(srcRoot, "by-topic");
-  if (await pathExists(topicDir)) {
-    const entries = await fs.readdir(topicDir);
-    for (const name of entries) {
-      if (!name.endsWith(".md") || name === "README.md") continue;
-      copied.push(await copyLocalFile(srcRoot, path.join("by-topic", name), OUT_DIR));
-    }
-  }
-
-  return copied;
-}
-
-async function fetchRaw(rel) {
-  const url = `https://raw.githubusercontent.com/${GITHUB.owner}/${GITHUB.repo}/${GITHUB.branch}/wiki/${rel}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`GitHub raw ${rel}: ${res.status}`);
-  return res.text();
-}
-
-async function writeRemote(rel, content) {
+async function writeFile(rel, content) {
   const dest = path.join(OUT_DIR, rel);
   await fs.mkdir(path.dirname(dest), { recursive: true });
   await fs.writeFile(dest, content, "utf8");
   return rel;
 }
 
-async function listRemoteTopicFiles() {
-  const url = `https://api.github.com/repos/${GITHUB.owner}/${GITHUB.repo}/contents/wiki/by-topic?ref=${GITHUB.branch}`;
-  const res = await fetch(url, {
-    headers: { Accept: "application/vnd.github+json", "User-Agent": "twisted-stacks-wiki-sync" },
-  });
-  if (!res.ok) throw new Error(`GitHub API by-topic: ${res.status}`);
-  const items = await res.json();
-  return items
-    .filter((item) => item.type === "file" && item.name.endsWith(".md") && item.name !== "README.md")
-    .map((item) => item.name);
+async function copyIfExists(srcRoot, rel) {
+  const src = path.join(srcRoot, rel);
+  if (!(await pathExists(src))) return null;
+  await writeFile(rel, await fs.readFile(src, "utf8"));
+  return rel;
 }
 
-async function syncFromGitHub() {
+async function fetchRaw(repoPath) {
+  const url = `https://raw.githubusercontent.com/${GITHUB.owner}/${GITHUB.repo}/${GITHUB.branch}/${repoPath}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`${repoPath}: ${res.status}`);
+  return res.text();
+}
+
+async function syncWiki(repoRoot, fromGitHub) {
   const copied = [];
   for (const rel of ["README.md", "IDEAS.md"]) {
-    try {
-      const content = await fetchRaw(rel);
-      copied.push(await writeRemote(rel, content));
-    } catch (err) {
-      console.warn(`  skip ${rel}:`, err.message);
+    const c = fromGitHub
+      ? await writeFile(rel, await fetchRaw(`wiki/${rel}`)).catch(() => null)
+      : await copyIfExists(path.join(repoRoot, "wiki"), rel);
+    if (c) copied.push(c);
+  }
+
+  const topicDir = fromGitHub ? null : path.join(repoRoot, "wiki/by-topic");
+  let topicNames = [];
+  if (topicDir && (await pathExists(topicDir))) {
+    topicNames = (await fs.readdir(topicDir)).filter((n) => n.endsWith(".md") && n !== "README.md");
+  } else if (fromGitHub) {
+    const url = `https://api.github.com/repos/${GITHUB.owner}/${GITHUB.repo}/contents/wiki/by-topic?ref=${GITHUB.branch}`;
+    const res = await fetch(url, { headers: { Accept: "application/vnd.github+json", "User-Agent": "suparays-sync" } });
+    if (res.ok) {
+      topicNames = (await res.json())
+        .filter((i) => i.type === "file" && i.name.endsWith(".md") && i.name !== "README.md")
+        .map((i) => i.name);
     }
   }
 
-  const topicNames = await listRemoteTopicFiles();
   for (const name of topicNames) {
     const rel = `by-topic/${name}`;
-    const content = await fetchRaw(rel);
-    copied.push(await writeRemote(rel, content));
+    if (fromGitHub) {
+      await writeFile(rel, await fetchRaw(`wiki/${rel}`));
+    } else {
+      await copyIfExists(path.join(repoRoot, "wiki"), rel);
+    }
+    copied.push(rel);
   }
 
   return copied;
 }
 
-function buildManifest(copied) {
+function buildPages(copied) {
   const pages = [];
-
   if (copied.includes("IDEAS.md")) {
     pages.push({
       id: "ideas",
       slug: "ideas",
       title: "Idéer & förslag",
-      description: "Drop zone — nya idéer och förslag till projektet",
+      description: "Drop zone — nya idéer och förslag",
       path: "IDEAS.md",
       category: "ideas",
       icon: "💡",
     });
   }
-
   for (const rel of copied) {
     if (!rel.startsWith("by-topic/") || !rel.endsWith(".md")) continue;
     const base = rel.replace("by-topic/", "").replace(/\.md$/, "");
@@ -150,38 +122,52 @@ function buildManifest(copied) {
       icon: "◈",
     });
   }
-
-  return {
-    syncedAt: new Date().toISOString(),
-    source: "wawawee/VR-SuperPowers/wiki",
-    pages,
-  };
+  return pages;
 }
 
 async function main() {
   await fs.rm(OUT_DIR, { recursive: true, force: true });
   await fs.mkdir(OUT_DIR, { recursive: true });
 
-  const localRoot = localWikiRoot();
-  let copied;
-  let source;
+  const repoRoot = localRepoRoot();
+  const fromGitHub = !(await pathExists(repoRoot));
+  const source = fromGitHub ? `github:${GITHUB.owner}/${GITHUB.repo}` : repoRoot;
 
-  if (await pathExists(localRoot)) {
-    console.log(`Syncing wiki from local: ${localRoot}`);
-    copied = await syncFromLocal(localRoot);
-    source = localRoot;
+  console.log(fromGitHub ? `Fetching from GitHub ${GITHUB.owner}/${GITHUB.repo}` : `Syncing from ${repoRoot}`);
+
+  const wikiCopied = await syncWiki(repoRoot, fromGitHub);
+
+  let tasklistMd;
+  let historyMd;
+  if (fromGitHub) {
+    tasklistMd = await fetchRaw("TASKLIST.md");
+    historyMd = await fetchRaw("docs/HISTORY.md");
   } else {
-    console.log(`Local wiki not found — fetching from GitHub ${GITHUB.owner}/${GITHUB.repo}`);
-    copied = await syncFromGitHub();
-    source = `github:${GITHUB.owner}/${GITHUB.repo}@${GITHUB.branch}`;
+    tasklistMd = await fs.readFile(path.join(repoRoot, "TASKLIST.md"), "utf8");
+    historyMd = await fs.readFile(path.join(repoRoot, "docs/HISTORY.md"), "utf8");
   }
+  await writeFile("TASKLIST.md", tasklistMd);
+  await writeFile("HISTORY.md", historyMd);
 
-  const manifest = buildManifest(copied);
-  manifest.source = source;
-  await fs.writeFile(path.join(OUT_DIR, "manifest.json"), JSON.stringify(manifest, null, 2), "utf8");
+  const tasklist = parseTasklist(tasklistMd);
+  const history = parseHistory(historyMd);
+  const pages = buildPages(wikiCopied);
+  const graph = buildGraph(pages, tasklist, history);
 
-  console.log(`Synced ${copied.length} wiki files → ${OUT_DIR}`);
-  console.log(`Manifest: ${manifest.pages.length} pages`);
+  await writeFile("tasklist.json", JSON.stringify(tasklist, null, 2));
+  await writeFile("history.json", JSON.stringify(history, null, 2));
+
+  const manifest = {
+    syncedAt: new Date().toISOString(),
+    source,
+    currentFocus: tasklist.currentFocus,
+    stats: tasklist.stats,
+    pages,
+    graph,
+  };
+  await writeFile("manifest.json", JSON.stringify(manifest, null, 2));
+
+  console.log(`Synced wiki: ${wikiCopied.length} files, ${pages.length} pages, ${tasklist.tasks.length} tasks, ${history.milestones.length} milestones`);
 }
 
 main().catch((err) => {

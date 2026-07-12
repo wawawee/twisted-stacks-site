@@ -12,8 +12,15 @@ export default defineConfig(() => {
       },
     },
     server: {
+      host: true,
       hmr: process.env.DISABLE_HMR !== 'true',
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
+      proxy: {
+        '/api/suparays': {
+          target: 'http://127.0.0.1:3011',
+          changeOrigin: true,
+        },
+      },
     },
   };
 });

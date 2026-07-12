@@ -93,7 +93,13 @@ export function clearSessionCookie(res: VercelResponse) {
   res.setHeader("Set-Cookie", parts.join("; "));
 }
 
+export function devAuthSkipped() {
+  const v = readEnv("SUPARAYS_DEV_SKIP_AUTH");
+  return v === "1" || v === "true";
+}
+
 export function requireSession(req: VercelRequest, res: VercelResponse) {
+  if (devAuthSkipped()) return true;
   const token = getSessionFromRequest(req);
   if (!verifySessionToken(token)) {
     res.status(401).json({ error: "Unauthorized" });

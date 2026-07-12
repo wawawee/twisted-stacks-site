@@ -8,7 +8,7 @@ import {
 } from "./_session";
 
 const WIKI_ROOT = path.join(process.cwd(), "suparays-wiki");
-const ALLOWED = /^[a-zA-Z0-9/_-]+\.md$/;
+const ALLOWED = /^(IDEAS\.md|TASKLIST\.md|HISTORY\.md|by-topic\/[a-zA-Z0-9_-]+\.md)$/;
 
 interface WikiPage {
   id: string;
@@ -42,6 +42,16 @@ function safeWikiPath(rel: string) {
   return normalized;
 }
 
+function resolvePagePath(entry: { path?: string; slug?: string } | undefined, pagePath: string) {
+  if (entry?.path) return safeWikiPath(entry.path);
+  const slugMap: Record<string, string> = {
+    tasklist: "TASKLIST.md",
+    history: "HISTORY.md",
+  };
+  if (slugMap[pagePath]) return slugMap[pagePath];
+  return safeWikiPath(pagePath);
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Cache-Control", "private, no-store");
 
@@ -68,7 +78,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const entry = manifest.pages.find((p) => p.slug === pagePath || p.path === pagePath);
-  const rel = safeWikiPath(entry?.path || pagePath);
+  const rel = resolvePagePath(entry, pagePath);
   if (!rel) {
     res.status(400).json({ error: "Invalid page" });
     return;
