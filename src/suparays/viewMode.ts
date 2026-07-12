@@ -2,6 +2,7 @@ export type ViewMode = "dev" | "company";
 
 /** Wiki topics visible in company / external view */
 export const COMPANY_WIKI_SLUGS = new Set([
+  "competitors",
   "ideas",
   "sensors",
   "use-cases",
@@ -27,6 +28,21 @@ export function buildMenuItems(
   const items: MenuItem[] = [
     { id: "overview", label: "Översikt", slug: null, kind: "overview", section: "overview" },
     { id: "focus", label: "Nuvarande fokus", slug: "tasklist-focus", kind: "focus", section: "progress" },
+  ];
+
+  const hasCompetitors = wikiPages.some((p) => p.slug === "competitors");
+
+  if (mode === "company" && hasCompetitors) {
+    items.push({
+      id: "wiki-competitors",
+      label: "Konkurrenter",
+      slug: "competitors",
+      kind: "topic",
+      section: "wiki",
+    });
+  }
+
+  items.push(
     {
       id: "tasklist",
       label: mode === "company" ? "Framsteg" : "TASKLIST",
@@ -43,9 +59,10 @@ export function buildMenuItems(
       section: "progress",
       devOnly: true,
     },
-  ];
+  );
 
   for (const page of wikiPages) {
+    if (mode === "company" && page.slug === "competitors") continue;
     if (mode === "company" && !COMPANY_WIKI_SLUGS.has(page.slug)) continue;
     items.push({
       id: `wiki-${page.slug}`,
@@ -105,49 +122,86 @@ export function buildGridSections(
         },
       ],
     },
-    {
-      id: "wiki",
-      title: "Wiki & idéer",
-      items: wikiPages.map((p) => ({
+  ];
+
+  if (mode === "company") {
+    const hasCompetitors = wikiPages.some((p) => p.slug === "competitors");
+    const marketItems = [
+      ...(hasCompetitors
+        ? [
+            {
+              id: "wiki-competitors",
+              label: "Konkurrenter & jämförelser",
+              sublabel: "FLIR, Ekahau, nami, liknande projekt",
+              slug: "competitors",
+              kind: "topic" as const,
+            },
+          ]
+        : []),
+      ...wikiPages
+        .filter((p) => p.slug === "partnerships" || p.slug === "use-cases")
+        .map((p) => ({
+          id: `wiki-${p.slug}`,
+          label: p.title,
+          sublabel: p.slug === "partnerships" ? "Partner vs konkurrent" : "Segment & kunder",
+          slug: p.slug,
+          kind: "topic" as const,
+        })),
+    ];
+    if (marketItems.length > 0) {
+      sections.push({
+        id: "market",
+        title: "Marknad & konkurrens",
+        items: marketItems,
+      });
+    }
+  }
+
+  sections.push({
+    id: "wiki",
+    title: mode === "company" ? "Mer wiki" : "Wiki & idéer",
+    items: wikiPages
+      .filter((p) => mode === "dev" || !["competitors", "partnerships", "use-cases"].includes(p.slug))
+      .map((p) => ({
         id: `wiki-${p.slug}`,
         label: p.title,
         sublabel: p.category === "ideas" ? "Förslag" : "Tema",
         slug: p.slug,
         kind: p.category === "ideas" ? "ideas" : "topic",
       })),
-    },
-    {
-      id: "progress",
-      title: mode === "company" ? "Framsteg" : "TASKLIST & historik",
-      items: [
-        {
-          id: "tasklist",
-          label: mode === "company" ? "Status & milstolpar" : "TASKLIST",
-          sublabel: `${manifest.stats.done}/${manifest.stats.total} klara`,
-          slug: mode === "company" ? "progress-summary" : "tasklist",
-          kind: "hub",
-        },
-        {
-          id: "history",
-          label: "Historik",
-          sublabel: "Tidslinje",
-          slug: "history",
-          kind: "hub",
-        },
-        ...(mode === "dev"
-          ? [
-              {
-                id: "activity",
-                label: "Aktivitet",
-                sublabel: "Agent-logg",
-                slug: "activity",
-                kind: "hub" as const,
-              },
-            ]
-          : []),
-      ],
-    },
-  ];
+  });
+
+  sections.push({
+    id: "progress",
+    title: mode === "company" ? "Framsteg" : "TASKLIST & historik",
+    items: [
+      {
+        id: "tasklist",
+        label: mode === "company" ? "Status & milstolpar" : "TASKLIST",
+        sublabel: `${manifest.stats.done}/${manifest.stats.total} klara`,
+        slug: mode === "company" ? "progress-summary" : "tasklist",
+        kind: "hub",
+      },
+      {
+        id: "history",
+        label: "Historik",
+        sublabel: "Tidslinje",
+        slug: "history",
+        kind: "hub",
+      },
+      ...(mode === "dev"
+        ? [
+            {
+              id: "activity",
+              label: "Aktivitet",
+              sublabel: "Agent-logg",
+              slug: "activity",
+              kind: "hub" as const,
+            },
+          ]
+        : []),
+    ],
+  });
 
   if (mode === "dev") {
     const p0 = manifest.graph.nodes.filter((n) => n.kind === "task-p0");

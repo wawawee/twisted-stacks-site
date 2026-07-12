@@ -19,6 +19,7 @@ const TOPIC_LABELS = {
   "use-cases": "Användningsfall & kunder",
   funding: "Finansiering & anslag",
   partnerships: "Partnerskap",
+  competitors: "Konkurrenter & jämförelser",
   "ux-ui": "UX, produkt & demo",
   "tech-debt": "Teknik & infrastruktur",
   misc: "Övrigt",

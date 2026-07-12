@@ -146,9 +146,21 @@ export default function SuparaysRoom() {
   const [markdown, setMarkdown] = useState("");
   const [mdLoading, setMdLoading] = useState(false);
   const [booting, setBooting] = useState(true);
+  const [projectLoading, setProjectLoading] = useState(false);
   const [error, setError] = useState("");
   const { width: panelWidth, dragging, onPointerDown } = useResizablePanel();
   const { isDark, toggleTheme } = useTheme();
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(max-width: 800px)").matches,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 800px)");
+    const sync = () => setIsMobile(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
 
   const menuItems = useMemo(
     () => buildMenuItems(project?.manifest.pages || [], viewMode),
@@ -161,11 +173,16 @@ export default function SuparaysRoom() {
   );
 
   const loadProject = useCallback(async () => {
-    const res = await fetch("/api/suparays/project");
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Kunde inte ladda projekt");
-    setProject(data);
-    setError("");
+    setProjectLoading(true);
+    try {
+      const res = await fetch("/api/suparays/project");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Kunde inte ladda projekt");
+      setProject(data);
+      setError("");
+    } finally {
+      setProjectLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -307,6 +324,45 @@ export default function SuparaysRoom() {
 
   return (
     <div className={`suparays-root${isDark ? " theme-dark" : ""}`}>
+      <header className="room-mobile-bar">
+        <div className="room-mobile-bar-top">
+          <strong>SUPARAYS</strong>
+          <div className="room-mobile-bar-actions">
+            <button
+              type="button"
+              className="room-theme-toggle room-mobile-theme"
+              onClick={toggleTheme}
+              aria-pressed={isDark}
+              aria-label={isDark ? "Byt till ljust läge" : "Byt till mörkt läge"}
+            >
+              <span className={`room-theme-knob${!isDark ? " dark" : ""}`} />
+              <span className="room-theme-label">{isDark ? "Light" : "Dark"}</span>
+            </button>
+            {!SKIP_AUTH && auth?.member ? (
+              <button type="button" className="room-btn room-btn-muted" onClick={logout}>
+                Ut
+              </button>
+            ) : null}
+          </div>
+        </div>
+        <div className="room-mobile-view-toggle" role="group" aria-label="Visningsläge">
+          <button
+            type="button"
+            className={`room-toggle${viewMode === "company" ? " active" : ""}`}
+            onClick={() => setViewMode("company")}
+          >
+            Företag
+          </button>
+          <button
+            type="button"
+            className={`room-toggle${viewMode === "dev" ? " active" : ""}`}
+            onClick={() => setViewMode("dev")}
+          >
+            Dev
+          </button>
+        </div>
+      </header>
+
       <div className="room-layout">
         <SideMenu
           items={menuItems}
@@ -323,7 +379,9 @@ export default function SuparaysRoom() {
 
         <main className="room-main">
           {error ? <p className="room-error">{error}</p> : null}
-          {project ? (
+          {projectLoading ? (
+            <p className="room-loading">Laddar projekt…</p>
+          ) : project ? (
             <ProjectGrid
               sections={gridSections}
               activeId={activeId}
@@ -331,7 +389,11 @@ export default function SuparaysRoom() {
               onSelect={pick}
             />
           ) : (
-            <p className="room-error">Kör npm run sync:wiki</p>
+            <p className="room-error">
+              {import.meta.env.DEV
+                ? "Kör npm run sync:wiki"
+                : "Projektet kunde inte laddas. Prova att ladda om sidan."}
+            </p>
           )}
         </main>
 
@@ -343,7 +405,25 @@ export default function SuparaysRoom() {
           aria-label="Ändra panelbredd"
         />
 
-        <aside className="room-panel" style={{ width: panelWidth }}>
+        <aside
+          className={`room-panel${selection ? " room-panel-open" : ""}`}
+          style={!isMobile && selection ? { width: panelWidth } : undefined}
+        >
+          {selection ? (
+            <div className="room-panel-mobile-bar">
+              <span>{selection.label}</span>
+              <button
+                type="button"
+                className="room-btn"
+                onClick={() => {
+                  setSelection(null);
+                  setActiveId(null);
+                }}
+              >
+                Tillbaka
+              </button>
+            </div>
+          ) : null}
           {panelContent}
         </aside>
       </div>

@@ -47,8 +47,12 @@ function resolvePagePath(entry: { path?: string; slug?: string } | undefined, pa
   const slugMap: Record<string, string> = {
     tasklist: "TASKLIST.md",
     history: "HISTORY.md",
+    ideas: "IDEAS.md",
   };
   if (slugMap[pagePath]) return slugMap[pagePath];
+  if (pagePath && !pagePath.includes("/") && !pagePath.endsWith(".md")) {
+    return safeWikiPath(`by-topic/${pagePath}.md`);
+  }
   return safeWikiPath(pagePath);
 }
 

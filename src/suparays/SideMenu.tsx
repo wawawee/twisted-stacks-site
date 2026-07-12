@@ -83,9 +83,15 @@ export default function SideMenu({
       </nav>
 
       <div className="room-menu-foot">
-        <button type="button" className="room-theme-toggle" onClick={onToggleTheme} aria-pressed={isDark}>
-          <span className={`room-theme-knob${isDark ? " dark" : ""}`} />
-          <span className="room-theme-label">{isDark ? "Dark" : "Light"}</span>
+        <button
+          type="button"
+          className="room-theme-toggle"
+          onClick={onToggleTheme}
+          aria-pressed={isDark}
+          aria-label={isDark ? "Byt till ljust läge" : "Byt till mörkt läge"}
+        >
+          <span className={`room-theme-knob${!isDark ? " dark" : ""}`} />
+          <span className="room-theme-label">{isDark ? "Light" : "Dark"}</span>
         </button>
         <button type="button" className="room-btn" onClick={onRefresh}>
           Synka

@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 
 const MIN = 280;
-const MAX = 720;
-const DEFAULT = 400;
+const MAX = 900;
+const DEFAULT = 640;
 
-export function useResizablePanel(storageKey = "suparays-panel-width") {
+export function useResizablePanel(storageKey = "suparays-panel-width-v2") {
   const [width, setWidth] = useState(() => {
     const saved = localStorage.getItem(storageKey);
     const n = saved ? Number.parseInt(saved, 10) : DEFAULT;

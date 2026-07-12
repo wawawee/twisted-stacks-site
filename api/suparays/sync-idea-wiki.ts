@@ -56,7 +56,8 @@ function insertBullet(ideasMd: string, bullet: string, marker: string) {
   }
 
   const header = "## New (this week)";
-  const idx = ideasMd.indexOf(header);
+  const headerAtLine = ideasMd.indexOf(`\n${header}\n`);
+  const idx = headerAtLine !== -1 ? headerAtLine + 1 : ideasMd.indexOf(header);
   if (idx === -1) {
     throw new Error("wiki/IDEAS.md saknar sektionen ## New (this week)");
   }
