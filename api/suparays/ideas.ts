@@ -7,6 +7,7 @@ import {
   type VercelRequest,
   type VercelResponse,
 } from "./session.js";
+import { syncIdeaToWiki } from "./sync-idea-wiki.js";
 
 const TABLE = "suparays_ideas";
 const VALID_MEMBERS = new Set(["baha", "kris", "joachim", "per"]);
@@ -154,14 +155,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const row = data as { id: number; member: string; body: string; created_at: string };
-    res.status(201).json({
-      idea: {
-        id: row.id,
-        member: row.member,
-        body: row.body,
-        createdAt: row.created_at,
-      } satisfies IdeaEntry,
-    });
+    const idea = {
+      id: row.id,
+      member: row.member,
+      body: row.body,
+      createdAt: row.created_at,
+    } satisfies IdeaEntry;
+
+    const wiki = await syncIdeaToWiki(idea);
+
+    try {
+      if (wiki.synced) {
+        await supabase
+          .from(TABLE)
+          .update({ wiki_synced_at: new Date().toISOString(), wiki_sync_error: null })
+          .eq("id", row.id);
+      } else if (wiki.reason && !wiki.skipped) {
+        await supabase
+          .from(TABLE)
+          .update({ wiki_sync_error: wiki.reason.slice(0, 500) })
+          .eq("id", row.id);
+      }
+    } catch {
+      /* wiki_sync_* columns optional until migration runs */
+    }
+
+    res.status(201).json({ idea, wiki });
     return;
   }
 

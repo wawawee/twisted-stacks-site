@@ -75,6 +75,11 @@ export default function IdeasPanel({ memberId }: { memberId: string | null }) {
       const idea = data.idea as IdeaEntry;
       setIdeas((prev) => (prev.some((i) => i.id === idea.id) ? prev : [...prev, idea]));
       setDraft("");
+      if (data.wiki?.synced) {
+        setError("");
+      } else if (data.wiki?.reason && !data.wiki?.skipped) {
+        setError(`Sparad i idébox (#${idea.id}), men wiki-sync misslyckades: ${data.wiki.reason}`);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Kunde inte spara");
     } finally {
@@ -86,7 +91,7 @@ export default function IdeasPanel({ memberId }: { memberId: string | null }) {
     <div className="suparays-ideas">
       <header className="suparays-ideas-header">
         <h2>Idébox</h2>
-        <p>Saxa in råa idéer, anteckningar och lösa trådar — teamet ser allt här.</p>
+        <p>Saxa in idéer — sparas här och synkas direkt till wiki/IDEAS.md i repot.</p>
       </header>
 
       <div className="suparays-ideas-feed" ref={scrollRef} aria-live="polite">

@@ -58,7 +58,7 @@ export function buildMenuItems(
 
   items.push(
     { id: "chat", label: "Chat", slug: "chat", kind: "tool", section: "tools", devOnly: true },
-    { id: "ideas", label: "Idébox", slug: "ideas", kind: "tool", section: "tools", devOnly: true },
+    { id: "ideas", label: "Idébox", slug: "ideas", kind: "tool", section: "tools" },
     { id: "files", label: "Filer", slug: "files", kind: "tool", section: "tools", devOnly: true },
   );
 
@@ -165,17 +165,19 @@ export function buildGridSections(
         })),
       });
     }
-
-    sections.push({
-      id: "tools",
-      title: "Verktyg",
-      items: [
-        { id: "chat", label: "Chat", slug: "chat", kind: "tool" },
-        { id: "ideas", label: "Idébox", slug: "ideas", kind: "tool" },
-        { id: "files", label: "Delade filer", slug: "files", kind: "tool" },
-      ],
-    });
   }
+
+  sections.push({
+    id: "tools",
+    title: "Verktyg",
+    items: [
+      ...(mode === "dev" ? [{ id: "chat", label: "Chat", slug: "chat", kind: "tool" as const }] : []),
+      { id: "ideas", label: "Idébox", slug: "ideas", kind: "tool" as const },
+      ...(mode === "dev"
+        ? [{ id: "files", label: "Delade filer", slug: "files", kind: "tool" as const }]
+        : []),
+    ],
+  });
 
   return sections;
 }
