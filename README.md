@@ -75,6 +75,37 @@ this site.
 Run [supabase/contact.sql](./supabase/contact.sql) once in the Supabase
 SQL Editor.
 
+## SUPARAYS team room (`/suparays`)
+
+Password-protected project room: wiki (ideas + by-topic from
+[wawawee/VR-SuperPowers](https://github.com/wawawee/VR-SuperPowers) `wiki/`),
+team chat, and shared files.
+
+| URL | Purpose |
+| --- | --- |
+| [twistedstacks.com/suparays](https://www.twistedstacks.com/suparays) | Login + wiki + chat + files |
+
+Run in Supabase SQL Editor (same project as contact/leaderboard):
+
+- [supabase/suparays-chat.sql](./supabase/suparays-chat.sql)
+- [supabase/suparays-files.sql](./supabase/suparays-files.sql)
+
+Build runs `npm run sync:wiki` before Vite — pulls `wiki/IDEAS.md` and
+`wiki/by-topic/*.md` into `suparays-wiki/` (gitignored, server-only).
+
+Vercel env:
+
+```bash
+SUPARAYS_ROOM_PASSWORD=baha123   # team shared password
+# SUPARAYS_ROOM_SECRET=...       # optional HMAC override
+```
+
+Auto-update: push to `VR-SuperPowers` `wiki/**` on `main` triggers a Vercel
+deploy hook (see `.github/workflows/sync-wiki-room.yml` in that repo). Set
+secret `VERCEL_DEPLOY_HOOK_URL` on the VR-SuperPowers GitHub repo.
+
+Local full stack (API routes): `npx vercel dev` after `npm run sync:wiki`.
+
 ## Deploy (Vercel)
 
 - Repo: [wawawee/twisted-stacks-site](https://github.com/wawawee/twisted-stacks-site) (public)
