@@ -184,6 +184,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  res.setHeader("Allow", "GET, POST");
+  if (req.method === "DELETE") {
+    const member = getMemberFromRequest(req);
+    if (!member) {
+      res.status(400).json({ error: "Ogiltig session — logga in igen." });
+      return;
+    }
+
+    const idParam = req.query.id;
+    const idRaw = Array.isArray(idParam) ? idParam[0] : idParam;
+    const id = Number.parseInt(String(idRaw ?? ""), 10);
+    if (!Number.isFinite(id)) {
+      res.status(400).json({ error: "Ogiltigt id." });
+      return;
+    }
+
+    const { error } = await supabase.from(TABLE).delete().eq("id", id);
+    if (error) {
+      res.status(500).json({ error: error.message });
+      return;
+    }
+
+    res.status(200).json({ ok: true, deletedId: id });
+    return;
+  }
+
+  res.setHeader("Allow", "GET, POST, DELETE");
   res.status(405).json({ error: "Method not allowed" });
 }
