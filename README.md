@@ -83,11 +83,12 @@ team chat, and shared files.
 
 | URL | Purpose |
 | --- | --- |
-| [twistedstacks.com/suparays](https://www.twistedstacks.com/suparays) | Login + wiki + chat + files |
+| [twistedstacks.com/suparays](https://www.twistedstacks.com/suparays) | Login + wiki + chat + idébox + files |
 
 Run in Supabase SQL Editor (same project as contact/leaderboard):
 
 - [supabase/suparays-chat.sql](./supabase/suparays-chat.sql)
+- [supabase/suparays-ideas.sql](./supabase/suparays-ideas.sql)
 - [supabase/suparays-files.sql](./supabase/suparays-files.sql)
 
 Build runs `npm run sync:wiki` before Vite — pulls `wiki/IDEAS.md` and

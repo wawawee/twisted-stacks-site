@@ -58,6 +58,7 @@ export function buildMenuItems(
 
   items.push(
     { id: "chat", label: "Chat", slug: "chat", kind: "tool", section: "tools", devOnly: true },
+    { id: "ideas", label: "Idébox", slug: "ideas", kind: "tool", section: "tools", devOnly: true },
     { id: "files", label: "Filer", slug: "files", kind: "tool", section: "tools", devOnly: true },
   );
 
@@ -170,6 +171,7 @@ export function buildGridSections(
       title: "Verktyg",
       items: [
         { id: "chat", label: "Chat", slug: "chat", kind: "tool" },
+        { id: "ideas", label: "Idébox", slug: "ideas", kind: "tool" },
         { id: "files", label: "Delade filer", slug: "files", kind: "tool" },
       ],
     });

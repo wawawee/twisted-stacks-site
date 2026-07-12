@@ -679,8 +679,9 @@
   padding: 0.35rem;
 }
 
-/* Chat + files inside panel */
+/* Chat + idébox + files inside panel */
 .suparays-chat,
+.suparays-ideas,
 .suparays-files {
   height: 100%;
   display: flex;
@@ -690,6 +691,7 @@
 }
 
 .suparays-chat-header h2,
+.suparays-ideas-header h2,
 .suparays-files-header h2 {
   margin: 0 0 0.25rem;
   font-size: 0.85rem;
@@ -698,13 +700,15 @@
 }
 
 .suparays-chat-header p,
+.suparays-ideas-header p,
 .suparays-files-header p {
   margin: 0 0 0.65rem;
   font-size: 0.72rem;
   color: var(--muted);
 }
 
-.suparays-chat-feed {
+.suparays-chat-feed,
+.suparays-ideas-feed {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
@@ -712,6 +716,74 @@
   padding: 0.65rem;
   margin-bottom: 0.65rem;
   background: var(--bg);
+}
+
+.suparays-ideas-item {
+  margin-bottom: 0.65rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--divider);
+}
+
+.suparays-ideas-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.suparays-ideas-item-head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.68rem;
+}
+
+.suparays-ideas-id {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.62rem;
+  color: var(--accent);
+  border: 1px solid var(--divider);
+  padding: 0.1rem 0.3rem;
+}
+
+.suparays-ideas-item-head time {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 0.62rem;
+}
+
+.suparays-ideas-body {
+  border: 1px solid var(--divider);
+  padding: 0.55rem 0.65rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--surface);
+}
+
+.suparays-ideas-compose textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  font-family: inherit;
+  font-size: 0.82rem;
+  padding: 0.5rem;
+  resize: vertical;
+  min-height: 6rem;
+}
+
+.suparays-ideas-compose-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.4rem;
+}
+
+.suparays-ideas-empty {
+  font-size: 0.75rem;
+  color: var(--muted);
 }
 
 .suparays-chat-compose textarea {

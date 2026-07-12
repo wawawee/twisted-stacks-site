@@ -4,6 +4,7 @@ import ProjectGrid from "./ProjectGrid";
 import SideMenu from "./SideMenu";
 import ChatPanel from "./ChatPanel";
 import FilesPanel from "./FilesPanel";
+import IdeasPanel from "./IdeasPanel";
 import { useResizablePanel } from "./useResizablePanel";
 import { useTheme } from "./useTheme";
 import {
@@ -218,6 +219,7 @@ export default function SuparaysRoom() {
     const slug = selection.slug;
     if (
       slug === "chat" ||
+      slug === "ideas" ||
       slug === "files" ||
       ["tasklist", "tasklist-focus", "activity", "history", "progress-summary"].includes(slug) ||
       slug.startsWith("task-")
@@ -285,6 +287,8 @@ export default function SuparaysRoom() {
   const panelContent =
     selection?.slug === "chat" ? (
       <ChatPanel memberId={memberId} />
+    ) : selection?.slug === "ideas" ? (
+      <IdeasPanel memberId={memberId} />
     ) : selection?.slug === "files" ? (
       <FilesPanel />
     ) : (

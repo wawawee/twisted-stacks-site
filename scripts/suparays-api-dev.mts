@@ -37,6 +37,7 @@ const routes: Record<string, () => Promise<{ default: (req: unknown, res: unknow
   "/api/suparays/project": () => import("../api/suparays/project.ts"),
   "/api/suparays/wiki": () => import("../api/suparays/wiki.ts"),
   "/api/suparays/chat": () => import("../api/suparays/chat.ts"),
+  "/api/suparays/ideas": () => import("../api/suparays/ideas.ts"),
   "/api/suparays/files": () => import("../api/suparays/files.ts"),
 };
 
