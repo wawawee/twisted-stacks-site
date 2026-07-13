@@ -2,15 +2,24 @@ export type ViewMode = "dev" | "company";
 
 /** Wiki topics visible in company / external view */
 export const COMPANY_WIKI_SLUGS = new Set([
-  "collab-chat",
   "competitors",
-  "ideas",
   "sensors",
   "use-cases",
   "funding",
   "partnerships",
   "ux-ui",
 ]);
+
+/** Wiki pages synced for agents but not shown in colab UI (use Idébox + Chat tools instead) */
+export const HIDDEN_WIKI_SLUGS = new Set(["ideas", "collab-chat"]);
+
+const WIKI_SUBLABELS: Record<string, string> = {
+  sensors: "Moduler & hårdvara",
+  funding: "Anslag & investerare",
+  "ux-ui": "Demo, glasögon, brand",
+  misc: "Övrigt",
+  "tech-debt": "Teknik & CI",
+};
 
 export interface MenuItem {
   id: string;
@@ -74,6 +83,7 @@ export function buildMenuItems(
   );
 
   for (const page of wikiPages) {
+    if (HIDDEN_WIKI_SLUGS.has(page.slug)) continue;
     if (page.slug === "competitors" && mode === "company") continue;
     if (page.slug === "use-cases") continue;
     if (mode === "company" && !COMPANY_WIKI_SLUGS.has(page.slug)) continue;
@@ -191,19 +201,24 @@ export function buildGridSections(
     }
   }
 
-  sections.push({
-    id: "wiki",
-    title: mode === "company" ? "Mer wiki" : "Wiki & idéer",
-    items: wikiPages
-      .filter((p) => !["competitors", "partnerships", "use-cases"].includes(p.slug))
-      .map((p) => ({
-        id: `wiki-${p.slug}`,
-        label: p.title,
-        sublabel: p.category === "ideas" ? "Förslag" : "Tema",
-        slug: p.slug,
-        kind: p.category === "ideas" ? "ideas" : "topic",
-      })),
-  });
+  const extraWikiItems = wikiPages
+    .filter((p) => !HIDDEN_WIKI_SLUGS.has(p.slug))
+    .filter((p) => !["competitors", "partnerships", "use-cases"].includes(p.slug))
+    .map((p) => ({
+      id: `wiki-${p.slug}`,
+      label: p.title,
+      sublabel: WIKI_SUBLABELS[p.slug] || "Wiki",
+      slug: p.slug,
+      kind: "topic" as const,
+    }));
+
+  if (extraWikiItems.length > 0) {
+    sections.push({
+      id: "wiki",
+      title: mode === "company" ? "Teknik & roadmap" : "Teknik-wiki",
+      items: extraWikiItems,
+    });
+  }
 
   sections.push({
     id: "progress",
