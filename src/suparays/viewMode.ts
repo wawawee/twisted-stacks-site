@@ -140,7 +140,7 @@ export function buildGridSections(
         {
           id: "focus",
           label: "Nuvarande fokus",
-          sublabel: manifest.currentFocus.slice(0, 100),
+          sublabel: manifest.currentFocus.slice(0, 72) + (manifest.currentFocus.length > 72 ? "…" : ""),
           slug: "tasklist-focus",
           kind: "focus",
         },
