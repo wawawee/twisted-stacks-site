@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import DetailPanel, { type HistoryData, type TasklistData } from "./DetailPanel";
 import ProjectGrid from "./ProjectGrid";
 import SideMenu from "./SideMenu";
+import OverviewPanel from "./OverviewPanel";
 import ChatPanel from "./ChatPanel";
 import FilesPanel from "./FilesPanel";
 import IdeasPanel from "./IdeasPanel";
@@ -302,7 +303,15 @@ export default function SuparaysRoom() {
   const memberId = SKIP_AUTH ? "per" : auth?.member ?? null;
 
   const panelContent =
-    selection?.slug === "chat" ? (
+    selection?.kind === "overview" && project ? (
+      <OverviewPanel
+        tasklist={project.tasklist}
+        history={project.history}
+        syncedAt={project.manifest.syncedAt}
+        viewMode={viewMode}
+        onNavigate={pick}
+      />
+    ) : selection?.slug === "chat" ? (
       <ChatPanel memberId={memberId} />
     ) : selection?.slug === "ideabox" ? (
       <IdeasPanel memberId={memberId} />
