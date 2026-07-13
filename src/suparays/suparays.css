@@ -1084,10 +1084,62 @@
   margin-top: 0.4rem;
 }
 
+.suparays-chat-msg {
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--divider);
+}
+
+.suparays-chat-msg:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.suparays-chat-msg-head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.45rem;
+  font-size: 0.68rem;
+  line-height: 1.2;
+}
+
+.suparays-chat-avatar {
+  flex-shrink: 0;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 1;
+  background: var(--surface);
+}
+
+.suparays-chat-msg-head strong {
+  font-weight: 800;
+}
+
+.suparays-chat-msg-head time {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding-left: 0.35rem;
+  color: var(--muted);
+  font-size: 0.62rem;
+  white-space: nowrap;
+}
+
 .suparays-chat-msg-body {
   border: 1px solid var(--divider);
-  padding: 0.45rem 0.55rem;
+  padding: 0.55rem 0.65rem;
   font-size: 0.78rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
   background: var(--surface);
 }
 
