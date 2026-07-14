@@ -109,6 +109,12 @@ secret `VERCEL_DEPLOY_HOOK_URL` on the VR-SuperPowers GitHub repo.
 Local full stack (API routes): `npm run dev:suparays` → http://localhost:3010/suparays  
 See [docs/suparays-local-dev.md](./docs/suparays-local-dev.md). Plain `npm run dev` (port 3000) does **not** serve `/api/suparays/*`.
 
+## ATE investor room (`/ate`)
+
+Password-protected trading colab: wiki, team chat, and TRADE workspace (paper only).
+
+Local full stack: `npm run dev:ate` → http://localhost:3010/ate (`predev:ate` syncs wiki before start; use `npm run dev:ate:fresh` for an explicit re-sync).
+
 ## Deploy (Vercel)
 
 - Repo: [wawawee/twisted-stacks-site](https://github.com/wawawee/twisted-stacks-site) (public)

@@ -761,9 +761,19 @@
   color: var(--accent);
 }
 
+.ate-regime-banner {
+  padding: 0.5rem 1rem;
+  border-bottom: 2px solid var(--warn);
+  background: color-mix(in srgb, var(--warn) 14%, var(--surface));
+  color: var(--fg);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
 .ate-fusion-strip {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.5rem;
   padding: 0.65rem 1rem;
   border-top: 2px solid var(--border);
@@ -792,6 +802,10 @@
   color: var(--bull);
 }
 
+.ate-fusion-lane.macro label span:last-child {
+  color: var(--macro);
+}
+
 .ate-fusion-bar {
   height: 6px;
   border: 1px solid var(--border);
@@ -814,6 +828,10 @@
 
 .ate-fusion-lane.sequence .ate-fusion-bar span {
   background: var(--bull);
+}
+
+.ate-fusion-lane.macro .ate-fusion-bar span {
+  background: var(--macro);
 }
 
 .ate-trading-exit {

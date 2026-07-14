@@ -59,6 +59,18 @@ const MOCK_MACRO_QUOTES = [
   { label: "BTC $100K Dec", prob: 58 },
 ] as const;
 
+/** Demo macro score — avg of MOCK_MACRO_QUOTES implied probs (wiki fusion weight 15%). */
+function mockMacroScore(): number {
+  const avg = MOCK_MACRO_QUOTES.reduce((sum, q) => sum + q.prob, 0) / MOCK_MACRO_QUOTES.length;
+  return avg / 100;
+}
+
+/** RegimeGate v1 mock — hide banner only when SPY has an active C&H signal (trending). */
+function shouldShowRegimeBanner(symbol: string, topSignal: CupHandleSignal | null): boolean {
+  if (symbol === "SPY" && topSignal) return false;
+  return true;
+}
+
 const TradingContext = createContext<TradingContextValue | null>(null);
 
 export function useTradingWorkspace() {
@@ -476,7 +488,9 @@ export function TradingMainPanel() {
 }
 
 function TradingChartBlock({ height }: { height: number }) {
-  const { bars, quote, topSignal, isDark } = useTradingWorkspace();
+  const { bars, quote, topSignal, symbol, isDark } = useTradingWorkspace();
+  const macroScore = mockMacroScore();
+  const showRegimeBanner = shouldShowRegimeBanner(symbol, topSignal);
 
   return (
     <>
@@ -494,6 +508,12 @@ function TradingChartBlock({ height }: { height: number }) {
             <span>H {fmtPrice(quote.high)}</span>
             <span>L {fmtPrice(quote.low)}</span>
           </div>
+        </div>
+      ) : null}
+
+      {showRegimeBanner ? (
+        <div className="ate-regime-banner" role="status">
+          C&amp;H paused — not trending
         </div>
       ) : null}
 
@@ -528,6 +548,15 @@ function TradingChartBlock({ height }: { height: number }) {
             </label>
             <div className="ate-fusion-bar">
               <span style={{ width: `${Math.max(topSignal.sequence_prob * 100, 2)}%` }} />
+            </div>
+          </div>
+          <div className="ate-fusion-lane macro">
+            <label>
+              <span>Macro</span>
+              <span className="mono">{(macroScore * 100).toFixed(0)}%</span>
+            </label>
+            <div className="ate-fusion-bar">
+              <span style={{ width: `${Math.max(macroScore * 100, 2)}%` }} />
             </div>
           </div>
         </div>
