@@ -12,6 +12,7 @@ interface SideMenuProps {
   onRefresh: () => void;
   onLogout?: () => void;
   syncedAt: string | null;
+  brandLabel?: string;
 }
 
 export default function SideMenu({
@@ -25,6 +26,7 @@ export default function SideMenu({
   onRefresh,
   onLogout,
   syncedAt,
+  brandLabel = "SUPARAYS",
 }: SideMenuProps) {
   const sections = [
     { key: "overview", label: "Start" },
@@ -36,7 +38,7 @@ export default function SideMenu({
   return (
     <aside className="room-menu">
       <div className="room-menu-head">
-        <h1>SUPARAYS</h1>
+        <h1>{brandLabel}</h1>
         <p className="room-menu-meta">
           {viewMode === "dev" ? "DEV" : "COMPANY"}
           {syncedAt ? ` · ${new Date(syncedAt).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}` : ""}
