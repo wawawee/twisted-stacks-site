@@ -31,6 +31,14 @@ export interface CupHandleSignal {
   timestamp: string;
 }
 
+export type RegimeLabel = "trending" | "ranging" | "chop" | "crisis";
+
+export interface RegimeGateResult {
+  regime: RegimeLabel;
+  cup_handle_allowed: boolean;
+  adx?: number;
+}
+
 export const WATCHLIST = [
   { symbol: "SPY", label: "S&P 500 ETF" },
   { symbol: "QQQ", label: "Nasdaq 100" },

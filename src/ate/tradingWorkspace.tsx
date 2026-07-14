@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import TradingChart from "./TradingChart";
-import type { CupHandleSignal, MarketBar, MarketQuote } from "./tradingTypes";
+import type { CupHandleSignal, MarketBar, MarketQuote, RegimeGateResult } from "./tradingTypes";
 import { WATCHLIST } from "./tradingTypes";
 
 const API = "/api/ate";
@@ -15,6 +15,7 @@ export interface TelemetrySnapshot {
   symbol: string;
   signalCount: number;
   barCount: number;
+  regime: RegimeGateResult | null;
   at: Date;
 }
 
@@ -32,6 +33,7 @@ interface TradingContextValue {
   quote: MarketQuote | null;
   signals: CupHandleSignal[];
   topSignal: CupHandleSignal | null;
+  regime: RegimeGateResult | null;
   loading: boolean;
   scanning: boolean;
   error: string;
@@ -65,10 +67,11 @@ function mockMacroScore(): number {
   return avg / 100;
 }
 
-/** RegimeGate v1 mock — hide banner only when SPY has an active C&H signal (trending). */
-function shouldShowRegimeBanner(symbol: string, topSignal: CupHandleSignal | null): boolean {
-  if (symbol === "SPY" && topSignal) return false;
-  return true;
+/** RegimeGate v1 — show banner when C&H is gated by live regime classification. */
+function regimeBannerMessage(regime: RegimeGateResult | null): string | null {
+  if (!regime || regime.cup_handle_allowed) return null;
+  if (regime.regime === "crisis") return "C&H paused — crisis vol · size cap 50%";
+  return "C&H paused — not trending";
 }
 
 const TradingContext = createContext<TradingContextValue | null>(null);
@@ -94,6 +97,7 @@ export function TradingWorkspaceProvider({
   const [bars, setBars] = useState<MarketBar[]>([]);
   const [quote, setQuote] = useState<MarketQuote | null>(null);
   const [signals, setSignals] = useState<CupHandleSignal[]>([]);
+  const [regime, setRegime] = useState<RegimeGateResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState("");
@@ -129,10 +133,12 @@ export function TradingWorkspaceProvider({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Scan misslyckades");
       setSignals(data.signals || []);
+      setRegime(data.regime ?? null);
       setLastScan({
         symbol: data.symbol || symbol,
         signalCount: data.signal_count ?? (data.signals?.length ?? 0),
         barCount: data.bar_count ?? 0,
+        regime: data.regime ?? null,
         at: new Date(),
       });
       if (!bars.length && data.bar_count) {
@@ -161,6 +167,7 @@ export function TradingWorkspaceProvider({
       quote,
       signals,
       topSignal,
+      regime,
       loading,
       scanning,
       error,
@@ -180,6 +187,7 @@ export function TradingWorkspaceProvider({
       quote,
       signals,
       topSignal,
+      regime,
       loading,
       scanning,
       error,
@@ -294,6 +302,21 @@ function TelemetrySubsection() {
               </>
             ) : scanning ? (
               "Scanning…"
+            ) : (
+              "—"
+            )}
+          </dd>
+        </div>
+        <div className="ate-telemetry-row">
+          <dt>Regime</dt>
+          <dd className="mono">
+            {lastScan?.regime ? (
+              <>
+                {lastScan.regime.regime}
+                {lastScan.regime.adx != null ? ` · ADX ${lastScan.regime.adx.toFixed(1)}` : ""}
+              </>
+            ) : scanning ? (
+              "Classifying…"
             ) : (
               "—"
             )}
@@ -488,9 +511,9 @@ export function TradingMainPanel() {
 }
 
 function TradingChartBlock({ height }: { height: number }) {
-  const { bars, quote, topSignal, symbol, isDark } = useTradingWorkspace();
+  const { bars, quote, topSignal, regime, isDark } = useTradingWorkspace();
   const macroScore = mockMacroScore();
-  const showRegimeBanner = shouldShowRegimeBanner(symbol, topSignal);
+  const regimeBanner = regimeBannerMessage(regime);
 
   return (
     <>
@@ -511,9 +534,9 @@ function TradingChartBlock({ height }: { height: number }) {
         </div>
       ) : null}
 
-      {showRegimeBanner ? (
+      {regimeBanner ? (
         <div className="ate-regime-banner" role="status">
-          C&amp;H paused — not trending
+          {regimeBanner}
         </div>
       ) : null}
 

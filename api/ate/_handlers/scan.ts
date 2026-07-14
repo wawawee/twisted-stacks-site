@@ -1,4 +1,5 @@
 import { detectCupAndHandle } from "../_lib/cup-handle.js";
+import { classifyRegime } from "../_lib/regime-gate.js";
 import { fetchYahooBars } from "../_lib/yahoo.js";
 import { requireSession, type VercelRequest, type VercelResponse } from "../_lib/session.js";
 
@@ -26,6 +27,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const bars = await fetchYahooBars(symbol, timeframe, range);
     const signals = detectCupAndHandle(bars, { min_confidence: minConfidence });
+    const regime = classifyRegime(bars, symbol);
     res.status(200).json({
       symbol,
       timeframe,
@@ -33,6 +35,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       bar_count: bars.length,
       signal_count: signals.length,
       signals,
+      regime,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Scan failed";
