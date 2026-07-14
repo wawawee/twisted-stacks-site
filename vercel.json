@@ -9,6 +9,6 @@
       "has": [{ "type": "host", "value": "skatterevision.twistedstacks.com" }],
       "destination": "/skatterevision.html"
     },
-    { "source": "/:path*", "destination": "/index.html" }
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
