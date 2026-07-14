@@ -1,0 +1,39 @@
+export interface MarketBar {
+  symbol: string;
+  timeframe: string;
+  ts: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
+
+export interface MarketQuote {
+  symbol: string;
+  price: number;
+  change: number;
+  changePct: number;
+  high: number;
+  low: number;
+  volume: number;
+  asOf: string;
+}
+
+export interface CupHandleSignal {
+  ticker: string;
+  timeframe: string;
+  breakout_confidence: number;
+  vision_score: number;
+  sequence_prob: number;
+  fused_score: number;
+  invalidation: number;
+  timestamp: string;
+}
+
+export const WATCHLIST = [
+  { symbol: "SPY", label: "S&P 500 ETF" },
+  { symbol: "QQQ", label: "Nasdaq 100" },
+  { symbol: "BTC-USD", label: "Bitcoin" },
+  { symbol: "ETH-USD", label: "Ethereum" },
+] as const;

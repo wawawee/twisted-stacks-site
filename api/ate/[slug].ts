@@ -6,6 +6,8 @@ const routes: Record<string, () => Promise<{ default: (req: VercelRequest, res: 
   wiki: () => import("./_handlers/wiki.js"),
   chat: () => import("./_handlers/chat.js"),
   ideas: () => import("./_handlers/ideas.js"),
+  market: () => import("./_handlers/market.js"),
+  scan: () => import("./_handlers/scan.js"),
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {

@@ -5,6 +5,7 @@ import SideMenu from "../suparays/SideMenu";
 import OverviewPanel from "./OverviewPanel";
 import ChatPanel from "./ChatPanel";
 import IdeasPanel from "./IdeasPanel";
+import TradingPanel from "./TradingPanel";
 import { useResizablePanel } from "../suparays/useResizablePanel";
 import { useTheme } from "../suparays/useTheme";
 import { buildGridSections, buildMenuItems, type MenuItem, type ViewMode } from "./viewMode";
@@ -209,6 +210,7 @@ export default function AteRoom() {
   }
 
   useEffect(() => {
+    if (viewMode === "trading") return;
     setSelection(null);
     setActiveId(null);
   }, [viewMode]);
@@ -222,6 +224,7 @@ export default function AteRoom() {
     if (
       slug === "chat" ||
       slug === "ideabox" ||
+      slug === "trading" ||
       ["tasklist", "tasklist-focus", "history", "progress-summary"].includes(slug) ||
       slug.startsWith("task-")
     ) {
@@ -251,6 +254,11 @@ export default function AteRoom() {
 
   function pick(item: { id: string; label: string; slug: string | null; kind: string; taskId?: string }) {
     setActiveId(item.id);
+    if (item.slug === "trading") {
+      setViewMode("trading");
+    } else if (viewMode === "trading" && item.kind !== "trading") {
+      setViewMode("company");
+    }
     setSelection({
       id: item.id,
       kind: item.kind,
@@ -280,6 +288,8 @@ export default function AteRoom() {
   }
 
   const memberId = SKIP_AUTH ? "per" : auth?.member ?? null;
+  const isTrading = viewMode === "trading" || selection?.slug === "trading";
+  const wikiViewMode: "dev" | "company" = viewMode === "dev" ? "dev" : "company";
 
   const panelContent =
     selection?.kind === "overview" && project ? (
@@ -287,7 +297,7 @@ export default function AteRoom() {
         tasklist={project.tasklist}
         history={project.history}
         syncedAt={project.manifest.syncedAt}
-        viewMode={viewMode}
+        viewMode={wikiViewMode}
         onNavigate={pick}
       />
     ) : selection?.slug === "chat" ? (
@@ -346,27 +356,42 @@ export default function AteRoom() {
           >
             Dev
           </button>
+          <button
+            type="button"
+            className={`room-toggle${viewMode === "trading" ? " active" : ""}`}
+            onClick={() => {
+              setViewMode("trading");
+              setSelection({ id: "trading", kind: "trading", slug: "trading", label: "Terminal" });
+              setActiveId("trading");
+            }}
+          >
+            Terminal
+          </button>
         </div>
       </header>
 
-      <div className="room-layout">
-        <SideMenu
-          items={menuItems}
-          activeId={activeId}
-          viewMode={viewMode}
-          isDark={isDark}
-          onToggleTheme={toggleTheme}
-          onSelect={pick}
-          onToggleView={() => setViewMode((m) => (m === "dev" ? "company" : "dev"))}
-          onRefresh={loadProject}
-          onLogout={SKIP_AUTH ? undefined : logout}
-          syncedAt={project?.manifest.syncedAt || null}
-          brandLabel="ATE"
-        />
+      <div className={`room-layout${isTrading ? " ate-trading-layout-root" : ""}`}>
+        {!isTrading ? (
+          <SideMenu
+            items={menuItems}
+            activeId={activeId}
+            viewMode={wikiViewMode}
+            isDark={isDark}
+            onToggleTheme={toggleTheme}
+            onSelect={pick}
+            onToggleView={() => setViewMode((m) => (m === "dev" ? "company" : "dev"))}
+            onRefresh={loadProject}
+            onLogout={SKIP_AUTH ? undefined : logout}
+            syncedAt={project?.manifest.syncedAt || null}
+            brandLabel="ATE"
+          />
+        ) : null}
 
-        <main className="room-main">
-          {error ? <p className="room-error">{error}</p> : null}
-          {projectLoading ? (
+        <main className={`room-main${isTrading ? " ate-trading-main-full" : ""}`}>
+          {error && !isTrading ? <p className="room-error">{error}</p> : null}
+          {isTrading ? (
+            <TradingPanel memberId={memberId} />
+          ) : projectLoading ? (
             <p className="room-loading">Laddar projekt…</p>
           ) : project ? (
             <ProjectGrid
@@ -382,35 +407,39 @@ export default function AteRoom() {
           )}
         </main>
 
-        <div
-          className={`room-resize${dragging ? " dragging" : ""}`}
-          onPointerDown={onPointerDown}
-          role="separator"
-          aria-orientation="vertical"
-          aria-label="Ändra panelbredd"
-        />
+        {!isTrading ? (
+          <>
+            <div
+              className={`room-resize${dragging ? " dragging" : ""}`}
+              onPointerDown={onPointerDown}
+              role="separator"
+              aria-orientation="vertical"
+              aria-label="Ändra panelbredd"
+            />
 
-        <aside
-          className={`room-panel${selection ? " room-panel-open" : ""}`}
-          style={!isMobile && selection ? { width: panelWidth } : undefined}
-        >
-          {selection ? (
-            <div className="room-panel-mobile-bar">
-              <span>{selection.label}</span>
-              <button
-                type="button"
-                className="room-btn"
-                onClick={() => {
-                  setSelection(null);
-                  setActiveId(null);
-                }}
-              >
-                Tillbaka
-              </button>
-            </div>
-          ) : null}
-          {panelContent}
-        </aside>
+            <aside
+              className={`room-panel${selection ? " room-panel-open" : ""}`}
+              style={!isMobile && selection ? { width: panelWidth } : undefined}
+            >
+              {selection ? (
+                <div className="room-panel-mobile-bar">
+                  <span>{selection.label}</span>
+                  <button
+                    type="button"
+                    className="room-btn"
+                    onClick={() => {
+                      setSelection(null);
+                      setActiveId(null);
+                    }}
+                  >
+                    Tillbaka
+                  </button>
+                </div>
+              ) : null}
+              {panelContent}
+            </aside>
+          </>
+        ) : null}
       </div>
     </div>
   );
