@@ -21,14 +21,14 @@ interface OverviewPanelProps {
 }
 
 const PHASE_BLURBS: Record<string, string> = {
-  "0": "Schemas, infra, CI, colab",
-  "1": "Cup & handle · SPY/BTC",
-  "2": "Chart vision · YOLO/ViT",
-  "3": "Fusion · risk · walk-forward",
+  "0": "Schemas, CI, colab — mostly done",
+  "1": "C&H · chart_patterns · backtests ✓",
+  "2": "Vision dataset · YOLO train ← **active**",
+  "3": "Fusion · RegimeGate · Macro ✓ stubs",
   "4": "Agent swarm · memory",
-  "5": "Temporal · MCP · paper",
-  "6": "React Flow UI · HITL",
-  "7": "Alt-data · PMXT stubs",
+  "5": "Temporal · MCP · HITL wire-up",
+  "6": "TRADE UI · React Flow map",
+  "7": "Multi-strategy consensus",
   "8": "Live gates · compliance",
 };
 
@@ -76,8 +76,8 @@ export default function OverviewPanel({
       <div className="detail-scroll overview-scroll">
         <p className="overview-lede ate-overview-lede">
           {viewMode === "company"
-            ? "Pre-Phase-0 → paper trading roadmap. SPY + BTC, hybrid risk, inga live-resultat än."
-            : "Fasplan från TASKLIST — vad som är klart, pågår och planerat."}
+            ? "TRADE live på /ate — SPY/BTC, RegimeGate, live Polymarket, fusion. Paper only. Phase 2: vision training."
+            : "Fasplan från TASKLIST — Phase 2 vision training är aktivt fokus."}
         </p>
 
         <div className="ate-overview-stats">

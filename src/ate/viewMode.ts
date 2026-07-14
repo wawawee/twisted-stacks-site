@@ -142,7 +142,7 @@ export function buildGridSections(
               {
                 id: "trading",
                 label: "TRADE",
-                sublabel: "SPY · cup-and-handle · paper",
+                sublabel: "Live · RegimeGate · Polymarket · fusion",
                 slug: "trading",
                 kind: "trading" as const,
               },

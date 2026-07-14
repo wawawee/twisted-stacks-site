@@ -16,8 +16,9 @@ export function parseTasklist(md) {
   const focusLines = immediate
     .split("\n")
     .filter((l) => /^\d+\./.test(l.trim()))
-    .map((l) => stripMd(l.replace(/^\d+\.\s*/, "")));
-  const currentFocus = focusLines[0] || "Phase 0 — Foundation & Contracts";
+    .map((l) => ({ raw: l, text: stripMd(l.replace(/^\d+\.\s*/, "")), done: /\[x\]/.test(l) }));
+  const openFocus = focusLines.find((l) => !l.done && !/\[x\]/.test(l.raw));
+  const currentFocus = openFocus?.text || focusLines.find((l) => !l.done)?.text || "Phase 2 — Vision Channel";
 
   const tasks = [];
   const phaseBlocks = md.split(/^## Phase /m).slice(1);
