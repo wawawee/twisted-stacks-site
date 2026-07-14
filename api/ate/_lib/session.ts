@@ -22,6 +22,19 @@ export function readEnv(name: string) {
   return value?.replace(/^['"]|['"]$/g, "");
 }
 
+export function getSupabaseUrl() {
+  return readEnv("SUPABASE_URL") || readEnv("VITE_SUPABASE_URL");
+}
+
+/** Legacy `service_role` JWT or new `sb_secret_*` dashboard key. */
+export function getSupabaseServiceKey() {
+  return (
+    readEnv("SUPABASE_SERVICE_ROLE_KEY") ||
+    readEnv("SUPABASE_SECRET_KEY") ||
+    readEnv("SUPABASE_SERVICE_KEY")
+  );
+}
+
 export function getRoomPassword() {
   return readEnv("ATE_ROOM_PASSWORD") || readEnv("SUPARAYS_ROOM_PASSWORD") || "baha123";
 }

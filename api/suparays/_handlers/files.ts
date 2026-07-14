@@ -1,6 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
 
 import {
+  getSupabaseServiceKey,
+  getSupabaseUrl,
   parseCookieHeader,
   readEnv,
   requireSession,
@@ -19,8 +21,8 @@ const RATE_LIMIT_MAX_WRITES = 6;
 const writeWindows = new Map<string, number[]>();
 
 function getSupabaseClient() {
-  const url = readEnv("SUPABASE_URL") || readEnv("VITE_SUPABASE_URL");
-  const serviceRoleKey = readEnv("SUPABASE_SERVICE_ROLE_KEY") || readEnv("SUPABASE_SERVICE_KEY");
+  const url = getSupabaseUrl();
+  const serviceRoleKey = getSupabaseServiceKey();
   if (!url || !serviceRoleKey) {
     throw new Error("Supabase is not configured.");
   }

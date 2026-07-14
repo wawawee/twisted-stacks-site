@@ -114,7 +114,9 @@ function readEnv(name: string): string | null {
 function getSupabaseClient() {
   const url = readEnv("SUPABASE_URL") || readEnv("VITE_SUPABASE_URL");
   const serviceRoleKey =
-    readEnv("SUPABASE_SERVICE_ROLE_KEY") || readEnv("SUPABASE_SERVICE_KEY");
+    readEnv("SUPABASE_SERVICE_ROLE_KEY") ||
+    readEnv("SUPABASE_SECRET_KEY") ||
+    readEnv("SUPABASE_SERVICE_KEY");
 
   if (!url || !serviceRoleKey) {
     throw new Error("Supabase contact environment is not configured.");
