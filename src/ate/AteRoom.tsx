@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import DetailPanel, { type HistoryData, type TasklistData } from "../suparays/DetailPanel";
 import ProjectGrid from "../suparays/ProjectGrid";
 import SideMenu from "../suparays/SideMenu";
-import OverviewPanel from "../suparays/OverviewPanel";
+import OverviewPanel from "./OverviewPanel";
 import ChatPanel from "./ChatPanel";
 import IdeasPanel from "./IdeasPanel";
 import { useResizablePanel } from "../suparays/useResizablePanel";
