@@ -10,6 +10,7 @@ import {
   TradingMainPanel,
   TradingSidePanel,
   TradingWorkspaceProvider,
+  TradingWorkspaceShell,
 } from "./tradingWorkspace";
 import { useIsMobile } from "./useIsMobile";
 import { useResizablePanel } from "../suparays/useResizablePanel";
@@ -484,7 +485,7 @@ export default function AteRoom() {
       <div className="room-layout">
         {tradeOpen ? (
           <TradingWorkspaceProvider isDark={isDark} isMobile={isMobile}>
-            {layout}
+            <TradingWorkspaceShell>{layout}</TradingWorkspaceShell>
           </TradingWorkspaceProvider>
         ) : (
           layout

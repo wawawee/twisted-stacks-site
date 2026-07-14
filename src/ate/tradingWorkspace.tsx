@@ -53,6 +53,10 @@ interface TradingContextValue {
   isDark: boolean;
   mobileTab: MobileTab;
   setMobileTab: (t: MobileTab) => void;
+  hitlOpen: boolean;
+  setHitlOpen: (open: boolean) => void;
+  hitlDecision: "pending" | "approved" | "rejected";
+  setHitlDecision: (d: "pending" | "approved" | "rejected") => void;
 }
 
 function fmtTelemetryTime(d: Date) {
@@ -121,6 +125,8 @@ export function TradingWorkspaceProvider({
   const [lastMarketFetch, setLastMarketFetch] = useState<MarketFetchSnapshot | null>(null);
   const [macro, setMacro] = useState<MacroPayload | null>(null);
   const [macroLoading, setMacroLoading] = useState(false);
+  const [hitlOpen, setHitlOpen] = useState(false);
+  const [hitlDecision, setHitlDecision] = useState<"pending" | "approved" | "rejected">("pending");
 
   const loadMacro = useCallback(async () => {
     setMacroLoading(true);
@@ -222,6 +228,10 @@ export function TradingWorkspaceProvider({
       isDark,
       mobileTab,
       setMobileTab,
+      hitlOpen,
+      setHitlOpen,
+      hitlDecision,
+      setHitlDecision,
     }),
     [
       symbol,
@@ -246,10 +256,99 @@ export function TradingWorkspaceProvider({
       isMobile,
       isDark,
       mobileTab,
+      hitlOpen,
+      hitlDecision,
     ],
   );
 
   return <TradingContext.Provider value={value}>{children}</TradingContext.Provider>;
+}
+
+function HitlModalStub() {
+  const {
+    symbol,
+    topSignal,
+    fusedScore,
+    tradeAllowed,
+    hitlOpen,
+    setHitlOpen,
+    hitlDecision,
+    setHitlDecision,
+  } = useTradingWorkspace();
+
+  if (!hitlOpen) return null;
+
+  const scorePct = fusedScore != null ? `${(fusedScore * 100).toFixed(0)}%` : "—";
+
+  return (
+    <div className="ate-hitl-backdrop" role="presentation" onClick={() => setHitlOpen(false)}>
+      <div
+        className="ate-hitl-modal"
+        role="dialog"
+        aria-labelledby="ate-hitl-title"
+        aria-modal="true"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <header className="ate-hitl-head">
+          <h3 id="ate-hitl-title">Human-in-the-loop</h3>
+          <span className="ate-trading-badge ate-telemetry-paper">PAPER STUB</span>
+        </header>
+        <p className="ate-trading-muted">
+          Gate review for <strong>{symbol}</strong> — Temporal signal wiring lands Phase 5.
+        </p>
+        <dl className="ate-hitl-summary mono">
+          <div>
+            <dt>Fused</dt>
+            <dd>{scorePct}</dd>
+          </div>
+          <div>
+            <dt>Gate</dt>
+            <dd>{tradeAllowed ? "open" : "closed"}</dd>
+          </div>
+          <div>
+            <dt>Invalidation</dt>
+            <dd>{topSignal ? fmtPrice(topSignal.invalidation) : "—"}</dd>
+          </div>
+        </dl>
+        {hitlDecision !== "pending" ? (
+          <p className="ate-hitl-status mono" role="status">
+            Decision: {hitlDecision}
+          </p>
+        ) : null}
+        <div className="ate-hitl-actions">
+          <button
+            type="button"
+            className="room-btn"
+            onClick={() => {
+              setHitlDecision("rejected");
+              setHitlOpen(false);
+            }}
+          >
+            Reject
+          </button>
+          <button
+            type="button"
+            className="room-btn room-btn-primary"
+            onClick={() => {
+              setHitlDecision("approved");
+              setHitlOpen(false);
+            }}
+          >
+            Approve paper
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function TradingWorkspaceShell({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      {children}
+      <HitlModalStub />
+    </>
+  );
 }
 
 export function TradingToolbar({ compact }: { compact?: boolean }) {
@@ -263,7 +362,13 @@ export function TradingToolbar({ compact }: { compact?: boolean }) {
     loadMarket,
     runScan,
     isMobile,
+    tradeAllowed,
+    fusedScore,
+    setHitlOpen,
+    hitlDecision,
   } = useTradingWorkspace();
+
+  const showHitl = tradeAllowed === true && (fusedScore ?? 0) >= 0.6;
 
   return (
     <div className={`ate-trade-toolbar${compact ? " compact" : ""}`}>
@@ -314,6 +419,15 @@ export function TradingToolbar({ compact }: { compact?: boolean }) {
         <button type="button" className="room-btn room-btn-primary" onClick={runScan} disabled={scanning}>
           {scanning ? "…" : isMobile ? "Scan" : "Cup & Handle"}
         </button>
+        {showHitl ? (
+          <button
+            type="button"
+            className={`room-btn ate-hitl-trigger${hitlDecision === "pending" ? " blink" : ""}`}
+            onClick={() => setHitlOpen(true)}
+          >
+            {isMobile ? "HITL" : "Review gate"}
+          </button>
+        ) : null}
         <span className="ate-trading-badge">PAPER</span>
       </div>
     </div>
@@ -469,7 +583,8 @@ function MacroScoutSection() {
 }
 
 export function TradingSideContent() {
-  const { symbol, setSymbol, signals } = useTradingWorkspace();
+  const { symbol, setSymbol, signals, macro, topSignal } = useTradingWorkspace();
+  const macroLive = macro?.source === "live" || macro?.source === "mixed";
 
   return (
     <>
@@ -521,17 +636,21 @@ export function TradingSideContent() {
       <section className="ate-trading-section ate-trading-lanes">
         <h3>Lanes</h3>
         <ul className="ate-lane-status">
-          <li className="active classical">
+          <li className={`active classical${topSignal ? "" : ""}`}>
             <span>Classical</span>
-            <em>live</em>
+            <em>{topSignal ? "live" : "idle"}</em>
           </li>
-          <li>
+          <li className={topSignal && topSignal.vision_score > 0 ? "active" : ""}>
             <span>Vision</span>
-            <em>soon</em>
+            <em>{topSignal && topSignal.vision_score > 0 ? "stub" : "soon"}</em>
           </li>
-          <li className="macro">
+          <li className={topSignal && topSignal.sequence_prob > 0 ? "active" : ""}>
+            <span>Sequence</span>
+            <em>{topSignal && topSignal.sequence_prob > 0 ? "stub" : "soon"}</em>
+          </li>
+          <li className={`macro${macroLive ? " active" : ""}`}>
             <span>Macro</span>
-            <em>soon</em>
+            <em>{macroLive ? "live" : "stub"}</em>
           </li>
         </ul>
         <TelemetrySubsection />
