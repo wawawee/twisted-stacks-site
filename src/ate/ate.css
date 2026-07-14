@@ -1386,6 +1386,23 @@
 
   .ate-root .overview-panel.ate-overview {
     min-height: 0;
-    height: 100%;
+    height: auto;
+    flex-shrink: 0;
+  }
+
+  .ate-mobile-home {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-height: 0;
+  }
+
+  .ate-mobile-home .room-grid {
+    padding-top: 0.25rem;
+    border-top: 2px solid var(--border);
+  }
+
+  .ate-mobile-home .room-grid-section:first-of-type .room-grid-title {
+    margin-top: 0.5rem;
   }
 }

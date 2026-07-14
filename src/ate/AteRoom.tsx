@@ -389,13 +389,22 @@ export default function AteRoom() {
           <p className="room-loading">Laddar projekt…</p>
         ) : project ? (
           isMobile && !selection ? (
-            <OverviewPanel
-              tasklist={project.tasklist}
-              history={project.history}
-              syncedAt={project.manifest.syncedAt}
-              viewMode={viewMode}
-              onNavigate={pick}
-            />
+            <div className="ate-mobile-home">
+              <OverviewPanel
+                tasklist={project.tasklist}
+                history={project.history}
+                syncedAt={project.manifest.syncedAt}
+                viewMode={viewMode}
+                onNavigate={pick}
+              />
+              <ProjectGrid
+                sections={gridSections}
+                activeId={activeId}
+                stats={project.manifest.stats}
+                onSelect={pick}
+                showStats={false}
+              />
+            </div>
           ) : (
             <ProjectGrid
               sections={gridSections}

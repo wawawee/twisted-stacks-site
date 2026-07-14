@@ -19,13 +19,15 @@ interface ProjectGridProps {
     };
   };
   onSelect: (item: GridSection["items"][0]) => void;
+  showStats?: boolean;
 }
 
-export default function ProjectGrid({ sections, activeId, stats, onSelect }: ProjectGridProps) {
+export default function ProjectGrid({ sections, activeId, stats, onSelect, showStats = true }: ProjectGridProps) {
   const phase = stats.phaseProgress;
   return (
     <div className="room-grid">
-      <div className="room-grid-stats">
+      {showStats ? (
+        <div className="room-grid-stats">
         <div className="stat-chip">
           <span className="stat-val">{phase?.activePhasePct ?? Math.round((stats.done / Math.max(stats.total, 1)) * 100)}%</span>
           <span className="stat-lbl">FAS {phase?.activePhaseNum ?? "?"}</span>
@@ -39,6 +41,7 @@ export default function ProjectGrid({ sections, activeId, stats, onSelect }: Pro
           <span className="stat-lbl">AKTIV FAS</span>
         </div>
       </div>
+      ) : null}
 
       {sections.map((section) => (
         <section key={section.id} className="room-grid-section">
