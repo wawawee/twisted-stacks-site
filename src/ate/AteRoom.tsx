@@ -6,6 +6,8 @@ import OverviewPanel from "./OverviewPanel";
 import ChatPanel from "./ChatPanel";
 import IdeasPanel from "./IdeasPanel";
 import TradingPanel from "./TradingPanel";
+import AteMobileNav, { type MobileNavId } from "./AteMobileNav";
+import { useIsMobile } from "./useIsMobile";
 import { useResizablePanel } from "../suparays/useResizablePanel";
 import { useTheme } from "../suparays/useTheme";
 import { buildGridSections, buildMenuItems, type MenuItem, type ViewMode } from "./viewMode";
@@ -137,17 +139,7 @@ export default function AteRoom() {
   const [error, setError] = useState("");
   const { width: panelWidth, dragging, onPointerDown } = useResizablePanel("ate-panel-width-v1");
   const { isDark, toggleTheme } = useTheme();
-  const [isMobile, setIsMobile] = useState(
-    () => typeof window !== "undefined" && window.matchMedia("(max-width: 800px)").matches,
-  );
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 800px)");
-    const sync = () => setIsMobile(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
+  const isMobile = useIsMobile();
 
   const menuItems = useMemo(
     () => buildMenuItems(project?.manifest.pages || [], viewMode),
@@ -254,7 +246,7 @@ export default function AteRoom() {
 
   function pick(item: { id: string; label: string; slug: string | null; kind: string; taskId?: string }) {
     setActiveId(item.id);
-    if (item.slug === "trading") {
+    if (item.slug === "trading" || item.kind === "trading") {
       setViewMode("trading");
     } else if (viewMode === "trading" && item.kind !== "trading") {
       setViewMode("company");
@@ -291,6 +283,35 @@ export default function AteRoom() {
   const isTrading = viewMode === "trading" || selection?.slug === "trading";
   const wikiViewMode: "dev" | "company" = viewMode === "dev" ? "dev" : "company";
 
+  const mobileNavActive: MobileNavId = isTrading
+    ? "trading"
+    : selection?.slug === "chat"
+      ? "chat"
+      : selection?.slug === "ideabox"
+        ? "ideas"
+        : "home";
+
+  function handleMobileNav(id: MobileNavId) {
+    if (id === "home") {
+      setViewMode("company");
+      setSelection(null);
+      setActiveId(null);
+      return;
+    }
+    if (id === "trading") {
+      setViewMode("trading");
+      setSelection({ id: "trading", kind: "trading", slug: "trading", label: "Terminal" });
+      setActiveId("trading");
+      return;
+    }
+    if (id === "chat") {
+      setViewMode("company");
+      pick({ id: "chat", label: "Chat", slug: "chat", kind: "tool" });
+      return;
+    }
+    pick({ id: "ideabox", label: "Idébox", slug: "ideabox", kind: "tool" });
+  }
+
   const panelContent =
     selection?.kind === "overview" && project ? (
       <OverviewPanel
@@ -319,7 +340,7 @@ export default function AteRoom() {
     );
 
   return (
-    <div className={`suparays-root ate-root${isDark ? " theme-dark" : ""}`}>
+    <div className={`suparays-root ate-root${isDark ? " theme-dark" : ""}${isMobile ? " ate-mobile" : ""}`}>
       <header className="room-mobile-bar">
         <div className="room-mobile-bar-top">
           <strong>ATE</strong>
@@ -393,12 +414,9 @@ export default function AteRoom() {
             <TradingPanel
               memberId={memberId}
               isDark={isDark}
+              isMobile={isMobile}
               onToggleTheme={toggleTheme}
-              onExit={() => {
-                setViewMode("company");
-                setSelection(null);
-                setActiveId(null);
-              }}
+              onExit={() => handleMobileNav("home")}
             />
           ) : projectLoading ? (
             <p className="room-loading">Laddar projekt…</p>
@@ -450,6 +468,10 @@ export default function AteRoom() {
           </>
         ) : null}
       </div>
+
+      {isMobile && (SKIP_AUTH || auth?.authenticated) ? (
+        <AteMobileNav active={mobileNavActive} onSelect={handleMobileNav} />
+      ) : null}
     </div>
   );
 }

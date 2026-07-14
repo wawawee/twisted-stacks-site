@@ -138,6 +138,17 @@ export function buildGridSections(
           slug: "tasklist-focus",
           kind: "focus",
         },
+        ...(mode === "company"
+          ? [
+              {
+                id: "trading",
+                label: "Live-terminal",
+                sublabel: "SPY · cup-and-handle · paper",
+                slug: "trading",
+                kind: "trading" as const,
+              },
+            ]
+          : []),
       ],
     },
   ];
