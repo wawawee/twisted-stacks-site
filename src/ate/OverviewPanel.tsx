@@ -44,10 +44,10 @@ const LIVE_NOW = [
 ];
 
 const REAL_EDGE_TRACK = [
-  "1.1 Funding rate → RegimeGate overheated",
-  "1.2 Exchange netflow → OnChainSignal (CryptoQuant)",
-  "1.3 DXY–crypto cross-market",
-  "1.4 Polymarket prob shifts → Macro Scout",
+  "1.1 Funding rate → RegimeGate — NO-GO (8.6% hit, 0.42× lift)",
+  "1.2 Exchange netflow → OnChainSignal (CryptoQuant) — draft",
+  "1.3 DXY–crypto cross-market — NO-GO (47% same-day, 0.93× lift)",
+  "1.4 Polymarket prob shifts → Macro Scout — stub",
 ];
 
 function groupPhases(tasks: AteTask[]) {
