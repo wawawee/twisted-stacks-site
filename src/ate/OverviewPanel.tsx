@@ -23,7 +23,7 @@ interface OverviewPanelProps {
 const PHASE_BLURBS: Record<string, string> = {
   "0": "Schemas, CI, colab ✓",
   "1": "C&H · backtests · TRADE colab ✓",
-  "2": "376/165 dataset · YOLO ← **active**",
+  "2": "376/165 dataset · YOLO ✓ · ONNX ✓",
   "3": "Fusion · RegimeGate · Macro live",
   "4": "Pydantic AI scouts — **next**",
   "5": "Temporal · MCP · HITL wire-up",
@@ -38,6 +38,7 @@ const LIVE_NOW = [
   "Live Polymarket i Macro Scout",
   "VectorBT backtests + QuantStats tear sheets",
   "Vision dataset 376 pos / 165 neg (`ate_v1`)",
+  "Vision YOLO classify — 50 ep, val top1 100%, ONNX exported",
   "hybrid-scan export (JSON/CSV + regime–macro)",
   "HITL approve/reject modal (stub)",
   "Alt-data stubs (null tills go/no-go)",
@@ -47,7 +48,7 @@ const REAL_EDGE_TRACK = [
   "1.1 Funding rate → RegimeGate — NO-GO (8.6% hit, 0.42× lift)",
   "1.2 Exchange netflow → OnChainSignal (CryptoQuant) — draft",
   "1.3 DXY–crypto cross-market — NO-GO (47% same-day, 0.93× lift)",
-  "1.4 Polymarket prob shifts → Macro Scout — stub",
+  "1.4 Polymarket prob shifts → Macro Scout — NO-GO (41% BTC 1d, 0.91× lift)",
 ];
 
 function groupPhases(tasks: AteTask[]) {
@@ -98,8 +99,8 @@ export default function OverviewPanel({
       <div className="detail-scroll overview-scroll">
         <p className="overview-lede ate-overview-lede">
           {viewMode === "company"
-            ? "TRADE live på /ate — chart, RegimeGate, 4 fusion lanes, Polymarket macro. Paper only. YOLO fine-tune + Real Edge validation pågår."
-            : "Fasplan från TASKLIST — Phase 2 vision + Real Edge 1.1–1.4 är aktivt fokus."}
+            ? "TRADE live på /ate — chart, RegimeGate, 4 fusion lanes, Polymarket macro. Paper only. Phase 2 YOLO + ONNX klart; Real Edge 1.1/1.3/1.4 NO-GO."
+            : "Fasplan från TASKLIST — Phase 2 vision done; Real Edge scorecard 1.1/1.3/1.4 NO-GO."}
         </p>
 
         <div className="ate-overview-stats">
