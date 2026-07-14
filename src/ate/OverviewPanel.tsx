@@ -111,7 +111,7 @@ export default function OverviewPanel({
             <strong>
               {phase?.phasesComplete ?? 0}/{phase?.phasesTotal ?? 9}
             </strong>
-            <span>faser klara</span>
+            <span>faser levererade</span>
           </div>
           <div className="ate-overview-stat">
             <strong>
@@ -124,11 +124,10 @@ export default function OverviewPanel({
             <span>läge</span>
           </div>
         </div>
-        {viewMode === "company" ? (
-          <p className="ate-overview-phase-note mono">
+          <p className="ate-overview-phase-note">
             Aktiv: Phase {phase?.activePhaseNum} — {phase?.activePhaseName}
+            {viewMode === "company" ? " · tidigare faser räknas vid ≥50%" : ""}
           </p>
-        ) : null}
 
         <blockquote className="overview-focus ate-overview-focus">{tasklist.currentFocus}</blockquote>
 

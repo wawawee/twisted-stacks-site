@@ -31,7 +31,7 @@ function parseImmediateSection(md) {
   return { focusLines, recentWins };
 }
 
-function computePhaseProgress(tasks) {
+function computePhaseProgress(tasks, currentFocus = "") {
   const byPhase = new Map();
   for (const t of tasks) {
     const n = t.phaseNum || "?";
@@ -43,21 +43,27 @@ function computePhaseProgress(tasks) {
     .map(Number)
     .sort((a, b) => a - b);
 
-  let phasesComplete = 0;
-  for (const num of nums) {
-    const pt = byPhase.get(String(num));
-    const nonDeferred = pt.filter((t) => !t.deferred);
-    if (nonDeferred.length > 0 && nonDeferred.every((t) => t.done)) phasesComplete++;
+  function phasePct(num) {
+    const nd = (byPhase.get(String(num)) || []).filter((t) => !t.deferred);
+    if (!nd.length) return 0;
+    return nd.filter((t) => t.done).length / nd.length;
   }
 
+  const focusMatch = currentFocus.match(/Phase\s*(\d+)/i);
+  const focusPhase = focusMatch ? Number(focusMatch[1]) : null;
+  const inProgressPhases = nums.filter((n) => byPhase.get(String(n)).some((t) => t.inProgress));
+
   const activeNum =
-    nums.find((n) => byPhase.get(String(n)).some((t) => t.inProgress)) ??
-    nums.find((n) => {
-      const nonDeferred = byPhase.get(String(n)).filter((t) => !t.deferred);
-      return nonDeferred.some((t) => !t.done);
+    focusPhase ??
+    (inProgressPhases.length ? Math.max(...inProgressPhases) : null) ??
+    [...nums].reverse().find((n) => {
+      const pct = phasePct(n);
+      return pct > 0 && pct < 1;
     }) ??
-    nums[nums.length - 1] ??
     2;
+
+  // Prior phases ≥50% done count as delivered (investor roadmap — not strict 100% gate)
+  const phasesComplete = nums.filter((n) => Number(n) < activeNum && phasePct(n) >= 0.5).length;
 
   const apt = byPhase.get(String(activeNum)) || [];
   const nonDeferred = apt.filter((t) => !t.deferred);
@@ -124,7 +130,7 @@ export function parseTasklist(md) {
     done: tasks.filter((t) => t.done).length,
     p0Open: tasks.filter((t) => t.priority === "P0" && !t.done && !t.deferred).length,
     p1Open: tasks.filter((t) => t.priority === "P1" && !t.done && !t.deferred).length,
-    phaseProgress: computePhaseProgress(tasks),
+    phaseProgress: computePhaseProgress(tasks, currentFocus),
   };
 
   return {
