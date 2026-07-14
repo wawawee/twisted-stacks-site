@@ -96,6 +96,16 @@
   margin-bottom: 1.25rem;
 }
 
+.ate-overview-phase-note {
+  margin: -0.5rem 0 0.85rem;
+  font-size: 0.68rem;
+  opacity: 0.85;
+}
+
+.ate-overview-stat-primary strong {
+  color: var(--accent);
+}
+
 .ate-overview-section {
   margin-bottom: 1.25rem;
 }
@@ -1368,5 +1378,14 @@
 
   .ate-overview-stats {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .ate-root .overview-panel .detail-panel-head {
+    display: flex;
+  }
+
+  .ate-root .overview-panel.ate-overview {
+    min-height: 0;
+    height: 100%;
   }
 }

@@ -133,6 +133,13 @@ export function buildGridSections(
       title: "Fokus",
       items: [
         {
+          id: "overview",
+          label: "Översikt",
+          sublabel: "Fasprogress · live · Real Edge",
+          slug: null,
+          kind: "overview" as const,
+        },
+        {
           id: "focus",
           label: "Nuvarande fokus",
           sublabel: manifest.currentFocus.slice(0, 72) + (manifest.currentFocus.length > 72 ? "…" : ""),

@@ -45,7 +45,7 @@ const LIVE_NOW = [
 
 const REAL_EDGE_TRACK = [
   "1.1 Funding rate → RegimeGate overheated",
-  "1.2 Exchange netflow → OnChainSignal",
+  "1.2 Exchange netflow → OnChainSignal (CryptoQuant)",
   "1.3 DXY–crypto cross-market",
   "1.4 Polymarket prob shifts → Macro Scout",
 ];
@@ -81,7 +81,7 @@ export default function OverviewPanel({
 }: OverviewPanelProps) {
   const tasks = tasklist.tasks as AteTask[];
   const phases = useMemo(() => groupPhases(tasks), [tasks]);
-  const pct = Math.round((tasklist.stats.done / Math.max(tasklist.stats.total, 1)) * 100);
+  const phase = tasklist.stats.phaseProgress;
   const focusTasks = tasklist.focusTasks ?? tasks.filter((t) => t.priority === "P0" && !t.done && !t.deferred);
   const visiblePhases = viewMode === "company" ? phases.filter((p) => Number(p.num) <= 4) : phases;
 
@@ -103,25 +103,32 @@ export default function OverviewPanel({
         </p>
 
         <div className="ate-overview-stats">
-          <div className="ate-overview-stat">
-            <strong>{pct}%</strong>
-            <span>klart</span>
+          <div className="ate-overview-stat ate-overview-stat-primary">
+            <strong>{phase?.activePhasePct ?? 0}%</strong>
+            <span>Fas {phase?.activePhaseNum ?? "?"}</span>
           </div>
           <div className="ate-overview-stat">
             <strong>
-              {tasklist.stats.done}/{tasklist.stats.total}
+              {phase?.phasesComplete ?? 0}/{phase?.phasesTotal ?? 9}
             </strong>
-            <span>tasks</span>
+            <span>faser klara</span>
           </div>
           <div className="ate-overview-stat">
-            <strong>376/165</strong>
-            <span>vision</span>
+            <strong>
+              {phase?.activePhaseDone ?? 0}/{phase?.activePhaseTotal ?? 0}
+            </strong>
+            <span>i aktiv fas</span>
           </div>
           <div className="ate-overview-stat ate-overview-stat-mode">
             <strong>PAPER</strong>
             <span>läge</span>
           </div>
         </div>
+        {viewMode === "company" ? (
+          <p className="ate-overview-phase-note mono">
+            Aktiv: Phase {phase?.activePhaseNum} — {phase?.activePhaseName}
+          </p>
+        ) : null}
 
         <blockquote className="overview-focus ate-overview-focus">{tasklist.currentFocus}</blockquote>
 

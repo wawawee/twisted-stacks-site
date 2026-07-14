@@ -388,12 +388,22 @@ export default function AteRoom() {
         ) : projectLoading ? (
           <p className="room-loading">Laddar projekt…</p>
         ) : project ? (
-          <ProjectGrid
-            sections={gridSections}
-            activeId={activeId}
-            stats={project.manifest.stats}
-            onSelect={pick}
-          />
+          isMobile && !selection ? (
+            <OverviewPanel
+              tasklist={project.tasklist}
+              history={project.history}
+              syncedAt={project.manifest.syncedAt}
+              viewMode={viewMode}
+              onNavigate={pick}
+            />
+          ) : (
+            <ProjectGrid
+              sections={gridSections}
+              activeId={activeId}
+              stats={project.manifest.stats}
+              onSelect={pick}
+            />
+          )
         ) : (
           <p className="room-error">
             {import.meta.env.DEV ? "Kör npm run sync:ate" : "Projektet kunde inte laddas."}

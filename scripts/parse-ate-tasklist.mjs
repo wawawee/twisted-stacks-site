@@ -31,6 +31,52 @@ function parseImmediateSection(md) {
   return { focusLines, recentWins };
 }
 
+function computePhaseProgress(tasks) {
+  const byPhase = new Map();
+  for (const t of tasks) {
+    const n = t.phaseNum || "?";
+    if (!byPhase.has(n)) byPhase.set(n, []);
+    byPhase.get(n).push(t);
+  }
+  const nums = [...byPhase.keys()]
+    .filter((n) => n !== "?")
+    .map(Number)
+    .sort((a, b) => a - b);
+
+  let phasesComplete = 0;
+  for (const num of nums) {
+    const pt = byPhase.get(String(num));
+    const nonDeferred = pt.filter((t) => !t.deferred);
+    if (nonDeferred.length > 0 && nonDeferred.every((t) => t.done)) phasesComplete++;
+  }
+
+  const activeNum =
+    nums.find((n) => byPhase.get(String(n)).some((t) => t.inProgress)) ??
+    nums.find((n) => {
+      const nonDeferred = byPhase.get(String(n)).filter((t) => !t.deferred);
+      return nonDeferred.some((t) => !t.done);
+    }) ??
+    nums[nums.length - 1] ??
+    2;
+
+  const apt = byPhase.get(String(activeNum)) || [];
+  const nonDeferred = apt.filter((t) => !t.deferred);
+  const activePhaseDone = nonDeferred.filter((t) => t.done).length;
+  const activePhaseTotal = nonDeferred.length;
+  const activePhasePct =
+    activePhaseTotal > 0 ? Math.round((activePhaseDone / activePhaseTotal) * 100) : 0;
+
+  return {
+    phasesTotal: nums.length,
+    phasesComplete,
+    activePhaseNum: String(activeNum),
+    activePhaseName: apt[0]?.phaseName || `Phase ${activeNum}`,
+    activePhaseDone,
+    activePhaseTotal,
+    activePhasePct,
+  };
+}
+
 export function parseTasklist(md) {
   const lastUpdated = md.match(/\*\*Last updated:\*\*\s*(.+)/i)?.[1]?.trim() || null;
 
@@ -78,6 +124,7 @@ export function parseTasklist(md) {
     done: tasks.filter((t) => t.done).length,
     p0Open: tasks.filter((t) => t.priority === "P0" && !t.done && !t.deferred).length,
     p1Open: tasks.filter((t) => t.priority === "P1" && !t.done && !t.deferred).length,
+    phaseProgress: computePhaseProgress(tasks),
   };
 
   return {

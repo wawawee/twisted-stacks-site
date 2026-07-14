@@ -22,7 +22,21 @@ interface TasklistData {
   gates: Array<{ id: string; requirement: string; done: boolean }>;
   activity: Array<{ date: string; agent: string; taskId: string | null; action: string }>;
   completed: Array<{ id: string | null; task: string; completed: string; by: string }>;
-  stats: { total: number; done: number; p0Open: number; p1Open: number };
+  stats: {
+    total: number;
+    done: number;
+    p0Open: number;
+    p1Open: number;
+    phaseProgress?: {
+      phasesTotal: number;
+      phasesComplete: number;
+      activePhaseNum: string;
+      activePhaseName: string;
+      activePhaseDone: number;
+      activePhaseTotal: number;
+      activePhasePct: number;
+    };
+  };
 }
 
 interface HistoryData {
@@ -100,11 +114,17 @@ export default function DetailPanel({
             <div className="progress-bar">
               <div
                 className="progress-fill"
-                style={{ width: `${Math.round((tasklist.stats.done / Math.max(tasklist.stats.total, 1)) * 100)}%` }}
+                style={{
+                  width: `${tasklist.stats.phaseProgress?.activePhasePct ?? Math.round((tasklist.stats.done / Math.max(tasklist.stats.total, 1)) * 100)}%`,
+                }}
               />
             </div>
             <span className="progress-pct mono">
-              {tasklist.stats.done}/{tasklist.stats.total} tasks · {tasklist.stats.p0Open} P0 öppna
+              Fas {tasklist.stats.phaseProgress?.activePhaseNum ?? "?"}:{" "}
+              {tasklist.stats.phaseProgress?.activePhaseDone ?? tasklist.stats.done}/
+              {tasklist.stats.phaseProgress?.activePhaseTotal ?? tasklist.stats.total} i aktiv fas ·{" "}
+              {tasklist.stats.phaseProgress?.phasesComplete ?? 0}/
+              {tasklist.stats.phaseProgress?.phasesTotal ?? 9} faser klara
             </span>
           </div>
           <h3>Funding gates</h3>

@@ -4,25 +4,39 @@ import type { GridSection } from "./viewMode";
 interface ProjectGridProps {
   sections: GridSection[];
   activeId: string | null;
-  stats: { total: number; done: number; p0Open: number; p1Open: number };
+  stats: {
+    total: number;
+    done: number;
+    p0Open: number;
+    p1Open: number;
+    phaseProgress?: {
+      activePhasePct: number;
+      activePhaseNum: string;
+      activePhaseDone: number;
+      activePhaseTotal: number;
+      phasesComplete: number;
+      phasesTotal: number;
+    };
+  };
   onSelect: (item: GridSection["items"][0]) => void;
 }
 
 export default function ProjectGrid({ sections, activeId, stats, onSelect }: ProjectGridProps) {
+  const phase = stats.phaseProgress;
   return (
     <div className="room-grid">
       <div className="room-grid-stats">
         <div className="stat-chip">
-          <span className="stat-val">{stats.done}/{stats.total}</span>
-          <span className="stat-lbl">TASKS</span>
+          <span className="stat-val">{phase?.activePhasePct ?? Math.round((stats.done / Math.max(stats.total, 1)) * 100)}%</span>
+          <span className="stat-lbl">FAS {phase?.activePhaseNum ?? "?"}</span>
         </div>
         <div className="stat-chip">
-          <span className="stat-val">{stats.p0Open}</span>
-          <span className="stat-lbl">P0 ÖPPNA</span>
+          <span className="stat-val">{phase?.phasesComplete ?? 0}/{phase?.phasesTotal ?? 9}</span>
+          <span className="stat-lbl">FASER KLARA</span>
         </div>
         <div className="stat-chip">
-          <span className="stat-val">{Math.round((stats.done / Math.max(stats.total, 1)) * 100)}%</span>
-          <span className="stat-lbl">KLART</span>
+          <span className="stat-val">{phase?.activePhaseDone ?? stats.done}/{phase?.activePhaseTotal ?? stats.total}</span>
+          <span className="stat-lbl">AKTIV FAS</span>
         </div>
       </div>
 
