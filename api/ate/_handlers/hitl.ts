@@ -18,6 +18,50 @@ function postHitlStatus(decision: HitlDecision): string {
   return decision === "approved" ? "paper_ready" : "hitl_rejected";
 }
 
+function defaultWorkflowId(symbol: string): string {
+  return `paper-tick-${symbol.toUpperCase()}`;
+}
+
+function isTemporalConfigured(): boolean {
+  const address = process.env.TEMPORAL_ADDRESS?.trim();
+  const namespace = process.env.TEMPORAL_NAMESPACE?.trim();
+  return Boolean(address && namespace);
+}
+
+async function signalTemporalProxy(params: {
+  symbol: string;
+  decision: HitlDecision;
+  workflowId: string;
+  fusionScore: number | null;
+}): Promise<{ signaled: boolean; detail?: string; temporal?: unknown }> {
+  const proxyUrl = process.env.ATE_HITL_PROXY_URL?.trim();
+  if (!proxyUrl) {
+    return {
+      signaled: false,
+      detail: "ATE_HITL_PROXY_URL not set — log-only stub (see docs/DEPLOY_ENV.md)",
+    };
+  }
+
+  const resp = await fetch(proxyUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      symbol: params.symbol,
+      decision: params.decision,
+      workflow_id: params.workflowId,
+      fusion_score: params.fusionScore,
+    }),
+  });
+
+  if (!resp.ok) {
+    const text = await resp.text();
+    return { signaled: false, detail: `proxy ${resp.status}: ${text.slice(0, 200)}` };
+  }
+
+  const body = (await resp.json()) as Record<string, unknown>;
+  return { signaled: true, temporal: body };
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Cache-Control", "no-store");
 
@@ -47,7 +91,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     typeof body.fusion_score === "number" && Number.isFinite(body.fusion_score)
       ? body.fusion_score
       : null;
-  const workflowId = body.workflow_id?.trim() || null;
+  const workflowId = body.workflow_id?.trim() || defaultWorkflowId(symbol);
 
   const record = {
     symbol,
@@ -60,11 +104,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   console.info("[ate/hitl]", JSON.stringify(record));
 
+  let temporalResult: { signaled: boolean; detail?: string; temporal?: unknown } | null = null;
+  if (isTemporalConfigured()) {
+    temporalResult = await signalTemporalProxy({
+      symbol,
+      decision,
+      workflowId,
+      fusionScore,
+    });
+    if (temporalResult.signaled) {
+      console.info("[ate/hitl] temporal signaled", JSON.stringify(temporalResult.temporal));
+    } else {
+      console.warn("[ate/hitl] temporal stub", temporalResult.detail);
+    }
+  }
+
   const status = postHitlStatus(decision);
 
   res.status(200).json({
     ok: true,
     status,
     recorded: record,
+    temporal: temporalResult,
   });
 }
