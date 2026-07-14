@@ -6,7 +6,7 @@ import {
   requireSession,
   type VercelRequest,
   type VercelResponse,
-} from "./session.js";
+} from "../_lib/session.js";
 
 const BUCKET = "suparays-shared";
 const TABLE = "suparays_files";

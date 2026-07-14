@@ -6,8 +6,8 @@ import {
   requireSession,
   type VercelRequest,
   type VercelResponse,
-} from "./session.js";
-import { syncChatToWiki } from "./sync-chat-wiki.js";
+} from "../_lib/session.js";
+import { syncChatToWiki } from "../_lib/sync-chat-wiki.js";
 
 const TABLE = "suparays_messages";
 const VALID_MEMBERS = new Set(["baha", "kris", "joachim", "per"]);

@@ -1,9 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-import { requireSession, type VercelRequest, type VercelResponse } from "./session.js";
+import { requireSession, type VercelRequest, type VercelResponse } from "../_lib/session.js";
 
-const ROOT = path.join(process.cwd(), "suparays-wiki");
+const ROOT = path.join(process.cwd(), "ate-wiki");
 
 async function readJson(name: string) {
   const raw = await fs.readFile(path.join(ROOT, name), "utf8");
@@ -29,6 +29,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     ]);
     res.status(200).json({ manifest, tasklist, history });
   } catch {
-    res.status(503).json({ error: "Project not synced — kör npm run sync:wiki" });
+    res.status(503).json({ error: "Project not synced — kör npm run sync:ate" });
   }
 }

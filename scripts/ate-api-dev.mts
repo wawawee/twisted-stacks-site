@@ -32,11 +32,11 @@ loadEnvFile(".env.local");
 process.env.ATE_DEV_SKIP_AUTH = process.env.ATE_DEV_SKIP_AUTH || "1";
 
 const routes: Record<string, () => Promise<{ default: (req: unknown, res: unknown) => unknown }>> = {
-  "/api/ate/auth": () => import("../api/ate/auth.ts"),
-  "/api/ate/project": () => import("../api/ate/project.ts"),
-  "/api/ate/wiki": () => import("../api/ate/wiki.ts"),
-  "/api/ate/chat": () => import("../api/ate/chat.ts"),
-  "/api/ate/ideas": () => import("../api/ate/ideas.ts"),
+  "/api/ate/auth": () => import("../api/ate/_handlers/auth.ts"),
+  "/api/ate/project": () => import("../api/ate/_handlers/project.ts"),
+  "/api/ate/wiki": () => import("../api/ate/_handlers/wiki.ts"),
+  "/api/ate/chat": () => import("../api/ate/_handlers/chat.ts"),
+  "/api/ate/ideas": () => import("../api/ate/_handlers/ideas.ts"),
 };
 
 async function readBody(req: http.IncomingMessage) {

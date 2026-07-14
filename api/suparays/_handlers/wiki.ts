@@ -1,9 +1,13 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-import { requireSession, type VercelRequest, type VercelResponse } from "./session.js";
+import {
+  requireSession,
+  type VercelRequest,
+  type VercelResponse,
+} from "../_lib/session.js";
 
-const WIKI_ROOT = path.join(process.cwd(), "ate-wiki");
+const WIKI_ROOT = path.join(process.cwd(), "suparays-wiki");
 const ALLOWED = /^(IDEAS\.md|COLLAB-CHAT\.md|TASKLIST\.md|HISTORY\.md|by-topic\/[a-zA-Z0-9_-]+\.md)$/;
 
 interface WikiPage {

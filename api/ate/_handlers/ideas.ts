@@ -6,10 +6,10 @@ import {
   requireSession,
   type VercelRequest,
   type VercelResponse,
-} from "./session.js";
-import { syncChatToWiki } from "./sync-chat-wiki.js";
+} from "../_lib/session.js";
+import { syncIdeaToWiki } from "../_lib/sync-idea-wiki.js";
 
-const TABLE = "ate_messages";
+const TABLE = "ate_ideas";
 const VALID_MEMBERS = new Set(["baha", "kris", "joachim", "per"]);
 
 function getSupabaseClient() {
@@ -45,19 +45,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { data, error } = await supabase
       .from(TABLE)
       .select("id, member, body, created_at")
-      .order("created_at", { ascending: true })
-      .limit(80);
+      .order("created_at", { ascending: false })
+      .limit(50);
     if (error) {
       res.status(500).json({ error: error.message });
       return;
     }
-    const messages = (data || []).map((row: { id: number; member: string; body: string; created_at: string }) => ({
+    const ideas = (data || []).reverse().map((row: { id: number; member: string; body: string; created_at: string }) => ({
       id: row.id,
       member: row.member,
       body: row.body,
       createdAt: row.created_at,
     }));
-    res.status(200).json({ messages });
+    res.status(200).json({ ideas });
     return;
   }
 
@@ -68,9 +68,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
     const bodyObj = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-    const text = String(bodyObj?.body ?? "").trim().slice(0, 2000);
+    const text = String(bodyObj?.body ?? "").trim().slice(0, 8000);
     if (!text) {
-      res.status(400).json({ error: "Meddelandet är tomt." });
+      res.status(400).json({ error: "Idén är tom." });
       return;
     }
     const { data, error } = await supabase
@@ -82,21 +82,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       res.status(500).json({ error: error.message });
       return;
     }
-    const message = {
+    const idea = {
       id: data.id,
       member: data.member,
       body: data.body,
       createdAt: data.created_at,
     };
 
-    const wiki = await syncChatToWiki({
+    const wiki = await syncIdeaToWiki({
       id: data.id,
       member: data.member,
       body: data.body,
       createdAt: data.created_at,
     });
 
-    res.status(201).json({ message, wiki });
+    res.status(201).json({ idea, wiki });
     return;
   }
 

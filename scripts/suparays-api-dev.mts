@@ -33,12 +33,12 @@ loadEnvFile(".env.local");
 process.env.SUPARAYS_DEV_SKIP_AUTH = process.env.SUPARAYS_DEV_SKIP_AUTH || "1";
 
 const routes: Record<string, () => Promise<{ default: (req: unknown, res: unknown) => unknown }>> = {
-  "/api/suparays/auth": () => import("../api/suparays/auth.ts"),
-  "/api/suparays/project": () => import("../api/suparays/project.ts"),
-  "/api/suparays/wiki": () => import("../api/suparays/wiki.ts"),
-  "/api/suparays/chat": () => import("../api/suparays/chat.ts"),
-  "/api/suparays/ideas": () => import("../api/suparays/ideas.ts"),
-  "/api/suparays/files": () => import("../api/suparays/files.ts"),
+  "/api/suparays/auth": () => import("../api/suparays/_handlers/auth.ts"),
+  "/api/suparays/project": () => import("../api/suparays/_handlers/project.ts"),
+  "/api/suparays/wiki": () => import("../api/suparays/_handlers/wiki.ts"),
+  "/api/suparays/chat": () => import("../api/suparays/_handlers/chat.ts"),
+  "/api/suparays/ideas": () => import("../api/suparays/_handlers/ideas.ts"),
+  "/api/suparays/files": () => import("../api/suparays/_handlers/files.ts"),
 };
 
 async function readBody(req: http.IncomingMessage) {

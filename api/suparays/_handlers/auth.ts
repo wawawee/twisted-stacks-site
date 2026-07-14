@@ -6,7 +6,7 @@ import {
   verifySessionToken,
   type VercelRequest,
   type VercelResponse,
-} from "./session.js";
+} from "../_lib/session.js";
 
 const VALID_MEMBERS = new Set(["baha", "kris", "joachim", "per"]);
 
