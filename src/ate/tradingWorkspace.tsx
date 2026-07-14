@@ -11,6 +11,18 @@ export function fmtPrice(n: number, digits = 2) {
 
 type MobileTab = "chart" | "signals" | "watch";
 
+export interface TelemetrySnapshot {
+  symbol: string;
+  signalCount: number;
+  barCount: number;
+  at: Date;
+}
+
+export interface MarketFetchSnapshot {
+  symbol: string;
+  at: Date;
+}
+
 interface TradingContextValue {
   symbol: string;
   setSymbol: (s: string) => void;
@@ -25,11 +37,27 @@ interface TradingContextValue {
   error: string;
   loadMarket: () => Promise<void>;
   runScan: () => Promise<void>;
+  lastScan: TelemetrySnapshot | null;
+  lastMarketFetch: MarketFetchSnapshot | null;
   isMobile: boolean;
   isDark: boolean;
   mobileTab: MobileTab;
   setMobileTab: (t: MobileTab) => void;
 }
+
+function fmtTelemetryTime(d: Date) {
+  return d.toLocaleString("sv-SE", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+const MOCK_MACRO_QUOTES = [
+  { label: "Fed cut Mar '26", prob: 72 },
+  { label: "BTC $100K Dec", prob: 58 },
+] as const;
 
 const TradingContext = createContext<TradingContextValue | null>(null);
 
@@ -57,6 +85,8 @@ export function TradingWorkspaceProvider({
   const [loading, setLoading] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState("");
+  const [lastScan, setLastScan] = useState<TelemetrySnapshot | null>(null);
+  const [lastMarketFetch, setLastMarketFetch] = useState<MarketFetchSnapshot | null>(null);
 
   const loadMarket = useCallback(async () => {
     setLoading(true);
@@ -69,6 +99,7 @@ export function TradingWorkspaceProvider({
       if (!res.ok) throw new Error(data.error || "Kunde inte hämta marknadsdata");
       setBars(data.bars || []);
       setQuote(data.quote || null);
+      setLastMarketFetch({ symbol: data.symbol || symbol, at: new Date() });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Marknadsfel");
     } finally {
@@ -86,6 +117,12 @@ export function TradingWorkspaceProvider({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Scan misslyckades");
       setSignals(data.signals || []);
+      setLastScan({
+        symbol: data.symbol || symbol,
+        signalCount: data.signal_count ?? (data.signals?.length ?? 0),
+        barCount: data.bar_count ?? 0,
+        at: new Date(),
+      });
       if (!bars.length && data.bar_count) {
         await loadMarket();
       }
@@ -117,6 +154,8 @@ export function TradingWorkspaceProvider({
       error,
       loadMarket,
       runScan,
+      lastScan,
+      lastMarketFetch,
       isMobile,
       isDark,
       mobileTab,
@@ -134,6 +173,8 @@ export function TradingWorkspaceProvider({
       error,
       loadMarket,
       runScan,
+      lastScan,
+      lastMarketFetch,
       isMobile,
       isDark,
       mobileTab,
@@ -212,28 +253,87 @@ export function TradingToolbar({ compact }: { compact?: boolean }) {
 }
 
 export function TradingSidePanel() {
-  const { symbol, setSymbol, signals } = useTradingWorkspace();
   return (
     <div className="ate-trade-side-panel detail-panel">
       <header className="detail-panel-head">
         <h2>TRADE</h2>
       </header>
       <div className="detail-scroll">
-        <TradingSideContent symbol={symbol} setSymbol={setSymbol} signals={signals} />
+        <TradingSideContent />
       </div>
     </div>
   );
 }
 
-export function TradingSideContent({
-  symbol,
-  setSymbol,
-  signals,
-}: {
-  symbol: string;
-  setSymbol: (s: string) => void;
-  signals: CupHandleSignal[];
-}) {
+function TelemetrySubsection() {
+  const { lastScan, lastMarketFetch, scanning, loading } = useTradingWorkspace();
+
+  return (
+    <div className="ate-telemetry-block">
+      <h4 className="ate-telemetry-heading">Telemetry</h4>
+      <dl className="ate-telemetry-feed">
+        <div className="ate-telemetry-row">
+          <dt>Last scan</dt>
+          <dd className="mono">
+            {lastScan ? (
+              <>
+                {lastScan.symbol} · {lastScan.signalCount} signal{lastScan.signalCount === 1 ? "" : "s"} ·{" "}
+                {lastScan.barCount} bars
+              </>
+            ) : scanning ? (
+              "Scanning…"
+            ) : (
+              "—"
+            )}
+          </dd>
+        </div>
+        <div className="ate-telemetry-row">
+          <dt>Market fetch</dt>
+          <dd className="mono">
+            {lastMarketFetch ? (
+              <>
+                {fmtTelemetryTime(lastMarketFetch.at)} · {lastMarketFetch.symbol}
+              </>
+            ) : loading ? (
+              "Fetching…"
+            ) : (
+              "—"
+            )}
+          </dd>
+        </div>
+      </dl>
+      <span className="ate-trading-badge ate-telemetry-paper">PAPER</span>
+    </div>
+  );
+}
+
+function MacroScoutSection() {
+  return (
+    <section className="ate-trading-section ate-macro-scout" aria-labelledby="ate-macro-scout-heading">
+      <div className="ate-macro-scout-head">
+        <h3 id="ate-macro-scout-heading">Macro Scout</h3>
+        <span className="ate-macro-demo-badge">MOCK</span>
+      </div>
+      <p className="ate-trading-muted ate-macro-scout-note">Demo quotes — PMXT integration phase 3+</p>
+      <ul className="ate-macro-quotes">
+        {MOCK_MACRO_QUOTES.map((q) => (
+          <li key={q.label} className="ate-macro-quote">
+            <span className="ate-macro-quote-label">{q.label}</span>
+            <span className="ate-macro-quote-prob mono">{q.prob}%</span>
+          </li>
+        ))}
+      </ul>
+      <p className="ate-macro-whale mono">
+        <span className="ate-macro-whale-tag">Whale</span>
+        $1.2M YES · wallet +$4.7M lifetime
+      </p>
+    </section>
+  );
+}
+
+export function TradingSideContent() {
+  const { symbol, setSymbol, signals } = useTradingWorkspace();
+
   return (
     <>
       <section className="ate-trading-section">
@@ -279,26 +379,25 @@ export function TradingSideContent({
         )}
       </section>
 
+      <MacroScoutSection />
+
       <section className="ate-trading-section ate-trading-lanes">
         <h3>Lanes</h3>
         <ul className="ate-lane-status">
-          <li className="active">
-            <span>Cup & Handle</span>
+          <li className="active classical">
+            <span>Classical</span>
             <em>live</em>
           </li>
           <li>
             <span>Vision</span>
-            <em>phase 2</em>
+            <em>soon</em>
           </li>
-          <li>
-            <span>Fusion</span>
-            <em>phase 3</em>
-          </li>
-          <li>
-            <span>Telemetry</span>
+          <li className="macro">
+            <span>Macro</span>
             <em>soon</em>
           </li>
         </ul>
+        <TelemetrySubsection />
       </section>
     </>
   );
@@ -306,7 +405,6 @@ export function TradingSideContent({
 
 export function TradingMainPanel() {
   const {
-    bars,
     quote,
     topSignal,
     error,
@@ -314,8 +412,6 @@ export function TradingMainPanel() {
     isDark,
     mobileTab,
     setMobileTab,
-    symbol,
-    setSymbol,
     signals,
   } = useTradingWorkspace();
 
@@ -348,12 +444,12 @@ export function TradingMainPanel() {
         </div>
         {mobileTab === "watch" ? (
           <div className="ate-trading-mobile-pane">
-            <TradingSideContent symbol={symbol} setSymbol={setSymbol} signals={signals} />
+            <TradingSideContent />
           </div>
         ) : null}
         {mobileTab === "signals" ? (
           <div className="ate-trading-mobile-pane">
-            <TradingSideContent symbol={symbol} setSymbol={setSymbol} signals={signals} />
+            <TradingSideContent />
           </div>
         ) : null}
         {mobileTab === "chart" ? <TradingChartBlock height={chartHeight} /> : null}

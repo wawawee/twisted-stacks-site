@@ -10,6 +10,7 @@
   --bear: #b83b2e;
   --success: var(--bull);
   --agent: #6b4c9a;
+  --macro: #2563eb;
 
   --shadow: 4px 4px 0 var(--shadow-color);
 }
@@ -21,6 +22,7 @@
   --bear: #e85d4c;
   --success: var(--bull);
   --agent: #9b7ed9;
+  --macro: #60a5fa;
 }
 
 .ate-root .room-login-card h1,
@@ -522,11 +524,135 @@
   color: var(--success);
 }
 
+.ate-lane-status li.active.classical {
+  color: var(--accent);
+}
+
+.ate-lane-status li.macro span {
+  color: var(--macro);
+}
+
 .ate-lane-status em {
   font-style: normal;
   font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
+}
+
+.ate-telemetry-block {
+  margin-top: 0.65rem;
+  padding: 0.55rem 0.6rem;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.ate-telemetry-heading {
+  margin: 0 0 0.45rem;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+}
+
+.ate-telemetry-feed {
+  margin: 0;
+  font-size: 0.72rem;
+}
+
+.ate-telemetry-row {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  gap: 0.35rem;
+  padding: 0.2rem 0;
+}
+
+.ate-telemetry-row dt {
+  opacity: 0.65;
+  font-size: 0.68rem;
+}
+
+.ate-telemetry-row dd {
+  margin: 0;
+  word-break: break-word;
+}
+
+.ate-telemetry-paper {
+  display: inline-block;
+  margin-top: 0.45rem;
+}
+
+.ate-macro-scout {
+  border-left: 3px solid var(--macro);
+  padding-left: 0.55rem;
+}
+
+.ate-macro-scout-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.ate-macro-scout-head h3 {
+  margin: 0;
+  color: var(--macro);
+}
+
+.ate-macro-demo-badge {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 0.1rem 0.35rem;
+  border: 2px solid var(--macro);
+  color: var(--macro);
+}
+
+.ate-macro-scout-note {
+  margin: 0 0 0.45rem;
+  font-size: 0.68rem;
+}
+
+.ate-macro-quotes {
+  list-style: none;
+  margin: 0 0 0.45rem;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.ate-macro-quote {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  border: 2px solid var(--macro);
+  background: color-mix(in srgb, var(--macro) 8%, var(--surface));
+  padding: 0.3rem 0.45rem;
+  font-size: 0.72rem;
+}
+
+.ate-macro-quote-prob {
+  font-weight: 700;
+  color: var(--macro);
+}
+
+.ate-macro-whale {
+  margin: 0;
+  font-size: 0.68rem;
+  opacity: 0.85;
+  line-height: 1.35;
+}
+
+.ate-macro-whale-tag {
+  display: inline-block;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--macro);
+  margin-right: 0.35rem;
 }
 
 .ate-trading-main {
