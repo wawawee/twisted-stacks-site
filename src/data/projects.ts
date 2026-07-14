@@ -49,7 +49,8 @@ export type ProjectId =
   | "system_vr_superpowers"
   | "system_cymwave"
   | "system_arena"
-  | "system_tangle";
+  | "system_tangle"
+  | "system_ate";
 
 export interface ProjectEntry {
   id: ProjectId;
@@ -666,6 +667,60 @@ export const PROJECTS: ProjectEntry[] = [
       { label: "BALL SPEED", value: "DYNAMIC" },
       { label: "RENDER RATE", value: "60 FPS" },
       { label: "PADDLE MULTI", value: "4 ACTIVE" }
+    ],
+  },
+
+  /* ---------- 9. ATE ---------- */
+  {
+    id: "system_ate",
+    name: "ATE",
+    version: "Pre-Phase-0 / paper only",
+    status: "LAB",
+    tagline: "Typed agent swarm for classical + vision + fusion trading.",
+    description:
+      "ATE (Agentic Trading Engine) is a hybrid classical + vision + sequence ML trading system on an open-source backbone — Hummingbot, NautilusTrader, VectorBT, OpenBB — with owned fusion, hybrid memory, Temporal HITL, and React Flow swarm UI. First lane: cup-and-handle on SPY + BTC. Paper only until Phase 8.",
+    longDescription:
+      "ATE (Agentic Trading Engine) är ett hybrid trading-system som kombinerar klassisk mönsterigenkänning, vision-ML och sekvensmodeller i en typad agent-swarm. Majors äger connectors och backtesters; ATE:s kant är fusion, Risk Officer (hybrid veto + sizing), hybridminne och durable human-in-the-loop via Temporal.\n\nParallellt universum: SPY (1d) och BTC (4h). Risk Officer kombinerar hårda veto-gränser med CVaR-baserad sizing och HITL ovan tröskel.\n\nStatus: Pre-Phase-0 — monorepo scaffold, investor colab på /ate, inga live-resultat än.",
+    faq: [
+      {
+        q: "Vad är ATE?",
+        a: "Agentic Trading Engine — typad multi-agent trading med klassisk TA, vision och sekvens-ML, egen fusion och risk, på OSS-backbone (Hummingbot, Nautilus, VectorBT).",
+      },
+      {
+        q: "Handlar ATE live?",
+        a: "Nej. Paper/simulerat till Phase 8. Se docs/TRUTH-STATUS.md i repot.",
+      },
+      {
+        q: "Vilka tillgångar?",
+        a: "SPY (aktier, 1d) och BTC (krypto, 4h) — låst parallellt universum i v1.",
+      },
+    ],
+    stack: [
+      "Pydantic AI",
+      "LangGraph",
+      "Temporal",
+      "VectorBT",
+      "React Flow",
+      "Supabase",
+    ],
+    href: null,
+    ctaLabel: "Private",
+    collabHref: "/ate",
+    collabLabel: "Investor colab",
+    brandColor: "accent",
+    featured: true,
+    keywords: [
+      "agentic trading",
+      "cup and handle",
+      "multi-agent swarm",
+      "Temporal HITL",
+      "paper trading",
+    ],
+    lastUpdated: "2026-07-14",
+    telemetry: [
+      { label: "UNIVERSE", value: "SPY+BTC" },
+      { label: "MODE", value: "PAPER" },
+      { label: "STATUS", value: "LAB" },
     ],
   },
 ];

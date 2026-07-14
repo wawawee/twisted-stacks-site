@@ -1,0 +1,41 @@
+/* ATE room — B/W + amber #C9A227 + green #2D6A4F accents */
+
+.ate-root.suparays-root {
+  --accent: #c9a227;
+  --success: #2d6a4f;
+  --shadow: 4px 4px 0 var(--shadow-color);
+}
+
+.ate-root.suparays-root.theme-dark {
+  --accent: #c9a227;
+  --success: #2d6a4f;
+}
+
+.ate-root .room-login-card h1,
+.ate-root .room-brand-title {
+  letter-spacing: 0.12em;
+}
+
+.ate-root .room-toggle.active {
+  background: var(--accent);
+  color: #111;
+}
+
+.ate-root.theme-dark .room-toggle.active {
+  color: #111;
+}
+
+.ate-root .suparays-btn-primary,
+.ate-root .room-login-submit {
+  background: var(--accent);
+  border-color: var(--border);
+  color: #111;
+}
+
+.ate-root .project-stat-done {
+  color: var(--success);
+}
+
+.ate-root .room-card-accent {
+  border-left: 4px solid var(--accent);
+}

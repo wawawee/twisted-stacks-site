@@ -20,6 +20,10 @@ export default defineConfig(() => {
           target: 'http://127.0.0.1:3011',
           changeOrigin: true,
         },
+        '/api/ate': {
+          target: 'http://127.0.0.1:3012',
+          changeOrigin: true,
+        },
       },
     },
   };
