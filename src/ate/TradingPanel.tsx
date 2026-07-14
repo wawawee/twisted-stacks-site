@@ -7,13 +7,16 @@ const API = "/api/ate";
 
 interface TradingPanelProps {
   memberId: string | null;
+  isDark: boolean;
+  onToggleTheme: () => void;
+  onExit?: () => void;
 }
 
 function fmt(n: number, digits = 2) {
   return n.toLocaleString("en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits });
 }
 
-export default function TradingPanel({ memberId }: TradingPanelProps) {
+export default function TradingPanel({ memberId, isDark, onToggleTheme, onExit }: TradingPanelProps) {
   const [symbol, setSymbol] = useState("SPY");
   const [timeframe, setTimeframe] = useState("1d");
   const [bars, setBars] = useState<MarketBar[]>([]);
@@ -72,39 +75,59 @@ export default function TradingPanel({ memberId }: TradingPanelProps) {
     <div className="ate-trading-panel">
       <header className="ate-trading-head">
         <div className="ate-trading-brand">
-          <h2>Terminal</h2>
-          <span className="ate-trading-badge">PAPER</span>
-          {memberId ? <span className="ate-trading-user mono">{memberId}</span> : null}
+          <div className="ate-trading-brand-row">
+            <h2>ATE</h2>
+            <span className="ate-trading-badge">PAPER</span>
+            {memberId ? <span className="ate-trading-user mono">{memberId}</span> : null}
+          </div>
+          <p className="ate-trading-tagline">Agentic Trading Engine</p>
         </div>
-        <div className="ate-trading-controls">
-          <select
-            value={symbol}
-            onChange={(e) => setSymbol(e.target.value)}
-            aria-label="Symbol"
-            className="ate-trading-select"
+        <div className="ate-trading-head-actions">
+          <div className="ate-trading-controls">
+            <select
+              value={symbol}
+              onChange={(e) => setSymbol(e.target.value)}
+              aria-label="Symbol"
+              className="ate-trading-select"
+            >
+              {watchlistQuotes.map((w) => (
+                <option key={w.symbol} value={w.symbol}>
+                  {w.symbol}
+                </option>
+              ))}
+            </select>
+            <select
+              value={timeframe}
+              onChange={(e) => setTimeframe(e.target.value)}
+              aria-label="Timeframe"
+              className="ate-trading-select"
+            >
+              <option value="1d">1D</option>
+              <option value="4h">4H</option>
+              <option value="1h">1H</option>
+            </select>
+            <button type="button" className="room-btn" onClick={loadMarket} disabled={loading}>
+              {loading ? "…" : "Uppdatera"}
+            </button>
+            <button type="button" className="room-btn room-btn-primary" onClick={runScan} disabled={scanning}>
+              {scanning ? "Scannar…" : "Cup & Handle"}
+            </button>
+          </div>
+          <button
+            type="button"
+            className="room-theme-toggle"
+            onClick={onToggleTheme}
+            aria-pressed={isDark}
+            aria-label={isDark ? "Light mode" : "Dark mode"}
           >
-            {watchlistQuotes.map((w) => (
-              <option key={w.symbol} value={w.symbol}>
-                {w.symbol}
-              </option>
-            ))}
-          </select>
-          <select
-            value={timeframe}
-            onChange={(e) => setTimeframe(e.target.value)}
-            aria-label="Timeframe"
-            className="ate-trading-select"
-          >
-            <option value="1d">1D</option>
-            <option value="4h">4H</option>
-            <option value="1h">1H</option>
-          </select>
-          <button type="button" className="room-btn" onClick={loadMarket} disabled={loading}>
-            {loading ? "…" : "Uppdatera"}
+            <span className={`room-theme-knob${!isDark ? " dark" : ""}`} />
+            <span className="room-theme-label">{isDark ? "Light" : "Dark"}</span>
           </button>
-          <button type="button" className="room-btn room-btn-primary" onClick={runScan} disabled={scanning}>
-            {scanning ? "Scannar…" : "Cup & Handle"}
-          </button>
+          {onExit ? (
+            <button type="button" className="room-btn room-btn-muted ate-trading-exit" onClick={onExit}>
+              ← Colab
+            </button>
+          ) : null}
         </div>
       </header>
 
@@ -199,8 +222,44 @@ export default function TradingPanel({ memberId }: TradingPanelProps) {
           ) : null}
 
           <div className="ate-chart-wrap">
-            <TradingChart bars={bars} invalidation={topSignal?.invalidation ?? null} />
+            <TradingChart
+              bars={bars}
+              invalidation={topSignal?.invalidation ?? null}
+              isDark={isDark}
+            />
           </div>
+
+          {topSignal ? (
+            <div className="ate-fusion-strip" aria-label="Signal fusion weights">
+              <div className="ate-fusion-lane classical">
+                <label>
+                  <span>Classical</span>
+                  <span className="mono">{(topSignal.breakout_confidence * 100).toFixed(0)}%</span>
+                </label>
+                <div className="ate-fusion-bar">
+                  <span style={{ width: `${topSignal.breakout_confidence * 100}%` }} />
+                </div>
+              </div>
+              <div className="ate-fusion-lane vision">
+                <label>
+                  <span>Vision</span>
+                  <span className="mono">{(topSignal.vision_score * 100).toFixed(0)}%</span>
+                </label>
+                <div className="ate-fusion-bar">
+                  <span style={{ width: `${Math.max(topSignal.vision_score * 100, 2)}%` }} />
+                </div>
+              </div>
+              <div className="ate-fusion-lane sequence">
+                <label>
+                  <span>Sequence</span>
+                  <span className="mono">{(topSignal.sequence_prob * 100).toFixed(0)}%</span>
+                </label>
+                <div className="ate-fusion-bar">
+                  <span style={{ width: `${Math.max(topSignal.sequence_prob * 100, 2)}%` }} />
+                </div>
+              </div>
+            </div>
+          ) : null}
 
           {topSignal ? (
             <div className="ate-signal-hero">

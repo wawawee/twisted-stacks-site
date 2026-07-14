@@ -390,7 +390,16 @@ export default function AteRoom() {
         <main className={`room-main${isTrading ? " ate-trading-main-full" : ""}`}>
           {error && !isTrading ? <p className="room-error">{error}</p> : null}
           {isTrading ? (
-            <TradingPanel memberId={memberId} />
+            <TradingPanel
+              memberId={memberId}
+              isDark={isDark}
+              onToggleTheme={toggleTheme}
+              onExit={() => {
+                setViewMode("company");
+                setSelection(null);
+                setActiveId(null);
+              }}
+            />
           ) : projectLoading ? (
             <p className="room-loading">Laddar projekt…</p>
           ) : project ? (

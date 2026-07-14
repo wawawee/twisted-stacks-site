@@ -1,14 +1,26 @@
-/* ATE room — B/W + amber #C9A227 + green #2D6A4F accents */
+/* ATE room — B/W brutalist + amber brand + trading semantics */
 
 .ate-root.suparays-root {
+  /* Brand (colab identity — keep across investor + terminal) */
   --accent: #c9a227;
-  --success: #2d6a4f;
+  --warn: #c9a227;
+
+  /* Trading semantics */
+  --bull: #2d6a4f;
+  --bear: #b83b2e;
+  --success: var(--bull);
+  --agent: #6b4c9a;
+
   --shadow: 4px 4px 0 var(--shadow-color);
 }
 
 .ate-root.suparays-root.theme-dark {
   --accent: #c9a227;
-  --success: #2d6a4f;
+  --warn: #d4af37;
+  --bull: #3d9968;
+  --bear: #e85d4c;
+  --success: var(--bull);
+  --agent: #9b7ed9;
 }
 
 .ate-root .room-login-card h1,
@@ -303,8 +315,30 @@
 
 .ate-trading-brand {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+}
+
+.ate-trading-brand-row {
+  display: flex;
   align-items: center;
   gap: 0.65rem;
+}
+
+.ate-trading-tagline {
+  margin: 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  opacity: 0.72;
+  text-transform: none;
+}
+
+.ate-trading-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .ate-trading-brand h2 {
@@ -527,7 +561,7 @@
 }
 
 .ate-quote-change.down {
-  color: var(--accent);
+  color: var(--bear);
 }
 
 .ate-quote-stats {
@@ -541,6 +575,14 @@
   flex: 1;
   min-height: 200px;
   padding: 0.5rem 0.75rem;
+}
+
+.ate-trading-chart-lwc {
+  width: 100%;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
 }
 
 .ate-trading-chart {
@@ -591,6 +633,66 @@
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--accent);
+}
+
+.ate-fusion-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  border-top: 2px solid var(--border);
+  background: var(--surface);
+}
+
+.ate-fusion-lane label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.25rem;
+  opacity: 0.8;
+}
+
+.ate-fusion-lane.classical label span:last-child {
+  color: var(--accent);
+}
+
+.ate-fusion-lane.vision label span:last-child {
+  color: var(--agent);
+}
+
+.ate-fusion-lane.sequence label span:last-child {
+  color: var(--bull);
+}
+
+.ate-fusion-bar {
+  height: 6px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--border) 40%, transparent);
+}
+
+.ate-fusion-bar span {
+  display: block;
+  height: 100%;
+  background: currentColor;
+}
+
+.ate-fusion-lane.classical .ate-fusion-bar span {
+  background: var(--accent);
+}
+
+.ate-fusion-lane.vision .ate-fusion-bar span {
+  background: var(--agent);
+}
+
+.ate-fusion-lane.sequence .ate-fusion-bar span {
+  background: var(--bull);
+}
+
+.ate-trading-exit {
+  font-size: 0.75rem;
+  opacity: 0.85;
 }
 
 .ate-signal-hero-score small {
