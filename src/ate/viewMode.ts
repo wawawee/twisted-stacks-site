@@ -1,4 +1,4 @@
-export type ViewMode = "dev" | "company" | "trading";
+export type ViewMode = "dev" | "company";
 
 /** Wiki topics visible in company / investor view */
 export const COMPANY_WIKI_SLUGS = new Set([
@@ -37,7 +37,6 @@ export function buildMenuItems(
 ): MenuItem[] {
   const items: MenuItem[] = [
     { id: "overview", label: "Översikt", slug: null, kind: "overview", section: "overview" },
-    { id: "trading", label: "Terminal", slug: "trading", kind: "trading", section: "tools" },
     { id: "focus", label: "Nuvarande fokus", slug: "tasklist-focus", kind: "focus", section: "progress" },
   ];
 
@@ -142,7 +141,7 @@ export function buildGridSections(
           ? [
               {
                 id: "trading",
-                label: "Live-terminal",
+                label: "TRADE",
                 sublabel: "SPY · cup-and-handle · paper",
                 slug: "trading",
                 kind: "trading" as const,
@@ -250,7 +249,6 @@ export function buildGridSections(
     id: "tools",
     title: "Verktyg",
     items: [
-      { id: "trading", label: "Terminal", sublabel: "Market · scan · signals", slug: "trading", kind: "trading" as const },
       { id: "chat", label: "Chat", slug: "chat", kind: "tool" as const },
       { id: "ideabox", label: "Idébox", slug: "ideabox", kind: "tool" as const },
     ],

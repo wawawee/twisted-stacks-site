@@ -9,7 +9,7 @@ interface AteMobileNavProps {
 
 const ITEMS: { id: MobileNavId; label: string; short: string }[] = [
   { id: "home", label: "Översikt", short: "Hem" },
-  { id: "trading", label: "Terminal", short: "Trade" },
+  { id: "trading", label: "TRADE", short: "TRADE" },
   { id: "chat", label: "Chat", short: "Chat" },
   { id: "ideas", label: "Idébox", short: "Idéer" },
 ];

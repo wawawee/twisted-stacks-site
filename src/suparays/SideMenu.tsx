@@ -13,6 +13,9 @@ interface SideMenuProps {
   onLogout?: () => void;
   syncedAt: string | null;
   brandLabel?: string;
+  /** ATE: TRADE lives next to theme / logout */
+  onTrade?: () => void;
+  tradeActive?: boolean;
 }
 
 export default function SideMenu({
@@ -27,6 +30,8 @@ export default function SideMenu({
   onLogout,
   syncedAt,
   brandLabel = "SUPARAYS",
+  onTrade,
+  tradeActive,
 }: SideMenuProps) {
   const sections = [
     { key: "overview", label: "Start" },
@@ -85,6 +90,15 @@ export default function SideMenu({
       </nav>
 
       <div className="room-menu-foot">
+        {onTrade ? (
+          <button
+            type="button"
+            className={`room-btn ate-menu-trade${tradeActive ? " active" : ""}`}
+            onClick={onTrade}
+          >
+            TRADE
+          </button>
+        ) : null}
         <button
           type="button"
           className="room-theme-toggle"

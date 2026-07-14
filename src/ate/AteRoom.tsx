@@ -5,8 +5,12 @@ import SideMenu from "../suparays/SideMenu";
 import OverviewPanel from "./OverviewPanel";
 import ChatPanel from "./ChatPanel";
 import IdeasPanel from "./IdeasPanel";
-import TradingPanel from "./TradingPanel";
 import AteMobileNav, { type MobileNavId } from "./AteMobileNav";
+import {
+  TradingMainPanel,
+  TradingSidePanel,
+  TradingWorkspaceProvider,
+} from "./tradingWorkspace";
 import { useIsMobile } from "./useIsMobile";
 import { useResizablePanel } from "../suparays/useResizablePanel";
 import { useTheme } from "../suparays/useTheme";
@@ -130,6 +134,7 @@ export default function AteRoom() {
   const [auth, setAuth] = useState<AuthState | null>(SKIP_AUTH ? { authenticated: true, member: "per" } : null);
   const [project, setProject] = useState<ProjectPayload | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("company");
+  const [tradeOpen, setTradeOpen] = useState(false);
   const [selection, setSelection] = useState<Selection | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [markdown, setMarkdown] = useState("");
@@ -195,6 +200,7 @@ export default function AteRoom() {
 
   async function logout() {
     await fetch(`${API}/auth`, { method: "DELETE" });
+    setTradeOpen(false);
     setAuth({ authenticated: false, member: null });
     setProject(null);
     setSelection(null);
@@ -202,7 +208,6 @@ export default function AteRoom() {
   }
 
   useEffect(() => {
-    if (viewMode === "trading") return;
     setSelection(null);
     setActiveId(null);
   }, [viewMode]);
@@ -244,13 +249,32 @@ export default function AteRoom() {
     };
   }, [selection?.slug]);
 
-  function pick(item: { id: string; label: string; slug: string | null; kind: string; taskId?: string }) {
-    setActiveId(item.id);
-    if (item.slug === "trading" || item.kind === "trading") {
-      setViewMode("trading");
-    } else if (viewMode === "trading" && item.kind !== "trading") {
-      setViewMode("company");
+  function openTrade() {
+    setTradeOpen(true);
+    setActiveId("trading");
+    setSelection({ id: "trading", kind: "trading", slug: "trading", label: "TRADE" });
+  }
+
+  function closeTrade() {
+    setTradeOpen(false);
+    if (selection?.slug === "trading") {
+      setSelection(null);
+      setActiveId(null);
     }
+  }
+
+  function toggleTrade() {
+    if (tradeOpen) closeTrade();
+    else openTrade();
+  }
+
+  function pick(item: { id: string; label: string; slug: string | null; kind: string; taskId?: string }) {
+    if (item.slug === "trading" || item.kind === "trading") {
+      openTrade();
+      return;
+    }
+    closeTrade();
+    setActiveId(item.id);
     setSelection({
       id: item.id,
       kind: item.kind,
@@ -280,10 +304,8 @@ export default function AteRoom() {
   }
 
   const memberId = SKIP_AUTH ? "per" : auth?.member ?? null;
-  const isTrading = viewMode === "trading" || selection?.slug === "trading";
-  const wikiViewMode: "dev" | "company" = viewMode === "dev" ? "dev" : "company";
 
-  const mobileNavActive: MobileNavId = isTrading
+  const mobileNavActive: MobileNavId = tradeOpen
     ? "trading"
     : selection?.slug === "chat"
       ? "chat"
@@ -293,24 +315,25 @@ export default function AteRoom() {
 
   function handleMobileNav(id: MobileNavId) {
     if (id === "home") {
-      setViewMode("company");
+      closeTrade();
       setSelection(null);
       setActiveId(null);
       return;
     }
     if (id === "trading") {
-      setViewMode("trading");
-      setSelection({ id: "trading", kind: "trading", slug: "trading", label: "Terminal" });
-      setActiveId("trading");
+      openTrade();
       return;
     }
+    closeTrade();
     if (id === "chat") {
-      setViewMode("company");
       pick({ id: "chat", label: "Chat", slug: "chat", kind: "tool" });
       return;
     }
     pick({ id: "ideabox", label: "Idébox", slug: "ideabox", kind: "tool" });
   }
+
+  const showWikiPanel = !tradeOpen && !!selection;
+  const panelOpen = (tradeOpen && !isMobile) || showWikiPanel;
 
   const panelContent =
     selection?.kind === "overview" && project ? (
@@ -318,7 +341,7 @@ export default function AteRoom() {
         tasklist={project.tasklist}
         history={project.history}
         syncedAt={project.manifest.syncedAt}
-        viewMode={wikiViewMode}
+        viewMode={viewMode}
         onNavigate={pick}
       />
     ) : selection?.slug === "chat" ? (
@@ -339,18 +362,89 @@ export default function AteRoom() {
       />
     );
 
+  const layout = (
+    <>
+      <SideMenu
+        items={menuItems}
+        activeId={activeId}
+        viewMode={viewMode}
+        isDark={isDark}
+        onToggleTheme={toggleTheme}
+        onSelect={pick}
+        onToggleView={() => setViewMode((m) => (m === "dev" ? "company" : "dev"))}
+        onRefresh={loadProject}
+        onLogout={SKIP_AUTH ? undefined : logout}
+        syncedAt={project?.manifest.syncedAt || null}
+        brandLabel="ATE"
+        onTrade={toggleTrade}
+        tradeActive={tradeOpen}
+      />
+
+      <main className={`room-main${tradeOpen ? " ate-trade-main" : ""}`}>
+        {error && !tradeOpen ? <p className="room-error">{error}</p> : null}
+        {tradeOpen ? (
+          <TradingMainPanel />
+        ) : projectLoading ? (
+          <p className="room-loading">Laddar projekt…</p>
+        ) : project ? (
+          <ProjectGrid
+            sections={gridSections}
+            activeId={activeId}
+            stats={project.manifest.stats}
+            onSelect={pick}
+          />
+        ) : (
+          <p className="room-error">
+            {import.meta.env.DEV ? "Kör npm run sync:ate" : "Projektet kunde inte laddas."}
+          </p>
+        )}
+      </main>
+
+      <div
+        className={`room-resize${dragging ? " dragging" : ""}`}
+        onPointerDown={onPointerDown}
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="Ändra panelbredd"
+      />
+
+      <aside
+        className={`room-panel${panelOpen ? " room-panel-open" : ""}${tradeOpen ? " ate-trade-side" : ""}`}
+        style={!isMobile && panelOpen ? { width: panelWidth } : undefined}
+      >
+        {selection && showWikiPanel ? (
+          <div className="room-panel-mobile-bar">
+            <span>{selection.label}</span>
+            <button
+              type="button"
+              className="room-btn"
+              onClick={() => {
+                setSelection(null);
+                setActiveId(null);
+              }}
+            >
+              Tillbaka
+            </button>
+          </div>
+        ) : null}
+        {tradeOpen && !isMobile ? <TradingSidePanel /> : null}
+        {showWikiPanel && selection && selection.slug !== "trading" ? panelContent : null}
+      </aside>
+    </>
+  );
+
   return (
-    <div className={`suparays-root ate-root ate-mobile${isDark ? " theme-dark" : ""}`}>
+    <div className={`suparays-root ate-root ate-mobile${isDark ? " theme-dark" : ""}${tradeOpen ? " ate-trade-open" : ""}`}>
       <header className="room-mobile-bar">
         <div className="room-mobile-bar-top">
           <strong>ATE</strong>
           <div className="room-mobile-bar-actions">
             <button
               type="button"
-              className="ate-mobile-trade-cta"
-              onClick={() => handleMobileNav("trading")}
+              className={`ate-mobile-trade-cta${tradeOpen ? " active" : ""}`}
+              onClick={toggleTrade}
             >
-              Trade
+              TRADE
             </button>
             <button
               type="button"
@@ -369,7 +463,7 @@ export default function AteRoom() {
             ) : null}
           </div>
         </div>
-        <div className="room-mobile-view-toggle" role="group" aria-label="Visningsläge">
+        <div className="room-mobile-view-toggle ate-mobile-investor-toggle" role="group" aria-label="Visningsläge">
           <button
             type="button"
             className={`room-toggle${viewMode === "company" ? " active" : ""}`}
@@ -384,96 +478,17 @@ export default function AteRoom() {
           >
             Dev
           </button>
-          <button
-            type="button"
-            className={`room-toggle${viewMode === "trading" ? " active" : ""}`}
-            onClick={() => {
-              setViewMode("trading");
-              setSelection({ id: "trading", kind: "trading", slug: "trading", label: "Terminal" });
-              setActiveId("trading");
-            }}
-          >
-            Terminal
-          </button>
         </div>
       </header>
 
-      <div className={`room-layout${isTrading ? " ate-trading-layout-root" : ""}`}>
-        {!isTrading ? (
-          <SideMenu
-            items={menuItems}
-            activeId={activeId}
-            viewMode={wikiViewMode}
-            isDark={isDark}
-            onToggleTheme={toggleTheme}
-            onSelect={pick}
-            onToggleView={() => setViewMode((m) => (m === "dev" ? "company" : "dev"))}
-            onRefresh={loadProject}
-            onLogout={SKIP_AUTH ? undefined : logout}
-            syncedAt={project?.manifest.syncedAt || null}
-            brandLabel="ATE"
-          />
-        ) : null}
-
-        <main className={`room-main${isTrading ? " ate-trading-main-full" : ""}`}>
-          {error && !isTrading ? <p className="room-error">{error}</p> : null}
-          {isTrading ? (
-            <TradingPanel
-              memberId={memberId}
-              isDark={isDark}
-              isMobile={isMobile}
-              onToggleTheme={toggleTheme}
-              onExit={() => handleMobileNav("home")}
-            />
-          ) : projectLoading ? (
-            <p className="room-loading">Laddar projekt…</p>
-          ) : project ? (
-            <ProjectGrid
-              sections={gridSections}
-              activeId={activeId}
-              stats={project.manifest.stats}
-              onSelect={pick}
-            />
-          ) : (
-            <p className="room-error">
-              {import.meta.env.DEV ? "Kör npm run sync:ate" : "Projektet kunde inte laddas."}
-            </p>
-          )}
-        </main>
-
-        {!isTrading ? (
-          <>
-            <div
-              className={`room-resize${dragging ? " dragging" : ""}`}
-              onPointerDown={onPointerDown}
-              role="separator"
-              aria-orientation="vertical"
-              aria-label="Ändra panelbredd"
-            />
-
-            <aside
-              className={`room-panel${selection ? " room-panel-open" : ""}`}
-              style={!isMobile && selection ? { width: panelWidth } : undefined}
-            >
-              {selection ? (
-                <div className="room-panel-mobile-bar">
-                  <span>{selection.label}</span>
-                  <button
-                    type="button"
-                    className="room-btn"
-                    onClick={() => {
-                      setSelection(null);
-                      setActiveId(null);
-                    }}
-                  >
-                    Tillbaka
-                  </button>
-                </div>
-              ) : null}
-              {panelContent}
-            </aside>
-          </>
-        ) : null}
+      <div className="room-layout">
+        {tradeOpen ? (
+          <TradingWorkspaceProvider isDark={isDark} isMobile={isMobile}>
+            {layout}
+          </TradingWorkspaceProvider>
+        ) : (
+          layout
+        )}
       </div>
 
       {(SKIP_AUTH || auth?.authenticated) ? (
