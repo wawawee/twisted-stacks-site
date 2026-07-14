@@ -39,14 +39,16 @@ const LIVE_NOW = [
   "VectorBT backtests + QuantStats tear sheets",
   "Vision dataset 376 pos / 165 neg (`ate_v1`)",
   "Vision YOLO classify — 50 ep, val top1 100%, ONNX exported",
+  "Vision ONNX Temporal activity — cache `~/ate-data/cache/vision/`",
   "hybrid-scan export (JSON/CSV + regime–macro)",
-  "HITL approve/reject modal (stub)",
+  "Nightly batch — launchd 06:00 + GH Actions Mon 05:00 UTC",
+  "HITL approve/reject → Temporal proxy när konfigurerad",
   "Alt-data stubs (null tills go/no-go)",
 ];
 
 const REAL_EDGE_TRACK = [
   "1.1 Funding rate → RegimeGate — NO-GO (8.6% hit, 0.42× lift)",
-  "1.2 Exchange netflow → OnChainSignal (CryptoQuant) — draft",
+  "1.2 Exchange netflow → OnChainSignal — pending CryptoQuant key",
   "1.3 DXY–crypto cross-market — NO-GO (47% same-day, 0.93× lift)",
   "1.4 Polymarket prob shifts → Macro Scout — NO-GO (41% BTC 1d, 0.91× lift)",
 ];
@@ -99,8 +101,8 @@ export default function OverviewPanel({
       <div className="detail-scroll overview-scroll">
         <p className="overview-lede ate-overview-lede">
           {viewMode === "company"
-            ? "TRADE live på /ate — chart, RegimeGate, 4 fusion lanes, Polymarket macro. Paper only. Phase 2 YOLO + ONNX klart; Real Edge 1.1/1.3/1.4 NO-GO."
-            : "Fasplan från TASKLIST — Phase 2 vision done; Real Edge scorecard 1.1/1.3/1.4 NO-GO."}
+            ? "TRADE live på /ate — chart, RegimeGate, 4 fusion lanes, Polymarket macro. Paper only. Phase 2 YOLO + ONNX klart; nightly automation; Real Edge 1.1/1.3/1.4 NO-GO."
+            : "Fasplan från TASKLIST — Phase 2 vision done; nightly batch + HITL proxy; Real Edge 1.1/1.3/1.4 NO-GO."}
         </p>
 
         <div className="ate-overview-stats">
