@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import TradingChart from "./TradingChart";
-import type { CupHandleSignal, MacroPayload, MarketBar, MarketQuote, RegimeGateResult } from "./tradingTypes";
+import type { CupHandleSignal, MacroPayload, MarketBar, MarketQuote, RegimeGateResult, TaFeatures } from "./tradingTypes";
 import { WATCHLIST } from "./tradingTypes";
 
 const API = "/api/ate";
@@ -16,6 +16,9 @@ export interface TelemetrySnapshot {
   signalCount: number;
   barCount: number;
   regime: RegimeGateResult | null;
+  ta: TaFeatures | null;
+  fusedScore: number | null;
+  tradeAllowed: boolean | null;
   at: Date;
 }
 
@@ -34,6 +37,8 @@ interface TradingContextValue {
   signals: CupHandleSignal[];
   topSignal: CupHandleSignal | null;
   regime: RegimeGateResult | null;
+  fusedScore: number | null;
+  tradeAllowed: boolean | null;
   loading: boolean;
   scanning: boolean;
   error: string;
@@ -107,6 +112,8 @@ export function TradingWorkspaceProvider({
   const [quote, setQuote] = useState<MarketQuote | null>(null);
   const [signals, setSignals] = useState<CupHandleSignal[]>([]);
   const [regime, setRegime] = useState<RegimeGateResult | null>(null);
+  const [fusedScore, setFusedScore] = useState<number | null>(null);
+  const [tradeAllowed, setTradeAllowed] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState("");
@@ -159,11 +166,16 @@ export function TradingWorkspaceProvider({
       if (!res.ok) throw new Error(data.error || "Scan misslyckades");
       setSignals(data.signals || []);
       setRegime(data.regime ?? null);
+      setFusedScore(typeof data.fused_score === "number" ? data.fused_score : null);
+      setTradeAllowed(typeof data.trade_allowed === "boolean" ? data.trade_allowed : null);
       setLastScan({
         symbol: data.symbol || symbol,
         signalCount: data.signal_count ?? (data.signals?.length ?? 0),
         barCount: data.bar_count ?? 0,
         regime: data.regime ?? null,
+        ta: data.ta ?? null,
+        fusedScore: typeof data.fused_score === "number" ? data.fused_score : null,
+        tradeAllowed: typeof data.trade_allowed === "boolean" ? data.trade_allowed : null,
         at: new Date(),
       });
       if (!bars.length && data.bar_count) {
@@ -194,6 +206,8 @@ export function TradingWorkspaceProvider({
       signals,
       topSignal,
       regime,
+      fusedScore,
+      tradeAllowed,
       loading,
       scanning,
       error,
@@ -217,6 +231,8 @@ export function TradingWorkspaceProvider({
       signals,
       topSignal,
       regime,
+      fusedScore,
+      tradeAllowed,
       loading,
       scanning,
       error,
@@ -317,6 +333,17 @@ export function TradingSidePanel() {
   );
 }
 
+function fmtDryUp(ratio: number | null | undefined): string {
+  if (ratio == null) return "—";
+  const pct = (ratio * 100).toFixed(0);
+  return ratio < 0.85 ? `${pct}% · dry` : `${pct}%`;
+}
+
+function fmtMaStack(bullish: boolean | null | undefined): string {
+  if (bullish == null) return "—";
+  return bullish ? "bull stack" : "bear stack";
+}
+
 function TelemetrySubsection() {
   const { lastScan, lastMarketFetch, scanning, loading } = useTradingWorkspace();
 
@@ -346,9 +373,39 @@ function TelemetrySubsection() {
               <>
                 {lastScan.regime.regime}
                 {lastScan.regime.adx != null ? ` · ADX ${lastScan.regime.adx.toFixed(1)}` : ""}
+                {lastScan.regime.multiplier != null ? ` · ×${lastScan.regime.multiplier.toFixed(2)}` : ""}
               </>
             ) : scanning ? (
               "Classifying…"
+            ) : (
+              "—"
+            )}
+          </dd>
+        </div>
+        <div className="ate-telemetry-row">
+          <dt>TA</dt>
+          <dd className="mono">
+            {lastScan?.ta ? (
+              <>
+                vol {fmtDryUp(lastScan.ta.volume_dry_up_ratio)} · {fmtMaStack(lastScan.ta.ma_stack_bullish)}
+              </>
+            ) : scanning ? (
+              "Computing…"
+            ) : (
+              "—"
+            )}
+          </dd>
+        </div>
+        <div className="ate-telemetry-row">
+          <dt>Fusion</dt>
+          <dd className="mono">
+            {lastScan?.fusedScore != null ? (
+              <>
+                {(lastScan.fusedScore * 100).toFixed(0)}%
+                {lastScan.tradeAllowed != null ? (lastScan.tradeAllowed ? " · gate open" : " · gated") : ""}
+              </>
+            ) : scanning ? (
+              "Fusing…"
             ) : (
               "—"
             )}
@@ -487,6 +544,7 @@ export function TradingMainPanel() {
   const {
     quote,
     topSignal,
+    fusedScore,
     error,
     isMobile,
     isDark,
@@ -548,7 +606,9 @@ export function TradingMainPanel() {
             <strong>{topSignal.ticker}</strong> · {(topSignal.breakout_confidence * 100).toFixed(1)}% classical · inv{" "}
             <span className="mono">{fmtPrice(topSignal.invalidation)}</span>
           </p>
-          <span className="ate-signal-hero-score mono">{(topSignal.fused_score * 100).toFixed(0)}%</span>
+          <span className="ate-signal-hero-score mono">
+            {fusedScore != null ? `${(fusedScore * 100).toFixed(0)}%` : `${(topSignal.fused_score * 100).toFixed(0)}%`}
+          </span>
         </div>
       ) : null}
     </div>
@@ -556,9 +616,10 @@ export function TradingMainPanel() {
 }
 
 function TradingChartBlock({ height }: { height: number }) {
-  const { bars, quote, topSignal, regime, macro, isDark } = useTradingWorkspace();
+  const { bars, quote, topSignal, regime, macro, fusedScore, tradeAllowed, isDark } = useTradingWorkspace();
   const macroLane = macroScore(macro);
   const regimeBanner = regimeBannerMessage(regime);
+  const displayFused = fusedScore ?? topSignal?.fused_score ?? null;
 
   return (
     <>
@@ -591,6 +652,20 @@ function TradingChartBlock({ height }: { height: number }) {
 
       {topSignal ? (
         <div className="ate-fusion-strip" aria-label="Signal fusion weights">
+          {displayFused != null ? (
+            <div className="ate-fusion-total" role="status">
+              <label>
+                <span>Fused</span>
+                <span className="mono">
+                  {(displayFused * 100).toFixed(0)}%
+                  {tradeAllowed != null ? (tradeAllowed ? " · open" : " · gated") : ""}
+                </span>
+              </label>
+              <div className="ate-fusion-bar ate-fusion-bar-total">
+                <span style={{ width: `${displayFused * 100}%` }} />
+              </div>
+            </div>
+          ) : null}
           <div className="ate-fusion-lane classical">
             <label>
               <span>Classical</span>

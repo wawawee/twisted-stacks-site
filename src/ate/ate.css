@@ -792,6 +792,19 @@
   background: var(--surface);
 }
 
+.ate-fusion-total {
+  grid-column: 1 / -1;
+}
+
+.ate-fusion-total label span:last-child {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.ate-fusion-bar-total span {
+  background: linear-gradient(90deg, var(--accent), var(--macro));
+}
+
 .ate-fusion-lane label {
   display: flex;
   justify-content: space-between;

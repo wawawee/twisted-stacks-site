@@ -1,5 +1,8 @@
 import { detectCupAndHandle } from "../_lib/cup-handle.js";
+import { fuseSignal, macroLaneScore, tradeAllowed } from "../_lib/fusion.js";
+import { buildMacroResponse } from "../_handlers/macro.js";
 import { classifyRegime } from "../_lib/regime-gate.js";
+import { computeTaFeatures } from "../_lib/ta-features.js";
 import { fetchYahooBars } from "../_lib/yahoo.js";
 import { requireSession, type VercelRequest, type VercelResponse } from "../_lib/session.js";
 
@@ -28,6 +31,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const bars = await fetchYahooBars(symbol, timeframe, range);
     const signals = detectCupAndHandle(bars, { min_confidence: minConfidence });
     const regime = classifyRegime(bars, symbol);
+    const ta = computeTaFeatures(bars);
+
+    const macro = await buildMacroResponse();
+    const macroScore = macroLaneScore(macro.quotes);
+
+    const top = signals[0];
+    const fusedScore = top
+      ? fuseSignal(
+          top.breakout_confidence,
+          top.vision_score,
+          top.sequence_prob,
+          macroScore,
+          regime.multiplier,
+        )
+      : 0;
+
     res.status(200).json({
       symbol,
       timeframe,
@@ -36,6 +55,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       signal_count: signals.length,
       signals,
       regime,
+      ta,
+      macro_score: macroScore,
+      fused_score: fusedScore,
+      trade_allowed: tradeAllowed(fusedScore),
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Scan failed";

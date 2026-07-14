@@ -8,6 +8,7 @@ export interface RegimeGateResult {
   regime: RegimeLabel;
   cup_handle_allowed: boolean;
   adx?: number;
+  multiplier: number;
 }
 
 export interface RegimeGateConfig {
@@ -133,6 +134,15 @@ function toUiRegime(internal: InternalRegime, adx: number, atrPct: number, confi
   return "chop";
 }
 
+/** Regime multiplier — port of packages/fusion/regime_gate.py _multiplier_for. */
+function multiplierFor(internal: InternalRegime, atrPct: number, config: RegimeGateConfig): number {
+  if (internal === "high_vol") return 0;
+  if (internal === "range") return 0.5;
+  if (internal === "trend_up" && atrPct <= config.atr_percentile_max) return 1;
+  if (internal === "trend_down") return 0.75;
+  return 0.5;
+}
+
 export function classifyRegime(
   bars: YahooBar[],
   symbol: string,
@@ -141,7 +151,7 @@ export function classifyRegime(
   const cfg = { ...DEFAULT_CONFIG, ...config };
 
   if (bars.length < MIN_BARS) {
-    return { regime: "ranging", cup_handle_allowed: false };
+    return { regime: "ranging", cup_handle_allowed: false, multiplier: 0.5 };
   }
 
   const highs = bars.map((b) => b.high);
@@ -162,5 +172,6 @@ export function classifyRegime(
     regime,
     cup_handle_allowed: regime === "trending",
     adx: Math.round(adx * 100) / 100,
+    multiplier: multiplierFor(internal, atrPct, cfg),
   };
 }

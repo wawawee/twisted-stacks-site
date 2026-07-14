@@ -37,6 +37,17 @@ export interface RegimeGateResult {
   regime: RegimeLabel;
   cup_handle_allowed: boolean;
   adx?: number;
+  multiplier: number;
+}
+
+export interface TaFeatures {
+  bar_count: number;
+  volume_dry_up_ratio: number | null;
+  ma20: number | null;
+  ma50: number | null;
+  ma_stack_bullish: boolean | null;
+  atr: number | null;
+  atr_pct: number | null;
 }
 
 export type MacroQuoteSource = "live" | "mock";
