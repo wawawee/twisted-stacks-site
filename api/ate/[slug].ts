@@ -8,6 +8,7 @@ const routes: Record<string, () => Promise<{ default: (req: VercelRequest, res: 
   ideas: () => import("./_handlers/ideas.js"),
   market: () => import("./_handlers/market.js"),
   scan: () => import("./_handlers/scan.js"),
+  macro: () => import("./_handlers/macro.js"),
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {

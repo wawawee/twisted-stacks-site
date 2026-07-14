@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import TradingChart from "./TradingChart";
-import type { CupHandleSignal, MarketBar, MarketQuote, RegimeGateResult } from "./tradingTypes";
+import type { CupHandleSignal, MacroPayload, MarketBar, MarketQuote, RegimeGateResult } from "./tradingTypes";
 import { WATCHLIST } from "./tradingTypes";
 
 const API = "/api/ate";
@@ -41,6 +41,9 @@ interface TradingContextValue {
   runScan: () => Promise<void>;
   lastScan: TelemetrySnapshot | null;
   lastMarketFetch: MarketFetchSnapshot | null;
+  macro: MacroPayload | null;
+  macroLoading: boolean;
+  loadMacro: () => Promise<void>;
   isMobile: boolean;
   isDark: boolean;
   mobileTab: MobileTab;
@@ -56,14 +59,20 @@ function fmtTelemetryTime(d: Date) {
   });
 }
 
-const MOCK_MACRO_QUOTES = [
-  { label: "Fed cut Mar '26", prob: 72 },
-  { label: "BTC $100K Dec", prob: 58 },
-] as const;
+const FALLBACK_MACRO: MacroPayload = {
+  source: "mock",
+  quotes: [
+    { label: "Fed cut Jul '26", prob: 1, source: "mock" },
+    { label: "BTC $100K Dec", prob: 10, source: "mock" },
+  ],
+  whale: { amount: "$1.2M YES", pnl: "+$4.7M lifetime", source: "mock" },
+  fetchedAt: "",
+};
 
-/** Demo macro score — avg of MOCK_MACRO_QUOTES implied probs (wiki fusion weight 15%). */
-function mockMacroScore(): number {
-  const avg = MOCK_MACRO_QUOTES.reduce((sum, q) => sum + q.prob, 0) / MOCK_MACRO_QUOTES.length;
+function macroScore(macro: MacroPayload | null): number {
+  const quotes = macro?.quotes ?? FALLBACK_MACRO.quotes;
+  if (!quotes.length) return 0;
+  const avg = quotes.reduce((sum, q) => sum + q.prob, 0) / quotes.length;
   return avg / 100;
 }
 
@@ -103,6 +112,22 @@ export function TradingWorkspaceProvider({
   const [error, setError] = useState("");
   const [lastScan, setLastScan] = useState<TelemetrySnapshot | null>(null);
   const [lastMarketFetch, setLastMarketFetch] = useState<MarketFetchSnapshot | null>(null);
+  const [macro, setMacro] = useState<MacroPayload | null>(null);
+  const [macroLoading, setMacroLoading] = useState(false);
+
+  const loadMacro = useCallback(async () => {
+    setMacroLoading(true);
+    try {
+      const res = await fetch(`${API}/macro`);
+      const data = (await res.json()) as MacroPayload & { error?: string };
+      if (!res.ok) throw new Error(data.error || "Macro fetch failed");
+      setMacro(data);
+    } catch {
+      setMacro(FALLBACK_MACRO);
+    } finally {
+      setMacroLoading(false);
+    }
+  }, []);
 
   const loadMarket = useCallback(async () => {
     setLoading(true);
@@ -153,6 +178,7 @@ export function TradingWorkspaceProvider({
 
   useEffect(() => {
     loadMarket().then(() => runScan());
+    loadMacro();
   }, [symbol, timeframe]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const topSignal = signals[0] ?? null;
@@ -175,6 +201,9 @@ export function TradingWorkspaceProvider({
       runScan,
       lastScan,
       lastMarketFetch,
+      macro,
+      macroLoading,
+      loadMacro,
       isMobile,
       isDark,
       mobileTab,
@@ -195,6 +224,9 @@ export function TradingWorkspaceProvider({
       runScan,
       lastScan,
       lastMarketFetch,
+      macro,
+      macroLoading,
+      loadMacro,
       isMobile,
       isDark,
       mobileTab,
@@ -343,24 +375,37 @@ function TelemetrySubsection() {
 }
 
 function MacroScoutSection() {
+  const { macro, macroLoading } = useTradingWorkspace();
+  const data = macro ?? FALLBACK_MACRO;
+  const isLive = data.source === "live" || data.source === "mixed";
+
   return (
     <section className="ate-trading-section ate-macro-scout" aria-labelledby="ate-macro-scout-heading">
       <div className="ate-macro-scout-head">
         <h3 id="ate-macro-scout-heading">Macro Scout</h3>
-        <span className="ate-macro-demo-badge">MOCK</span>
+        <span className={`ate-macro-demo-badge${isLive ? " live" : ""}`}>{isLive ? "LIVE" : "MOCK"}</span>
       </div>
-      <p className="ate-trading-muted ate-macro-scout-note">Demo quotes — PMXT integration phase 3+</p>
+      <p className="ate-trading-muted ate-macro-scout-note">
+        {macroLoading
+          ? "Fetching Polymarket…"
+          : isLive
+            ? data.source === "mixed"
+              ? "Polymarket Gamma · partial fallback · 5m cache"
+              : "Polymarket Gamma · 5m cache"
+            : "Demo quotes — Polymarket unreachable"}
+      </p>
       <ul className="ate-macro-quotes">
-        {MOCK_MACRO_QUOTES.map((q) => (
+        {data.quotes.map((q) => (
           <li key={q.label} className="ate-macro-quote">
             <span className="ate-macro-quote-label">{q.label}</span>
-            <span className="ate-macro-quote-prob mono">{q.prob}%</span>
+            <span className="ate-macro-quote-prob mono">{macroLoading ? "…" : `${q.prob}%`}</span>
           </li>
         ))}
       </ul>
       <p className="ate-macro-whale mono">
         <span className="ate-macro-whale-tag">Whale</span>
-        $1.2M YES · wallet +$4.7M lifetime
+        {data.whale.amount} · wallet {data.whale.pnl}
+        {data.whale.source === "mock" ? " · demo" : ""}
       </p>
     </section>
   );
@@ -511,8 +556,8 @@ export function TradingMainPanel() {
 }
 
 function TradingChartBlock({ height }: { height: number }) {
-  const { bars, quote, topSignal, regime, isDark } = useTradingWorkspace();
-  const macroScore = mockMacroScore();
+  const { bars, quote, topSignal, regime, macro, isDark } = useTradingWorkspace();
+  const macroLane = macroScore(macro);
   const regimeBanner = regimeBannerMessage(regime);
 
   return (
@@ -576,10 +621,10 @@ function TradingChartBlock({ height }: { height: number }) {
           <div className="ate-fusion-lane macro">
             <label>
               <span>Macro</span>
-              <span className="mono">{(macroScore * 100).toFixed(0)}%</span>
+              <span className="mono">{(macroLane * 100).toFixed(0)}%</span>
             </label>
             <div className="ate-fusion-bar">
-              <span style={{ width: `${Math.max(macroScore * 100, 2)}%` }} />
+              <span style={{ width: `${Math.max(macroLane * 100, 2)}%` }} />
             </div>
           </div>
         </div>

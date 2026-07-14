@@ -39,6 +39,22 @@ export interface RegimeGateResult {
   adx?: number;
 }
 
+export type MacroQuoteSource = "live" | "mock";
+
+export interface MacroQuote {
+  label: string;
+  prob: number;
+  source: MacroQuoteSource;
+  slug?: string;
+}
+
+export interface MacroPayload {
+  source: MacroQuoteSource | "mixed";
+  quotes: MacroQuote[];
+  whale: { amount: string; pnl: string; source: MacroQuoteSource };
+  fetchedAt: string;
+}
+
 export const WATCHLIST = [
   { symbol: "SPY", label: "S&P 500 ETF" },
   { symbol: "QQQ", label: "Nasdaq 100" },

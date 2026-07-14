@@ -609,6 +609,18 @@
   color: var(--macro);
 }
 
+.ate-macro-demo-badge.live {
+  border-color: #16a34a;
+  color: #16a34a;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ate-macro-demo-badge.live {
+    border-color: #4ade80;
+    color: #4ade80;
+  }
+}
+
 .ate-macro-scout-note {
   margin: 0 0 0.45rem;
   font-size: 0.68rem;
