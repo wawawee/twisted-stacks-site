@@ -6,19 +6,38 @@ function stripMd(text) {
   return text
     .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
     .replace(/\*\*/g, "")
+    .replace(/\[[ ~x\-]\]\s*/g, "")
     .trim();
+}
+
+function parseImmediateSection(md) {
+  const immediate = md.split("## Immediate Next Actions")[1]?.split(/^## /m)[0] || "";
+  const focusLines = immediate
+    .split("\n")
+    .filter((l) => /^\d+\./.test(l.trim()))
+    .map((l) => ({
+      raw: l,
+      text: stripMd(l.replace(/^\d+\.\s*/, "")),
+      done: /\[x\]/.test(l),
+      inProgress: /\[~\]/.test(l),
+    }));
+
+  const completedBlock = immediate.split("### Completed this session")[1]?.split(/^### /m)[0] || "";
+  const recentWins = completedBlock
+    .split("\n")
+    .filter((l) => l.trim().startsWith("- [x]"))
+    .map((l) => stripMd(l.replace(/^- \[x\]\s*/, "")));
+
+  return { focusLines, recentWins };
 }
 
 export function parseTasklist(md) {
   const lastUpdated = md.match(/\*\*Last updated:\*\*\s*(.+)/i)?.[1]?.trim() || null;
 
-  const immediate = md.split("## Immediate Next Actions")[1]?.split(/^## /m)[0] || "";
-  const focusLines = immediate
-    .split("\n")
-    .filter((l) => /^\d+\./.test(l.trim()))
-    .map((l) => ({ raw: l, text: stripMd(l.replace(/^\d+\.\s*/, "")), done: /\[x\]/.test(l) }));
-  const openFocus = focusLines.find((l) => !l.done && !/\[x\]/.test(l.raw));
+  const { focusLines, recentWins } = parseImmediateSection(md);
+  const openFocus = focusLines.find((l) => !l.done && (l.inProgress || !/\[x\]/.test(l.raw)));
   const currentFocus = openFocus?.text || focusLines.find((l) => !l.done)?.text || "Phase 2 — Vision Channel";
+  const nextActions = focusLines.map(({ text, done, inProgress }) => ({ text, done, inProgress }));
 
   const tasks = [];
   const phaseBlocks = md.split(/^## Phase /m).slice(1);
@@ -64,6 +83,8 @@ export function parseTasklist(md) {
   return {
     lastUpdated,
     currentFocus,
+    nextActions,
+    recentWins,
     focusQueue: focusTasks.map((t) => t.id),
     focusTasks,
     tasks,

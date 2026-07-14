@@ -7,6 +7,7 @@ export const COMPANY_WIKI_SLUGS = new Set([
   "funding",
   "use-cases",
   "risk",
+  "real-edge",
 ]);
 
 /** Wiki pages synced but hidden from colab grid (use Idébox + Chat) */
@@ -19,6 +20,7 @@ const WIKI_SUBLABELS: Record<string, string> = {
   competitors: "Freqtrade, Hummingbot, LEAN",
   funding: "Budget & grants",
   "use-cases": "Segments & operators",
+  "real-edge": "Funding · netflow · DXY · PM",
 };
 
 export interface MenuItem {
@@ -142,7 +144,7 @@ export function buildGridSections(
               {
                 id: "trading",
                 label: "TRADE",
-                sublabel: "Live · RegimeGate · Polymarket · fusion",
+                sublabel: "Live · 4 lanes · HITL stub · Polymarket",
                 slug: "trading",
                 kind: "trading" as const,
               },

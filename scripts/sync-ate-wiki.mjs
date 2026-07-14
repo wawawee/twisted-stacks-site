@@ -21,6 +21,7 @@ const TOPIC_LABELS = {
   competitors: "Konkurrenter",
   funding: "Finansiering",
   "use-cases": "Användningsfall",
+  "real-edge": "Real Edge · alt-data",
 };
 
 function localRepoRoot() {

@@ -13,6 +13,8 @@ interface Task {
 
 interface TasklistData {
   currentFocus: string;
+  nextActions?: Array<{ text: string; done: boolean; inProgress?: boolean }>;
+  recentWins?: string[];
   focusQueue?: string[];
   focusTasks?: Task[];
   lastUpdated: string | null;
@@ -115,12 +117,26 @@ export default function DetailPanel({
           </ul>
           <h3>Senast klart</h3>
           <ul className="completed-list">
-            {tasklist.completed.slice(0, 8).map((c, i) => (
-              <li key={`${c.task}-${i}`}>
-                {c.id ? <code>{c.id}</code> : null} {c.task}
-              </li>
-            ))}
+            {(tasklist.recentWins?.length ? tasklist.recentWins : tasklist.completed.slice(0, 8).map((c) => c.task)).map(
+              (item, i) => (
+                <li key={`${item}-${i}`}>{item}</li>
+              ),
+            )}
           </ul>
+          {tasklist.nextActions?.some((a) => !a.done) ? (
+            <>
+              <h3>Nästa steg</h3>
+              <ul className="ate-status-list">
+                {tasklist.nextActions
+                  .filter((a) => !a.done)
+                  .map((a) => (
+                    <li key={a.text} className={a.inProgress ? "active" : ""}>
+                      {a.text}
+                    </li>
+                  ))}
+              </ul>
+            </>
+          ) : null}
           <h3>Milstolpar</h3>
           <ul className="milestone-list">
             {history.milestones.slice(-6).reverse().map((m) => (

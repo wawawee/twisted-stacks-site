@@ -108,6 +108,50 @@
   opacity: 0.8;
 }
 
+.ate-overview-note {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  opacity: 0.85;
+  line-height: 1.35;
+}
+
+.ate-status-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.ate-status-list li {
+  padding: 0.45rem 0.65rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.ate-status-list li:last-child {
+  border-bottom: none;
+}
+
+.ate-status-list-compact li {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.78rem;
+}
+
+.ate-status-list li.done::before {
+  content: "✓ ";
+  color: var(--success);
+  font-weight: 700;
+}
+
+.ate-status-list li.active::before {
+  content: "→ ";
+  color: var(--accent);
+  font-weight: 700;
+}
+
 .ate-phase-timeline {
   list-style: none;
   margin: 0;
