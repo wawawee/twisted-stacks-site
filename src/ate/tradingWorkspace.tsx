@@ -57,6 +57,9 @@ interface TradingContextValue {
   setHitlOpen: (open: boolean) => void;
   hitlDecision: "pending" | "approved" | "rejected";
   setHitlDecision: (d: "pending" | "approved" | "rejected") => void;
+  requiresHitl: boolean;
+  hitlStatus: string;
+  setHitlStatus: (s: string) => void;
 }
 
 function fmtTelemetryTime(d: Date) {
@@ -127,6 +130,8 @@ export function TradingWorkspaceProvider({
   const [macroLoading, setMacroLoading] = useState(false);
   const [hitlOpen, setHitlOpen] = useState(false);
   const [hitlDecision, setHitlDecision] = useState<"pending" | "approved" | "rejected">("pending");
+  const [requiresHitl, setRequiresHitl] = useState(false);
+  const [hitlStatus, setHitlStatus] = useState("");
 
   const loadMacro = useCallback(async () => {
     setMacroLoading(true);
@@ -174,6 +179,13 @@ export function TradingWorkspaceProvider({
       setRegime(data.regime ?? null);
       setFusedScore(typeof data.fused_score === "number" ? data.fused_score : null);
       setTradeAllowed(typeof data.trade_allowed === "boolean" ? data.trade_allowed : null);
+      const needsHitl = data.requires_hitl === true;
+      setRequiresHitl(needsHitl);
+      if (needsHitl) {
+        setHitlDecision("pending");
+        setHitlStatus("");
+        setHitlOpen(true);
+      }
       setLastScan({
         symbol: data.symbol || symbol,
         signalCount: data.signal_count ?? (data.signals?.length ?? 0),
@@ -232,6 +244,9 @@ export function TradingWorkspaceProvider({
       setHitlOpen,
       hitlDecision,
       setHitlDecision,
+      requiresHitl,
+      hitlStatus,
+      setHitlStatus,
     }),
     [
       symbol,
@@ -258,6 +273,8 @@ export function TradingWorkspaceProvider({
       mobileTab,
       hitlOpen,
       hitlDecision,
+      requiresHitl,
+      hitlStatus,
     ],
   );
 
@@ -274,7 +291,37 @@ function HitlModalStub() {
     setHitlOpen,
     hitlDecision,
     setHitlDecision,
+    setHitlStatus,
+    hitlStatus,
   } = useTradingWorkspace();
+  const [submitting, setSubmitting] = useState(false);
+
+  const submitHitl = useCallback(
+    async (decision: "approved" | "rejected") => {
+      setSubmitting(true);
+      setHitlStatus("");
+      try {
+        const res = await fetch(`${API}/hitl`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            symbol,
+            decision,
+            fusion_score: fusedScore ?? undefined,
+          }),
+        });
+        const data = (await res.json()) as { error?: string; status?: string; ok?: boolean };
+        if (!res.ok) throw new Error(data.error || "HITL submit failed");
+        setHitlDecision(decision);
+        setHitlStatus(data.status ? `Server: ${data.status}` : "Recorded");
+      } catch (err) {
+        setHitlStatus(err instanceof Error ? err.message : "Submit failed");
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [symbol, fusedScore, setHitlDecision, setHitlStatus],
+  );
 
   if (!hitlOpen) return null;
 
@@ -291,10 +338,11 @@ function HitlModalStub() {
       >
         <header className="ate-hitl-head">
           <h3 id="ate-hitl-title">Human-in-the-loop</h3>
-          <span className="ate-trading-badge ate-telemetry-paper">PAPER STUB</span>
+          <span className="ate-trading-badge ate-telemetry-paper">PAPER</span>
         </header>
         <p className="ate-trading-muted">
-          Gate review for <strong>{symbol}</strong> — Temporal signal wiring lands Phase 5.
+          Risk gate review for <strong>{symbol}</strong> — decision posts to <code>/api/ate/hitl</code> (Temporal
+          signals when worker is live).
         </p>
         <dl className="ate-hitl-summary mono">
           <div>
@@ -315,26 +363,27 @@ function HitlModalStub() {
             Decision: {hitlDecision}
           </p>
         ) : null}
+        {hitlStatus ? (
+          <p className="ate-hitl-status mono" role="status">
+            {hitlStatus}
+          </p>
+        ) : null}
         <div className="ate-hitl-actions">
           <button
             type="button"
             className="room-btn"
-            onClick={() => {
-              setHitlDecision("rejected");
-              setHitlOpen(false);
-            }}
+            disabled={submitting}
+            onClick={() => submitHitl("rejected")}
           >
             Reject
           </button>
           <button
             type="button"
             className="room-btn room-btn-primary"
-            onClick={() => {
-              setHitlDecision("approved");
-              setHitlOpen(false);
-            }}
+            disabled={submitting}
+            onClick={() => submitHitl("approved")}
           >
-            Approve paper
+            {submitting ? "…" : "Approve paper"}
           </button>
         </div>
       </div>
@@ -366,9 +415,10 @@ export function TradingToolbar({ compact }: { compact?: boolean }) {
     fusedScore,
     setHitlOpen,
     hitlDecision,
+    requiresHitl,
   } = useTradingWorkspace();
 
-  const showHitl = tradeAllowed === true && (fusedScore ?? 0) >= 0.6;
+  const showHitl = requiresHitl;
 
   return (
     <div className={`ate-trade-toolbar${compact ? " compact" : ""}`}>
