@@ -333,6 +333,22 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
     actionLabel: "GitHub"
   },
   {
+    id: "system_ate",
+    name: "ATE",
+    version: "Pre-Phase-0 / paper only",
+    status: "LAB / PAUSED",
+    tagline: "Typed agent swarm for classical + vision + fusion trading.",
+    description:
+      "ATE (Agentic Trading Engine) is a hybrid classical + vision + sequence ML trading system on an open-source backbone — Hummingbot, NautilusTrader, VectorBT, OpenBB — with owned fusion, hybrid memory, Temporal HITL, and React Flow swarm UI. First lane: cup-and-handle on SPY + BTC. Paper only until Phase 8.",
+    techStack: ["Pydantic AI", "LangGraph", "Temporal", "VectorBT"],
+    telemetry: [
+      { label: "UNIVERSE", value: "SPY+BTC" },
+      { label: "MODE", value: "PAPER" },
+      { label: "STATUS", value: "LAB" },
+    ],
+    actionLabel: "Investor colab",
+  },
+  {
     id: "system_arena",
     name: "TWISTED PONGG",
     version: "playable site",
@@ -819,7 +835,7 @@ export default function App() {
   };
 
   const isProjectActionable = (project: ShowroomProject) =>
-    Boolean(project.href || project.contactMessage || project.id === "system_arena");
+    Boolean(project.href || project.contactMessage || project.id === "system_arena" || getProjectById(project.id));
 
   const getExtendedFor = (id: string): ProjectEntry | undefined => getProjectById(id);
 
