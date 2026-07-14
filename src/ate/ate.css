@@ -869,22 +869,50 @@
 
 /* ATE mobile shell — bottom nav + investor-first */
 
-.ate-mobile .room-mobile-view-toggle {
+.ate-root .room-mobile-view-toggle {
   grid-template-columns: 1fr 1fr 1fr;
 }
 
-.ate-mobile .room-mobile-view-toggle .room-toggle {
-  font-size: 0.68rem;
-  padding: 0.55rem 0.25rem;
-  min-height: 44px;
+.ate-mobile-trade-cta {
+  display: none;
 }
 
-.ate-mobile .room-main {
-  padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+.ate-root .room-main {
+  padding-bottom: 0;
 }
 
-.ate-mobile.ate-root .room-layout.ate-trading-layout-root .room-main {
-  padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px));
+@media (max-width: 800px) {
+  .ate-root .room-mobile-view-toggle .room-toggle {
+    font-size: 0.68rem;
+    padding: 0.55rem 0.25rem;
+    min-height: 44px;
+  }
+
+  .ate-mobile-trade-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0.35rem 0.75rem;
+    border: 2px solid var(--border);
+    background: var(--accent);
+    color: #111;
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+  }
+
+  .ate-root .room-main {
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .ate-root .room-layout.ate-trading-layout-root .room-main {
+    padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px));
+  }
 }
 
 .ate-mobile-nav {
@@ -892,14 +920,14 @@
 }
 
 @media (max-width: 800px) {
-  .ate-mobile .ate-mobile-nav {
+  .ate-root .ate-mobile-nav {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 30;
+    z-index: 100;
     border-top: 3px solid var(--border);
     background: var(--surface);
     padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -943,12 +971,12 @@
     opacity: 0.85;
   }
 
-  .ate-mobile .room-card.kind-trading {
+  .ate-root .room-card.kind-trading {
     border-left: 4px solid var(--accent);
     background: color-mix(in srgb, var(--accent) 6%, var(--surface));
   }
 
-  .ate-mobile .room-card.kind-trading strong::after {
+  .ate-root .room-card.kind-trading strong::after {
     content: " · PAPER";
     font-size: 0.62rem;
     font-weight: 700;

@@ -340,11 +340,18 @@ export default function AteRoom() {
     );
 
   return (
-    <div className={`suparays-root ate-root${isDark ? " theme-dark" : ""}${isMobile ? " ate-mobile" : ""}`}>
+    <div className={`suparays-root ate-root ate-mobile${isDark ? " theme-dark" : ""}`}>
       <header className="room-mobile-bar">
         <div className="room-mobile-bar-top">
           <strong>ATE</strong>
           <div className="room-mobile-bar-actions">
+            <button
+              type="button"
+              className="ate-mobile-trade-cta"
+              onClick={() => handleMobileNav("trading")}
+            >
+              Trade
+            </button>
             <button
               type="button"
               className="room-theme-toggle room-mobile-theme"
@@ -469,7 +476,7 @@ export default function AteRoom() {
         ) : null}
       </div>
 
-      {isMobile && (SKIP_AUTH || auth?.authenticated) ? (
+      {(SKIP_AUTH || auth?.authenticated) ? (
         <AteMobileNav active={mobileNavActive} onSelect={handleMobileNav} />
       ) : null}
     </div>
