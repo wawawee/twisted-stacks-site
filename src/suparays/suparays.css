@@ -1648,10 +1648,10 @@
   letter-spacing: 0.08em;
 }
 
-.suparays-demo-cta p {
-  margin: 0;
-  font-size: 0.82rem;
-  line-height: 1.4;
+.suparays-demo-cta-meta {
+  margin-top: 0.35rem !important;
+  font-size: 0.68rem !important;
+  opacity: 0.8;
 }
 
 .suparays-demo-cta-btn,

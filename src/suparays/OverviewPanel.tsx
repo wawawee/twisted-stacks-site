@@ -102,10 +102,14 @@ export default function OverviewPanel({
         {viewMode === "company" ? (
           <section className="suparays-demo-cta">
             <div className="suparays-demo-cta-copy">
-              <h3>Pocket demo</h3>
+              <h3>Pocket demo — iPhone</h3>
               <p>
-                iPhone 13 Pro+ — 5-akts AR-demo (LiDAR, ljud, magnetometer). Stabilisering pågår
-                (T-004) innan investerarfilm.
+                <strong>Investor-safe path:</strong> Act I (vägg + magnetometer) och Act III (ljud) på
+                fysisk iPhone 13 Pro+. Stabiliseringspass T-004 pågår — mål: hands-on utan häng, inga
+                spök-WiFi/BLE, inget syntetiskt demo-läge.
+              </p>
+              <p className="suparays-demo-cta-meta mono">
+                Hands-on redo: efter 1–2 device dry-runs · Film (T-005): efter T-004 grön
               </p>
             </div>
             <button
@@ -115,7 +119,7 @@ export default function OverviewPanel({
                 onNavigate({ id: "demo", label: "Demo", slug: "ux-ui", kind: "topic" })
               }
             >
-              Demo-guide →
+              5-akts demo-guide →
             </button>
           </section>
         ) : null}
