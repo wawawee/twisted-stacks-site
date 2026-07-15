@@ -60,6 +60,19 @@ function phaseStatus(phase: { tasks: PhaseTask[] }) {
   return "planned";
 }
 
+function openPhaseDetail(
+  onNavigate: OverviewPanelProps["onNavigate"],
+  phaseNum: string,
+  phaseName: string,
+) {
+  onNavigate({
+    id: `phase-${phaseNum}`,
+    label: `${phaseName} — klart`,
+    slug: `phase-done-${phaseNum}`,
+    kind: "hub",
+  });
+}
+
 export default function OverviewPanel({
   tasklist,
   history,
@@ -70,11 +83,14 @@ export default function OverviewPanel({
   const tasks = tasklist.tasks as PhaseTask[];
   const phases = useMemo(() => groupPhases(tasks), [tasks]);
   const phase = tasklist.stats.phaseProgress;
-  const activePct = phase?.activePhasePct ?? 0;
+  const heroPct = phase?.heroPhasePct ?? 0;
+  const heroNum = phase?.heroPhaseNum ?? "1";
+  const heroDelivered = phase?.heroDelivered ?? false;
   const focusTasks = tasklist.focusTasks ?? tasks.filter((t) => t.priority === "P0" && !t.done);
   const visiblePhases = viewMode === "company" ? phases.filter((p) => Number(p.num) <= 3) : phases;
   const gateTasks = tasks.filter((t) => t.priority === "gate");
   const gatesDone = gateTasks.filter((t) => t.done).length;
+  const heroDoneTasks = tasks.filter((t) => t.phaseNum === heroNum && t.done && t.priority !== "gate");
 
   return (
     <div className="detail-panel overview-panel ate-overview">
@@ -83,47 +99,90 @@ export default function OverviewPanel({
       </header>
 
       <div className="detail-scroll overview-scroll">
+        {viewMode === "company" ? (
+          <section className="suparays-demo-cta">
+            <div className="suparays-demo-cta-copy">
+              <h3>Pocket demo</h3>
+              <p>
+                iPhone 13 Pro+ — 5-akts AR-demo (LiDAR, ljud, magnetometer). Stabilisering pågår
+                (T-004) innan investerarfilm.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="suparays-demo-cta-btn"
+              onClick={() =>
+                onNavigate({ id: "demo", label: "Demo", slug: "ux-ui", kind: "topic" })
+              }
+            >
+              Demo-guide →
+            </button>
+          </section>
+        ) : null}
+
         <p className="overview-lede ate-overview-lede">
           {viewMode === "company"
-            ? "En plattform — flera vertikaler. Framsteg per fas — nya idéer i senare faser påverkar inte aktiv wedge-%."
+            ? "Fas 1 research är levererad. Fas 2 = demo & Stockholm — nya idéer i senare faser påverkar inte levererat."
             : "Live project map — TASKLIST, wiki och colab. Fas 2 = G1 investerarvägg (P0)."}
         </p>
 
         <div className="ate-overview-stats">
           <div className="ate-overview-stat ate-overview-stat-primary">
-            <strong>{activePct}%</strong>
-            <span>Fas {phase?.activePhaseNum ?? "?"}</span>
+            <strong>{heroPct}%</strong>
+            <span>
+              Fas {heroNum}
+              {heroDelivered ? " · levererad" : ""}
+            </span>
           </div>
           <div className="ate-overview-stat">
             <strong>
-              {phase?.phasesComplete ?? 0}/{phase?.phasesTotal ?? 5}
+              {phase?.heroPhaseDone ?? 0}/{phase?.heroPhaseTotal ?? 0}
             </strong>
-            <span>faser levererade</span>
+            <span>klart i Fas {heroNum}</span>
           </div>
           <div className="ate-overview-stat">
             <strong>
               {phase?.activePhaseDone ?? 0}/{phase?.activePhaseTotal ?? 0}
             </strong>
-            <span>i aktiv fas</span>
+            <span>nästa · Fas {phase?.activePhaseNum ?? "?"}</span>
           </div>
           <div className="ate-overview-stat">
-            <strong>{tasklist.stats.p0Open}</strong>
-            <span>P0 öppna</span>
+            <strong>{phase?.phasesComplete ?? 0}</strong>
+            <span>faser levererade</span>
           </div>
         </div>
 
+        {heroDelivered && viewMode === "company" ? (
+          <div className="suparays-delivered-banner">
+            <p>
+              <strong>Fas {heroNum}</strong> — {phase?.heroPhaseName} · {heroDoneTasks.length} tasks
+              klara
+            </p>
+            <button
+              type="button"
+              className="suparays-phase-done-btn"
+              onClick={() => openPhaseDetail(onNavigate, heroNum, phase?.heroPhaseName ?? `Fas ${heroNum}`)}
+            >
+              Visa allt klart i Fas {heroNum} →
+            </button>
+          </div>
+        ) : null}
+
         <p className="ate-overview-phase-note">
-          Aktiv: Fas {phase?.activePhaseNum} — {phase?.activePhaseName}
-          {viewMode === "company" ? " · tidigare faser räknas vid ≥50%" : ""}
+          Levererat: Fas {heroNum} ({heroPct}%) · Pågår: Fas {phase?.activePhaseNum} —{" "}
+          {phase?.activePhaseName}
+          {phase?.activePhasePct === 0 && viewMode === "company"
+            ? " — wedge-spåret startar här (demo, intervjuer)"
+            : ""}
         </p>
 
         <div className="overview-hero">
           <div className="overview-viz suparays-orbit-desktop">
             <div className="overview-viz-ring overview-viz-ring-outer" />
             <div className="overview-viz-ring overview-viz-ring-inner" />
-            <div className="overview-viz-core" style={{ ["--pct" as string]: `${activePct}` }}>
-              <span className="overview-viz-core-pct">{activePct}%</span>
-              <span className="overview-viz-core-lbl">fas {phase?.activePhaseNum ?? "?"}</span>
+            <div className="overview-viz-core" style={{ ["--pct" as string]: `${heroPct}` }}>
+              <span className="overview-viz-core-pct">{heroPct}%</span>
+              <span className="overview-viz-core-lbl">fas {heroNum}</span>
             </div>
             {ORBIT_NODES.map((node) => (
               <button
@@ -147,7 +206,25 @@ export default function OverviewPanel({
         </div>
 
         <div className="suparays-mobile-quicknav" role="navigation" aria-label="Snabbnavigering">
-          {ORBIT_NODES.map((node) => (
+          <button
+            type="button"
+            className="suparays-mobile-quicknav-chip suparays-mobile-quicknav-chip-accent"
+            onClick={() => onNavigate({ id: "demo", label: "Demo", slug: "ux-ui", kind: "topic" })}
+          >
+            Demo
+          </button>
+          {heroDelivered ? (
+            <button
+              type="button"
+              className="suparays-mobile-quicknav-chip suparays-mobile-quicknav-chip-accent"
+              onClick={() =>
+                openPhaseDetail(onNavigate, heroNum, phase?.heroPhaseName ?? `Fas ${heroNum}`)
+              }
+            >
+              Fas {heroNum} klart
+            </button>
+          ) : null}
+          {ORBIT_NODES.filter((n) => n.id !== "demo").map((node) => (
             <button
               key={node.id}
               type="button"
@@ -194,6 +271,7 @@ export default function OverviewPanel({
               const done = p.tasks.filter((t) => t.done).length;
               const total = p.tasks.filter((t) => !t.deferred).length;
               const phasePct = total > 0 ? Math.round((done / total) * 100) : 0;
+              const isDelivered = phasePct >= 50;
               return (
                 <li key={p.num} className={`ate-phase-item status-${status}`}>
                   <div className="ate-phase-marker" aria-hidden />
@@ -207,6 +285,15 @@ export default function OverviewPanel({
                     <div className="ate-phase-bar" role="presentation">
                       <span style={{ width: `${phasePct}%` }} />
                     </div>
+                    {isDelivered && done > 0 ? (
+                      <button
+                        type="button"
+                        className="ate-phase-task-link suparays-phase-inline-link"
+                        onClick={() => openPhaseDetail(onNavigate, p.num, p.name)}
+                      >
+                        Visa {done} klara i Fas {p.num} →
+                      </button>
+                    ) : null}
                     {viewMode === "dev" && status === "active" ? (
                       <ul className="ate-phase-next">
                         {p.tasks
@@ -259,7 +346,7 @@ export default function OverviewPanel({
 
         {focusTasks.length > 0 ? (
           <section className="ate-overview-section">
-            <h3>Fokus-kö</h3>
+            <h3>Fokus-kö (Fas {phase?.activePhaseNum})</h3>
             <div className="overview-queue">
               {focusTasks.slice(0, 6).map((t) => (
                 <button
@@ -297,22 +384,6 @@ export default function OverviewPanel({
                 </li>
               ))}
             </ul>
-          </section>
-        ) : null}
-
-        {history.milestones.length > 0 ? (
-          <section className="ate-overview-section">
-            <h3>Milstolpar</h3>
-            <div className="overview-stats">
-              <div className="overview-stat">
-                <strong>{history.milestones.length}</strong>
-                <span>totalt</span>
-              </div>
-              <div className="overview-stat">
-                <strong>{tasklist.stats.done}</strong>
-                <span>tasks klara</span>
-              </div>
-            </div>
           </section>
         ) : null}
 

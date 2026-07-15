@@ -134,6 +134,11 @@ export function buildGridSections(
         activePhaseDone: number;
         activePhaseTotal: number;
         activePhasePct: number;
+        heroPhasePct?: number;
+        heroPhaseNum?: string;
+        heroPhaseDone?: number;
+        heroPhaseTotal?: number;
+        heroDelivered?: boolean;
       };
     };
     pages: Array<{ slug: string; title: string; category: string }>;

@@ -9,6 +9,17 @@ interface Task {
   done: boolean;
   priority: string;
   notes: string;
+  phaseNum?: string;
+  phaseName?: string;
+}
+
+interface PhaseSnapshot {
+  num: string;
+  name: string;
+  done: number;
+  total: number;
+  pct: number;
+  delivered: boolean;
 }
 
 interface TasklistData {
@@ -35,6 +46,13 @@ interface TasklistData {
       activePhaseDone: number;
       activePhaseTotal: number;
       activePhasePct: number;
+      heroPhaseNum?: string;
+      heroPhaseName?: string;
+      heroPhaseDone?: number;
+      heroPhaseTotal?: number;
+      heroPhasePct?: number;
+      heroDelivered?: boolean;
+      phaseSnapshots?: PhaseSnapshot[];
     };
   };
 }
@@ -108,6 +126,37 @@ export default function DetailPanel({
 
       {loading ? <p className="suparays-loading">Laddar…</p> : null}
 
+      {!loading && slug.startsWith("phase-done-") && tasklist ? (
+        <div className="detail-scroll">
+          {(() => {
+            const phaseNum = slug.replace("phase-done-", "");
+            const snap = tasklist.stats.phaseProgress?.phaseSnapshots?.find((s) => s.num === phaseNum);
+            const doneTasks = tasklist.tasks.filter(
+              (t) => t.phaseNum === phaseNum && t.done && t.priority !== "gate",
+            );
+            return (
+              <>
+                <p className="detail-meta">
+                  {snap
+                    ? `${snap.done}/${snap.total} klara · ${snap.pct}%`
+                    : `${doneTasks.length} klara`}
+                  {snap?.delivered ? " · levererad" : ""}
+                </p>
+                <h3>{snap?.name ?? `Fas ${phaseNum}`}</h3>
+                <ul className="ate-status-list">
+                  {doneTasks.map((t) => (
+                    <li key={t.id} className="done">
+                      <code>{t.id}</code> {t.title}
+                    </li>
+                  ))}
+                </ul>
+                {doneTasks.length === 0 ? <p>Inga klara tasks i denna fas än.</p> : null}
+              </>
+            );
+          })()}
+        </div>
+      ) : null}
+
       {!loading && slug === "progress-summary" && tasklist && history ? (
         <div className="detail-scroll">
           <div className="progress-bar-wrap">
@@ -115,16 +164,18 @@ export default function DetailPanel({
               <div
                 className="progress-fill"
                 style={{
-                  width: `${tasklist.stats.phaseProgress?.activePhasePct ?? Math.round((tasklist.stats.done / Math.max(tasklist.stats.total, 1)) * 100)}%`,
+                  width: `${tasklist.stats.phaseProgress?.heroPhasePct ?? tasklist.stats.phaseProgress?.activePhasePct ?? Math.round((tasklist.stats.done / Math.max(tasklist.stats.total, 1)) * 100)}%`,
                 }}
               />
             </div>
             <span className="progress-pct mono">
-              Fas {tasklist.stats.phaseProgress?.activePhaseNum ?? "?"}:{" "}
-              {tasklist.stats.phaseProgress?.activePhaseDone ?? tasklist.stats.done}/
-              {tasklist.stats.phaseProgress?.activePhaseTotal ?? tasklist.stats.total} i aktiv fas ·{" "}
-              {tasklist.stats.phaseProgress?.phasesComplete ?? 0}/
-              {tasklist.stats.phaseProgress?.phasesTotal ?? 9} faser klara
+              Levererat: Fas {tasklist.stats.phaseProgress?.heroPhaseNum ?? "?"} —{" "}
+              {tasklist.stats.phaseProgress?.heroPhaseDone ?? 0}/
+              {tasklist.stats.phaseProgress?.heroPhaseTotal ?? 0} klara (
+              {tasklist.stats.phaseProgress?.heroPhasePct ?? 0}%) · Nästa: Fas{" "}
+              {tasklist.stats.phaseProgress?.activePhaseNum ?? "?"} —{" "}
+              {tasklist.stats.phaseProgress?.activePhaseDone ?? 0}/
+              {tasklist.stats.phaseProgress?.activePhaseTotal ?? 0}
             </span>
           </div>
           <h3>Funding gates</h3>

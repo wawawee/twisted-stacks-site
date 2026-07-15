@@ -111,6 +111,34 @@ function computePhaseProgress(tasks, currentFocus = "") {
   const activePhasePct =
     activePhaseTotal > 0 ? Math.round((activePhaseDone / activePhaseTotal) * 100) : 0;
 
+  const phaseSnapshots = nums.map((n) => {
+    const nd = (byPhase.get(String(n)) || []).filter((t) => !t.deferred);
+    const done = nd.filter((t) => t.done).length;
+    const total = nd.length;
+    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+    return {
+      num: String(n),
+      name: nd[0]?.phaseName || `Fas ${n}`,
+      done,
+      total,
+      pct,
+      delivered: pct >= 50,
+    };
+  });
+
+  const delivered = phaseSnapshots.filter((s) => s.delivered);
+  const hero =
+    delivered.length > 0
+      ? delivered[delivered.length - 1]
+      : phaseSnapshots.reduce((best, s) => (s.pct > best.pct ? s : best), phaseSnapshots[0] ?? {
+          num: "1",
+          name: "Research",
+          done: 0,
+          total: 0,
+          pct: 0,
+          delivered: false,
+        });
+
   return {
     phasesTotal: nums.length,
     phasesComplete,
@@ -119,6 +147,13 @@ function computePhaseProgress(tasks, currentFocus = "") {
     activePhaseDone,
     activePhaseTotal,
     activePhasePct,
+    heroPhaseNum: hero.num,
+    heroPhaseName: hero.name,
+    heroPhaseDone: hero.done,
+    heroPhaseTotal: hero.total,
+    heroPhasePct: hero.pct,
+    heroDelivered: hero.delivered,
+    phaseSnapshots,
   };
 }
 

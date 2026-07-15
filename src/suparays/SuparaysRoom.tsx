@@ -232,6 +232,7 @@ export default function SuparaysRoom() {
       slug === "ideabox" ||
       slug === "files" ||
       ["tasklist", "tasklist-focus", "activity", "history", "progress-summary"].includes(slug) ||
+      slug.startsWith("phase-done-") ||
       slug.startsWith("task-")
     ) {
       setMarkdown("");
@@ -301,7 +302,8 @@ export default function SuparaysRoom() {
         ? "ideas"
         : selection?.slug === "progress-summary" ||
             selection?.slug === "tasklist" ||
-            selection?.slug === "history"
+            selection?.slug === "history" ||
+            selection?.slug?.startsWith("phase-done-")
           ? "progress"
           : "home";
 
@@ -431,6 +433,7 @@ export default function SuparaysRoom() {
                   stats={project.manifest.stats}
                   onSelect={pick}
                   showStats={false}
+                  viewMode={viewMode}
                 />
               </div>
             ) : (
@@ -439,6 +442,7 @@ export default function SuparaysRoom() {
                 activeId={activeId}
                 stats={project.manifest.stats}
                 onSelect={pick}
+                viewMode={viewMode}
               />
             )
           ) : (
