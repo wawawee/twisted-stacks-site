@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import TradingChart from "./TradingChart";
-import type { CupHandleSignal, MacroPayload, MarketBar, MarketQuote, RegimeGateResult, TaFeatures } from "./tradingTypes";
+import type { CupHandleSignal, MacroAlert, MacroAlertsPayload, MacroPayload, MarketBar, MarketQuote, RegimeGateResult, TaFeatures } from "./tradingTypes";
 import { WATCHLIST } from "./tradingTypes";
 
 const API = "/api/ate";
@@ -49,6 +49,8 @@ interface TradingContextValue {
   macro: MacroPayload | null;
   macroLoading: boolean;
   loadMacro: () => Promise<void>;
+  macroAlerts: MacroAlert[];
+  macroAlertsLoading: boolean;
   isMobile: boolean;
   isDark: boolean;
   mobileTab: MobileTab;
@@ -69,6 +71,26 @@ function fmtTelemetryTime(d: Date) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+const FALLBACK_MACRO_ALERTS: MacroAlert[] = [
+  {
+    marketId: "btc-100k-dec",
+    platform: "polymarket",
+    title: "Bitcoin reaches $100K by Dec 2026",
+    tier: "tier1",
+    eventType: "crypto",
+    yesPrice: 0.68,
+    probShift: 0.12,
+    volume24h: 245_000,
+    direction: "bullish",
+    confidence: 0.87,
+    source: "mock",
+  },
+];
+
+function tierBadgeLabel(tier: MacroAlert["tier"]): string {
+  return tier.replace("tier", "T").toUpperCase();
 }
 
 const FALLBACK_MACRO: MacroPayload = {
@@ -128,6 +150,8 @@ export function TradingWorkspaceProvider({
   const [lastMarketFetch, setLastMarketFetch] = useState<MarketFetchSnapshot | null>(null);
   const [macro, setMacro] = useState<MacroPayload | null>(null);
   const [macroLoading, setMacroLoading] = useState(false);
+  const [macroAlerts, setMacroAlerts] = useState<MacroAlert[]>([]);
+  const [macroAlertsLoading, setMacroAlertsLoading] = useState(false);
   const [hitlOpen, setHitlOpen] = useState(false);
   const [hitlDecision, setHitlDecision] = useState<"pending" | "approved" | "rejected">("pending");
   const [requiresHitl, setRequiresHitl] = useState(false);
@@ -135,15 +159,28 @@ export function TradingWorkspaceProvider({
 
   const loadMacro = useCallback(async () => {
     setMacroLoading(true);
+    setMacroAlertsLoading(true);
     try {
-      const res = await fetch(`${API}/macro`);
-      const data = (await res.json()) as MacroPayload & { error?: string };
-      if (!res.ok) throw new Error(data.error || "Macro fetch failed");
+      const [macroRes, alertsRes] = await Promise.all([
+        fetch(`${API}/macro`),
+        fetch(`${API}/macro-alerts?limit=3`),
+      ]);
+      const data = (await macroRes.json()) as MacroPayload & { error?: string };
+      if (!macroRes.ok) throw new Error(data.error || "Macro fetch failed");
       setMacro(data);
+
+      const alertsData = (await alertsRes.json()) as MacroAlertsPayload & { error?: string };
+      if (alertsRes.ok && alertsData.alerts?.length) {
+        setMacroAlerts(alertsData.alerts);
+      } else {
+        setMacroAlerts(FALLBACK_MACRO_ALERTS);
+      }
     } catch {
       setMacro(FALLBACK_MACRO);
+      setMacroAlerts(FALLBACK_MACRO_ALERTS);
     } finally {
       setMacroLoading(false);
+      setMacroAlertsLoading(false);
     }
   }, []);
 
@@ -236,6 +273,8 @@ export function TradingWorkspaceProvider({
       macro,
       macroLoading,
       loadMacro,
+      macroAlerts,
+      macroAlertsLoading,
       isMobile,
       isDark,
       mobileTab,
@@ -268,6 +307,8 @@ export function TradingWorkspaceProvider({
       macro,
       macroLoading,
       loadMacro,
+      macroAlerts,
+      macroAlertsLoading,
       isMobile,
       isDark,
       mobileTab,
@@ -596,8 +637,9 @@ function TelemetrySubsection() {
 }
 
 function MacroScoutSection() {
-  const { macro, macroLoading } = useTradingWorkspace();
+  const { macro, macroLoading, macroAlerts, macroAlertsLoading } = useTradingWorkspace();
   const data = macro ?? FALLBACK_MACRO;
+  const alerts = macroAlerts.length ? macroAlerts : FALLBACK_MACRO_ALERTS;
   const isLive = data.source === "live" || data.source === "mixed";
 
   return (
@@ -623,6 +665,19 @@ function MacroScoutSection() {
           </li>
         ))}
       </ul>
+      {alerts.length > 0 && (
+        <ul className="ate-macro-alerts" aria-label="PM shift alerts">
+          {alerts.slice(0, 3).map((a) => (
+            <li key={a.marketId} className="ate-macro-alert">
+              <span className={`ate-macro-tier ate-macro-tier-${a.tier}`}>{tierBadgeLabel(a.tier)}</span>
+              <span className="ate-macro-alert-title">{a.title}</span>
+              <span className="ate-macro-alert-shift mono">
+                {macroAlertsLoading ? "…" : `${a.probShift >= 0 ? "+" : ""}${(a.probShift * 100).toFixed(0)}%`}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
       <p className="ate-macro-whale mono">
         <span className="ate-macro-whale-tag">Whale</span>
         {data.whale.amount} · wallet {data.whale.pnl}

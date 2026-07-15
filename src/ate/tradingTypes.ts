@@ -66,6 +66,28 @@ export interface MacroPayload {
   fetchedAt: string;
 }
 
+export type MacroAlertTier = "tier1" | "tier2" | "tier3" | "tier4" | "noise";
+
+export interface MacroAlert {
+  marketId: string;
+  platform: "polymarket" | "kalshi" | "limitless" | "opinion";
+  title: string;
+  tier: MacroAlertTier;
+  eventType: "crypto" | "macro" | "geopolitical" | "tech" | "other";
+  yesPrice: number;
+  probShift: number;
+  volume24h: number;
+  direction: "bullish" | "bearish" | "neutral";
+  confidence: number;
+  source: MacroQuoteSource;
+}
+
+export interface MacroAlertsPayload {
+  source: MacroQuoteSource | "mixed";
+  alerts: MacroAlert[];
+  fetchedAt: string;
+}
+
 export const WATCHLIST = [
   { symbol: "SPY", label: "S&P 500 ETF" },
   { symbol: "QQQ", label: "Nasdaq 100" },

@@ -787,6 +787,58 @@
   color: var(--macro);
 }
 
+.ate-macro-alerts {
+  list-style: none;
+  margin: 0.45rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.ate-macro-alert {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.35rem;
+  align-items: center;
+  font-size: 0.68rem;
+  padding: 0.25rem 0.35rem;
+  border: 1px solid color-mix(in srgb, var(--macro) 25%, var(--border));
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--macro) 4%, var(--surface));
+}
+
+.ate-macro-tier {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.05rem 0.25rem;
+  border-radius: 3px;
+  border: 1px solid var(--macro);
+  color: var(--macro);
+}
+
+.ate-macro-tier-tier1 {
+  border-color: #9333ea;
+  color: #9333ea;
+}
+
+.ate-macro-tier-tier2 {
+  border-color: var(--macro);
+  color: var(--macro);
+}
+
+.ate-macro-alert-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ate-macro-alert-shift {
+  color: var(--macro);
+  font-weight: 600;
+}
+
 .ate-macro-whale {
   margin: 0;
   font-size: 0.68rem;
