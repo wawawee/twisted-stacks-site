@@ -121,7 +121,21 @@ export interface GridSection {
 export function buildGridSections(
   manifest: {
     currentFocus: string;
-    stats: { total: number; done: number; p0Open: number; p1Open: number };
+    stats: {
+      total: number;
+      done: number;
+      p0Open: number;
+      p1Open: number;
+      phaseProgress?: {
+        phasesTotal: number;
+        phasesComplete: number;
+        activePhaseNum: string;
+        activePhaseName: string;
+        activePhaseDone: number;
+        activePhaseTotal: number;
+        activePhasePct: number;
+      };
+    };
     pages: Array<{ slug: string; title: string; category: string }>;
     graph: { nodes: Array<{ id: string; kind: string; label: string; sublabel: string; slug: string | null; taskId?: string }> };
   },
@@ -227,7 +241,9 @@ export function buildGridSections(
       {
         id: "tasklist",
         label: mode === "company" ? "Status & milstolpar" : "TASKLIST",
-        sublabel: `${manifest.stats.done}/${manifest.stats.total} klara`,
+        sublabel: manifest.stats.phaseProgress
+          ? `Fas ${manifest.stats.phaseProgress.activePhaseNum}: ${manifest.stats.phaseProgress.activePhasePct}% · ${manifest.stats.phaseProgress.phasesComplete}/${manifest.stats.phaseProgress.phasesTotal} levererade`
+          : `${manifest.stats.done}/${manifest.stats.total} klara`,
         slug: mode === "company" ? "progress-summary" : "tasklist",
         kind: "hub",
       },

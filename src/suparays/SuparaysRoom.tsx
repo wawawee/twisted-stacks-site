@@ -6,6 +6,8 @@ import OverviewPanel from "./OverviewPanel";
 import ChatPanel from "./ChatPanel";
 import FilesPanel from "./FilesPanel";
 import IdeasPanel from "./IdeasPanel";
+import SuparaysMobileNav, { type SuparaysMobileNavId } from "./SuparaysMobileNav";
+import { useIsMobile } from "./useIsMobile";
 import { useResizablePanel } from "./useResizablePanel";
 import { useTheme } from "./useTheme";
 import {
@@ -151,17 +153,7 @@ export default function SuparaysRoom() {
   const [error, setError] = useState("");
   const { width: panelWidth, dragging, onPointerDown } = useResizablePanel();
   const { isDark, toggleTheme } = useTheme();
-  const [isMobile, setIsMobile] = useState(
-    () => typeof window !== "undefined" && window.matchMedia("(max-width: 800px)").matches,
-  );
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 800px)");
-    const sync = () => setIsMobile(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
+  const isMobile = useIsMobile();
 
   const menuItems = useMemo(
     () => buildMenuItems(project?.manifest.pages || [], viewMode),
@@ -302,6 +294,39 @@ export default function SuparaysRoom() {
 
   const memberId = SKIP_AUTH ? "per" : auth?.member ?? null;
 
+  const mobileNavActive: SuparaysMobileNavId =
+    selection?.slug === "chat"
+      ? "chat"
+      : selection?.slug === "ideabox"
+        ? "ideas"
+        : selection?.slug === "progress-summary" ||
+            selection?.slug === "tasklist" ||
+            selection?.slug === "history"
+          ? "progress"
+          : "home";
+
+  function handleMobileNav(id: SuparaysMobileNavId) {
+    if (id === "home") {
+      setSelection(null);
+      setActiveId(null);
+      return;
+    }
+    if (id === "progress") {
+      pick({
+        id: "tasklist",
+        label: viewMode === "company" ? "Status & milstolpar" : "TASKLIST",
+        slug: viewMode === "company" ? "progress-summary" : "tasklist",
+        kind: "hub",
+      });
+      return;
+    }
+    if (id === "chat") {
+      pick({ id: "chat", label: "Chat", slug: "chat", kind: "tool" });
+      return;
+    }
+    pick({ id: "ideabox", label: "Idébox", slug: "ideabox", kind: "tool" });
+  }
+
   const panelContent =
     selection?.kind === "overview" && project ? (
       <OverviewPanel
@@ -332,7 +357,7 @@ export default function SuparaysRoom() {
     );
 
   return (
-    <div className={`suparays-root${isDark ? " theme-dark" : ""}`}>
+    <div className={`suparays-root suparays-mobile${isDark ? " theme-dark" : ""}`}>
       <header className="room-mobile-bar">
         <div className="room-mobile-bar-top">
           <strong>SUPARAYS</strong>
@@ -391,12 +416,31 @@ export default function SuparaysRoom() {
           {projectLoading ? (
             <p className="room-loading">Laddar projekt…</p>
           ) : project ? (
-            <ProjectGrid
-              sections={gridSections}
-              activeId={activeId}
-              stats={project.manifest.stats}
-              onSelect={pick}
-            />
+            isMobile && !selection ? (
+              <div className="suparays-mobile-home">
+                <OverviewPanel
+                  tasklist={project.tasklist}
+                  history={project.history}
+                  syncedAt={project.manifest.syncedAt}
+                  viewMode={viewMode}
+                  onNavigate={pick}
+                />
+                <ProjectGrid
+                  sections={gridSections}
+                  activeId={activeId}
+                  stats={project.manifest.stats}
+                  onSelect={pick}
+                  showStats={false}
+                />
+              </div>
+            ) : (
+              <ProjectGrid
+                sections={gridSections}
+                activeId={activeId}
+                stats={project.manifest.stats}
+                onSelect={pick}
+              />
+            )
           ) : (
             <p className="room-error">
               {import.meta.env.DEV
@@ -436,6 +480,8 @@ export default function SuparaysRoom() {
           {panelContent}
         </aside>
       </div>
+
+      {isMobile ? <SuparaysMobileNav active={mobileNavActive} onSelect={handleMobileNav} /> : null}
     </div>
   );
 }

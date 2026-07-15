@@ -1359,4 +1359,216 @@
   .detail-panel-empty {
     display: none;
   }
+
+  /* Investor-first mobile shell (iPhone) */
+
+  .suparays-root.suparays-mobile {
+    min-height: 100dvh;
+    min-height: -webkit-fill-available;
+  }
+
+  .suparays-root .room-mobile-bar {
+    padding-top: calc(0.55rem + env(safe-area-inset-top, 0px));
+  }
+
+  .suparays-root .room-mobile-view-toggle .room-toggle {
+    font-size: 0.68rem;
+    padding: 0.55rem 0.25rem;
+    min-height: 44px;
+  }
+
+  .suparays-root .room-main {
+    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .suparays-mobile-home {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-height: 0;
+  }
+
+  .suparays-mobile-home .overview-panel {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .suparays-mobile-home .overview-panel .detail-panel-head {
+    display: none;
+  }
+
+  .suparays-mobile-home .room-grid {
+    padding-top: 0.35rem;
+    border-top: 2px solid var(--border);
+  }
+
+  .suparays-orbit-desktop {
+    display: none;
+  }
+
+  .suparays-mobile-quicknav {
+    display: flex;
+    gap: 0.45rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    padding: 0.15rem 0 0.65rem;
+    margin: 0 -0.15rem;
+  }
+
+  .suparays-mobile-quicknav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .suparays-mobile-quicknav-chip {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    min-height: 44px;
+    padding: 0.55rem 0.85rem;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    color: var(--fg);
+    font: inherit;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+  }
+
+  .suparays-mobile-quicknav-chip:active {
+    background: var(--accent);
+    color: #111;
+  }
+
+  .suparays-root .ate-overview-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .suparays-root .ate-overview-stat {
+    min-height: 52px;
+  }
+
+  .suparays-root .ate-overview-stat-primary strong {
+    font-size: 1.35rem;
+  }
+
+  .suparays-root .ate-phase-timeline {
+    margin: 0;
+    padding: 0;
+  }
+
+  .suparays-root .ate-phase-head {
+    flex-wrap: wrap;
+    gap: 0.25rem 0.5rem;
+  }
+
+  .suparays-root .ate-phase-name {
+    flex: 1 1 8rem;
+    min-width: 0;
+  }
+
+  .suparays-root .overview-queue-chip {
+    min-height: 44px;
+    padding: 0.55rem 0.65rem;
+  }
+
+  .suparays-root .room-card {
+    min-height: 52px;
+    padding: 0.65rem 0.75rem;
+  }
+
+  .suparays-root .room-panel-mobile-bar .room-btn {
+    min-height: 44px;
+    min-width: 5.5rem;
+    padding: 0.45rem 0.75rem;
+  }
+
+  .suparays-root .detail-scroll {
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .suparays-root .suparays-chat-compose textarea,
+  .suparays-root .suparays-ideas-compose textarea {
+    font-size: 16px;
+  }
+
+  .suparays-mobile-nav {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    border-top: 3px solid var(--border);
+    background: var(--surface);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-shadow: 0 -4px 0 var(--shadow-color);
+  }
+
+  .suparays-mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+    border: none;
+    border-right: 2px solid var(--border);
+    background: var(--surface);
+    color: inherit;
+    font: inherit;
+    min-height: 56px;
+    padding: 0.35rem 0.2rem;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .suparays-mobile-nav-item:last-child {
+    border-right: none;
+  }
+
+  .suparays-mobile-nav-item.active {
+    background: var(--accent);
+    color: #111;
+  }
+
+  .suparays-mobile-nav-short {
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .suparays-mobile-nav-label {
+    font-size: 0.58rem;
+    opacity: 0.85;
+  }
+}
+
+.suparays-mobile-quicknav {
+  display: none;
+}
+
+.suparays-mobile-nav {
+  display: none;
+}
+
+@media (max-width: 520px) {
+  .suparays-root .overview-lede {
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+
+  .suparays-root .ate-phase-blurb {
+    font-size: 0.72rem;
+  }
+
+  .suparays-root .progress-pct {
+    font-size: 0.72rem;
+    line-height: 1.4;
+  }
 }

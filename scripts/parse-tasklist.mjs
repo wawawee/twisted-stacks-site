@@ -25,11 +25,101 @@ function parseTableRows(section, predicate) {
 }
 
 function priorityFromHeading(heading) {
-  if (/P0/i.test(heading)) return "P0";
-  if (/P1/i.test(heading)) return "P1";
-  if (/P2/i.test(heading)) return "P2";
+  if (/^P0\b/i.test(heading)) return "P0";
+  if (/^P1\b/i.test(heading)) return "P1";
+  if (/^P2\b/i.test(heading)) return "P2";
   if (/backlog/i.test(heading)) return "backlog";
   return "other";
+}
+
+/** Investor-facing phases — new P2/backlog tasks do not move Fas 2 %. */
+const PHASE_BY_PRIORITY = {
+  P1: { num: "1", name: "Research & dokumentation" },
+  P0: { num: "2", name: "G1 investerarvägg" },
+  P2: { num: "3", name: "Produkt & mesh" },
+  backlog: { num: "4", name: "Backlog" },
+};
+
+const GATE_PHASE = { num: "5", name: "Funding gates (G1)" };
+
+function attachPhase(task) {
+  const phase = PHASE_BY_PRIORITY[task.priority] || { num: "4", name: "Backlog" };
+  return {
+    ...task,
+    phaseNum: phase.num,
+    phaseName: phase.name,
+    phase: `Fas ${phase.num}`,
+    inProgress: /\bpending\b|in progress|\[~]/i.test(task.notes || ""),
+    deferred: false,
+  };
+}
+
+function gateTasks(gates) {
+  return gates.map((g, i) => ({
+    id: g.id,
+    title: g.requirement,
+    owner: "—",
+    done: g.done,
+    priority: "gate",
+    notes: "",
+    phaseNum: GATE_PHASE.num,
+    phaseName: GATE_PHASE.name,
+    phase: `Fas ${GATE_PHASE.num}`,
+    inProgress: false,
+    deferred: false,
+  }));
+}
+
+function computePhaseProgress(tasks, currentFocus = "") {
+  const byPhase = new Map();
+  for (const t of tasks) {
+    const n = t.phaseNum || "?";
+    if (!byPhase.has(n)) byPhase.set(n, []);
+    byPhase.get(n).push(t);
+  }
+  const nums = [...byPhase.keys()]
+    .filter((n) => n !== "?")
+    .map(Number)
+    .sort((a, b) => a - b);
+
+  function phasePct(num) {
+    const nd = (byPhase.get(String(num)) || []).filter((t) => !t.deferred);
+    if (!nd.length) return 0;
+    return nd.filter((t) => t.done).length / nd.length;
+  }
+
+  const focusMatch = currentFocus.match(/G1|investor|demo|pitch|stockholm/i);
+  const inProgressPhases = nums.filter((n) => byPhase.get(String(n)).some((t) => t.inProgress));
+  const p0Open = (byPhase.get("2") || []).some((t) => !t.done && !t.deferred);
+
+  const activeNum =
+    ((focusMatch || p0Open) ? 2 : null) ??
+    (inProgressPhases.length ? Math.max(...inProgressPhases) : null) ??
+    [...nums].reverse().find((n) => {
+      const pct = phasePct(n);
+      return pct > 0 && pct < 1;
+    }) ??
+    2;
+
+  // Prior phases ≥50% done count as delivered (investor roadmap — not strict 100% gate)
+  const phasesComplete = nums.filter((n) => Number(n) < activeNum && phasePct(n) >= 0.5).length;
+
+  const apt = byPhase.get(String(activeNum)) || [];
+  const nonDeferred = apt.filter((t) => !t.deferred);
+  const activePhaseDone = nonDeferred.filter((t) => t.done).length;
+  const activePhaseTotal = nonDeferred.length;
+  const activePhasePct =
+    activePhaseTotal > 0 ? Math.round((activePhaseDone / activePhaseTotal) * 100) : 0;
+
+  return {
+    phasesTotal: nums.length,
+    phasesComplete,
+    activePhaseNum: String(activeNum),
+    activePhaseName: apt[0]?.phaseName || `Fas ${activeNum}`,
+    activePhaseDone,
+    activePhaseTotal,
+    activePhasePct,
+  };
 }
 
 export function parseFocusQueue(md) {
@@ -70,14 +160,16 @@ export function parseTasklist(md) {
 
     for (const cols of parseTableRows(part, (c) => /^T-\d+/.test(c[0]))) {
       const [id, title, owner, status, ...rest] = cols;
-      tasks.push({
-        id,
-        title: stripMd(title),
-        owner: owner || "—",
-        done: /☑|✅|\[x\]/i.test(status),
-        priority,
-        notes: stripMd(rest.join(" ")),
-      });
+      tasks.push(
+        attachPhase({
+          id,
+          title: stripMd(title),
+          owner: owner || "—",
+          done: /☑|✅|\[x\]/i.test(status),
+          priority,
+          notes: stripMd(rest.join(" ")),
+        }),
+      );
     }
   }
 
@@ -118,11 +210,15 @@ export function parseTasklist(md) {
       };
     });
 
+  const phasedTasks = [...tasks, ...gateTasks(gates)];
+  const recentWins = completed.slice(0, 6).map((c) => c.task);
+
   const stats = {
     total: tasks.length,
     done: tasks.filter((t) => t.done).length,
     p0Open: tasks.filter((t) => t.priority === "P0" && !t.done).length,
     p1Open: tasks.filter((t) => t.priority === "P1" && !t.done).length,
+    phaseProgress: computePhaseProgress(phasedTasks, currentFocus),
   };
 
   const focusTasks = openFocusTasks(tasks, focusQueue);
@@ -132,7 +228,8 @@ export function parseTasklist(md) {
     currentFocus,
     focusQueue,
     focusTasks,
-    tasks,
+    recentWins,
+    tasks: phasedTasks,
     gates,
     activity,
     completed,
