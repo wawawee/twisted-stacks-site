@@ -8,7 +8,7 @@ import {
   type VercelResponse,
 } from "../_lib/session.js";
 
-const VALID_MEMBERS = new Set(["baha", "kris", "joachim", "per"]);
+const VALID_MEMBERS = new Set(["baha", "kris", "joachim", "per", "toni"]);
 
 function parseBody(body: unknown) {
   if (typeof body !== "string") return body as Record<string, unknown>;

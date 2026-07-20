@@ -12,7 +12,7 @@ import {
 import { syncChatToWiki } from "../_lib/sync-chat-wiki.js";
 
 const TABLE = "suparays_messages";
-const VALID_MEMBERS = new Set(["baha", "kris", "joachim", "per"]);
+const VALID_MEMBERS = new Set(["baha", "kris", "joachim", "per", "toni"]);
 const BODY_MIN = 1;
 const BODY_MAX = 2000;
 const DEFAULT_LIMIT = 80;

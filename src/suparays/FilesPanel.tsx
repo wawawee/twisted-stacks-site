@@ -5,6 +5,7 @@ const MEMBER_LABELS: Record<string, string> = {
   kris: "Kris",
   joachim: "Joachim",
   per: "Per",
+  toni: "Toni",
 };
 
 interface SharedFile {

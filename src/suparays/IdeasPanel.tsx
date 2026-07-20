@@ -5,6 +5,7 @@ const MEMBER_LABELS: Record<string, string> = {
   kris: "Kris",
   joachim: "Joachim",
   per: "Per",
+  toni: "Toni",
 };
 
 const MEMBER_COLORS: Record<string, string> = {
@@ -12,6 +13,7 @@ const MEMBER_COLORS: Record<string, string> = {
   kris: "#c98a96",
   joachim: "#e6c07f",
   per: "#7cf58a",
+  toni: "#c9a0e8",
 };
 
 export interface IdeaEntry {

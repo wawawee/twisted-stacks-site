@@ -12,7 +12,7 @@ import {
 import { syncIdeaToWiki } from "../_lib/sync-idea-wiki.js";
 
 const TABLE = "suparays_ideas";
-const VALID_MEMBERS = new Set(["baha", "kris", "joachim", "per"]);
+const VALID_MEMBERS = new Set(["baha", "kris", "joachim", "per", "toni"]);
 const BODY_MIN = 1;
 const BODY_MAX = 8000;
 const DEFAULT_LIMIT = 50;

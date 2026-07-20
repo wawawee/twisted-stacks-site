@@ -25,6 +25,7 @@ const MEMBERS = [
   { id: "kris", label: "Kris" },
   { id: "joachim", label: "Joachim" },
   { id: "per", label: "Per" },
+  { id: "toni", label: "Toni" },
 ] as const;
 
 interface AuthState {

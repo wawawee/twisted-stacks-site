@@ -12,7 +12,7 @@ import {
 
 const BUCKET = "suparays-shared";
 const TABLE = "suparays_files";
-const VALID_MEMBERS = new Set(["baha", "kris", "joachim", "per"]);
+const VALID_MEMBERS = new Set(["baha", "kris", "joachim", "per", "toni"]);
 const MAX_BYTES = 25 * 1024 * 1024;
 const SIGNED_URL_TTL_SEC = 3600;
 const RATE_LIMIT_WINDOW_MS = 60_000;
