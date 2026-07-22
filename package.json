@@ -10,9 +10,11 @@
     "predev:ate": "npm run sync:ate",
     "dev:ate": "bash scripts/dev-ate.sh",
     "dev:ate:fresh": "npm run sync:ate && npm run dev:ate",
+    "dev:space": "bash scripts/dev-space.sh",
     "sync:wiki": "node scripts/sync-suparays-wiki.mjs",
     "sync:ate": "node scripts/sync-ate-wiki.mjs",
-    "build": "npm run sync:wiki && npm run sync:ate && vite build",
+    "sync:space": "node scripts/sync-space-wiki.mjs",
+    "build": "npm run sync:wiki && npm run sync:ate && npm run sync:space && vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit"

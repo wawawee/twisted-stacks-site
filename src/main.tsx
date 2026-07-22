@@ -3,6 +3,7 @@ import App from './App.tsx';
 import VRSuperPowers from './VRSuperPowers.tsx';
 import SuparaysRoom from './suparays/SuparaysRoom.tsx';
 import AteRoom from './ate/AteRoom.tsx';
+import SpaceRoom from './space/SpaceRoom.tsx';
 import {LanguageProvider} from './i18n/context';
 import './index.css';
 
@@ -20,6 +21,9 @@ function Root() {
   }
   if (path === "/ate" || path.startsWith("/ate/")) {
     return <AteRoom />;
+  }
+  if (path === "/space" || path.startsWith("/space/")) {
+    return <SpaceRoom />;
   }
   return (
     <LanguageProvider>

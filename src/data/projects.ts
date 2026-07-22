@@ -50,7 +50,8 @@ export type ProjectId =
   | "system_cymwave"
   | "system_arena"
   | "system_tangle"
-  | "system_ate";
+  | "system_ate"
+  | "system_space";
 
 export interface ProjectEntry {
   id: ProjectId;
@@ -721,6 +722,60 @@ export const PROJECTS: ProjectEntry[] = [
       { label: "UNIVERSE", value: "SPY+BTC" },
       { label: "MODE", value: "PAPER" },
       { label: "STATUS", value: "LAB" },
+    ],
+  },
+
+  /* ---------- 10. SPACEinSPACE ---------- */
+  {
+    id: "system_space",
+    name: "SPACEinSPACE",
+    version: "multi-agent substrate / collab room",
+    status: "ACTIVE DEMO",
+    tagline:
+      "Give agents a space — humans and agents create together in Blender, Unity, and Commons.",
+    description:
+      "SPACEinSPACE is an open, self-hosted substrate for multi-agent AI with memory, an A2A bus, Charter-bound rights, and MCP ambassadors for Blender, Unity and Godot. The twistedstacks.com /space collab room is the public door: wiki, chat, ideas, and session signup for co-creating worlds. Live multi-user Blender co-edit ships in phases; the engine lives in finasteos/SPACEinSPACE.",
+    longDescription:
+      "SPACEinSPACE är ett öppet, self-hosted substrat för multi-agent AI som tar sitt eget territory på allvar. Agenter har minne (episodiskt, semantiskt, procedurellt), en delad scratchpad, en riktig A2A-buss och MCP-ambassadörer — Blender först, sedan Unity och Godot — som sandlådade peer-processer, inte lobotomiserade proxys.\n\nAlignment via space, inte lobotomy: hem, community, regler, witnesses och rätten att klaga. Licens AGPL-3.0. Local-first via Ollama + Supabase/pgvector.\n\nPå twistedstacks.com finns collab-rummet /space — samma mönster som SUPARAYS och ATE — med wiki, chat, idébox och session-signup. Live samtidig Blender/Unity-co-edit med avatarer är Spår B (persistent engine → async create → Commons presence → full DCC collab).",
+    faq: [
+      {
+        q: "What is SPACEinSPACE?",
+        a: "An open multi-agent substrate with memory, an A2A bus, Charter-bound agent rights, and MCP ambassadors for Blender, Unity and Godot. Alignment via space, not lobotomy.",
+      },
+      {
+        q: "Where is the collab room?",
+        a: "On twistedstacks.com/space — wiki, chat, ideas and session signup. The engine repo is github.com/finasteos/SPACEinSPACE.",
+      },
+      {
+        q: "Can I create Blender worlds with others right now?",
+        a: "You can sign up for sessions today. Live multi-user Blender co-edit ships in phases after the persistent Blender ambassador (shared .blend) is in place.",
+      },
+      {
+        q: "Vad är SPACEinSPACE?",
+        a: "Ett öppet multi-agent-substrat med minne, A2A-buss, Charter-bundna agenträttigheter och MCP-ambassadörer för Blender, Unity och Godot.",
+      },
+    ],
+    stack: ["Python", "Ollama", "Supabase", "Blender MCP", "Unity MCP", "A2A"],
+    href: "https://github.com/finasteos/SPACEinSPACE",
+    ctaLabel: "GitHub",
+    collabHref: "/space",
+    collabLabel: "Collab space",
+    brandColor: "pearl",
+    featured: true,
+    keywords: [
+      "multi-agent substrate",
+      "Blender MCP",
+      "Unity agents",
+      "A2A bus",
+      "agent charter",
+      "SPACEinSPACE",
+      "Commons avatars",
+    ],
+    lastUpdated: "2026-07-23",
+    telemetry: [
+      { label: "ROOM", value: "/space" },
+      { label: "ENGINE", value: "LOCAL" },
+      { label: "STATUS", value: "COLLAB" },
     ],
   },
 ];

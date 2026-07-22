@@ -349,6 +349,24 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
     actionLabel: "Investor colab",
   },
   {
+    id: "system_space",
+    name: "SPACEinSPACE",
+    version: "multi-agent substrate / collab room",
+    status: "ACTIVE DEMO",
+    tagline:
+      "Give agents a space — humans and agents create together in Blender, Unity, and Commons.",
+    description:
+      "SPACEinSPACE is an open, self-hosted substrate for multi-agent AI with memory, an A2A bus, Charter-bound rights, and MCP ambassadors for Blender, Unity and Godot. The /space collab room is the public door: wiki, chat, ideas, and session signup for co-creating worlds.",
+    techStack: ["Python", "Ollama", "Blender MCP", "Unity MCP"],
+    telemetry: [
+      { label: "ROOM", value: "/space" },
+      { label: "ENGINE", value: "LOCAL" },
+      { label: "STATUS", value: "COLLAB" },
+    ],
+    href: "https://github.com/finasteos/SPACEinSPACE",
+    actionLabel: "GitHub",
+  },
+  {
     id: "system_arena",
     name: "TWISTED PONGG",
     version: "playable site",
