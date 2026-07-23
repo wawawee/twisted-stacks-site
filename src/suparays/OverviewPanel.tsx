@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import type { HistoryData, TasklistData } from "./DetailPanel";
+import type { ViewMode } from "./viewMode";
 import "../ate/ate.css";
 
 interface PhaseTask {
@@ -17,7 +18,7 @@ interface OverviewPanelProps {
   tasklist: TasklistData;
   history: HistoryData;
   syncedAt: string | null;
-  viewMode: "dev" | "company";
+  viewMode: ViewMode;
   onNavigate: (item: { id: string; label: string; slug: string | null; kind: string; taskId?: string }) => void;
 }
 

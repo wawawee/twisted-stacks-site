@@ -372,7 +372,11 @@ export default function AteRoom() {
         isDark={isDark}
         onToggleTheme={toggleTheme}
         onSelect={pick}
-        onToggleView={() => setViewMode((m) => (m === "dev" ? "company" : "dev"))}
+        onSetViewMode={(mode) => {
+          if (mode === "start") setViewMode("company");
+          else setViewMode(mode);
+        }}
+        availableModes={["company", "dev"]}
         onRefresh={loadProject}
         onLogout={SKIP_AUTH ? undefined : logout}
         syncedAt={project?.manifest.syncedAt || null}

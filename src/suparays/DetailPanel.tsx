@@ -22,7 +22,7 @@ interface PhaseSnapshot {
   delivered: boolean;
 }
 
-interface TasklistData {
+export interface TasklistData {
   currentFocus: string;
   nextActions?: Array<{ text: string; done: boolean; inProgress?: boolean }>;
   recentWins?: string[];
@@ -57,7 +57,7 @@ interface TasklistData {
   };
 }
 
-interface HistoryData {
+export interface HistoryData {
   eras: Array<{ title: string; bullets: string[] }>;
   milestones: Array<{ date: string; milestone: string; evidence: string }>;
 }
@@ -327,5 +327,3 @@ export default function DetailPanel({
     </div>
   );
 }
-
-export type { TasklistData, HistoryData };

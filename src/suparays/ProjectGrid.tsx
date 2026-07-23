@@ -1,5 +1,5 @@
 import React from "react";
-import type { GridSection } from "./viewMode";
+import type { GridSection, ViewMode } from "./viewMode";
 
 interface ProjectGridProps {
   sections: GridSection[];
@@ -25,7 +25,7 @@ interface ProjectGridProps {
   };
   onSelect: (item: GridSection["items"][0]) => void;
   showStats?: boolean;
-  viewMode?: "dev" | "company";
+  viewMode?: ViewMode;
 }
 
 export default function ProjectGrid({

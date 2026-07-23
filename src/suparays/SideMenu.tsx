@@ -1,5 +1,6 @@
 import React from "react";
 import type { MenuItem, ViewMode } from "./viewMode";
+import { viewModeLabel } from "./viewMode";
 
 interface SideMenuProps {
   items: MenuItem[];
@@ -8,15 +9,23 @@ interface SideMenuProps {
   isDark: boolean;
   onToggleTheme: () => void;
   onSelect: (item: MenuItem) => void;
-  onToggleView: () => void;
+  onSetViewMode: (mode: ViewMode) => void;
   onRefresh: () => void;
   onLogout?: () => void;
   syncedAt: string | null;
   brandLabel?: string;
+  /** Which mode toggles to show (SUPARAYS = all three; ATE = company+dev) */
+  availableModes?: ViewMode[];
   /** ATE: TRADE lives next to theme / logout */
   onTrade?: () => void;
   tradeActive?: boolean;
 }
+
+const VIEW_BUTTON_LABEL: Record<ViewMode, string> = {
+  start: "Start",
+  company: "Företag",
+  dev: "Dev",
+};
 
 export default function SideMenu({
   items,
@@ -25,11 +34,12 @@ export default function SideMenu({
   isDark,
   onToggleTheme,
   onSelect,
-  onToggleView,
+  onSetViewMode,
   onRefresh,
   onLogout,
   syncedAt,
   brandLabel = "SUPARAYS",
+  availableModes = ["start", "company", "dev"],
   onTrade,
   tradeActive,
 }: SideMenuProps) {
@@ -40,31 +50,35 @@ export default function SideMenu({
     { key: "tools", label: "Verktyg" },
   ] as const;
 
+  const modes = availableModes.length > 0 ? availableModes : (["company", "dev"] as ViewMode[]);
+
   return (
     <aside className="room-menu">
       <div className="room-menu-head">
         <h1>{brandLabel}</h1>
         <p className="room-menu-meta">
-          {viewMode === "dev" ? "DEV" : "COMPANY"}
-          {syncedAt ? ` · ${new Date(syncedAt).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}` : ""}
+          {viewModeLabel(viewMode)}
+          {syncedAt
+            ? ` · ${new Date(syncedAt).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}`
+            : ""}
         </p>
       </div>
 
-      <div className="room-toggle-row">
-        <button
-          type="button"
-          className={`room-toggle${viewMode === "company" ? " active" : ""}`}
-          onClick={() => viewMode !== "company" && onToggleView()}
-        >
-          Företag
-        </button>
-        <button
-          type="button"
-          className={`room-toggle${viewMode === "dev" ? " active" : ""}`}
-          onClick={() => viewMode !== "dev" && onToggleView()}
-        >
-          Dev
-        </button>
+      <div
+        className={`room-toggle-row${modes.length === 3 ? " room-toggle-row-3" : ""}`}
+        role="group"
+        aria-label="Visningsläge"
+      >
+        {modes.map((mode) => (
+          <button
+            key={mode}
+            type="button"
+            className={`room-toggle${viewMode === mode ? " active" : ""}`}
+            onClick={() => viewMode !== mode && onSetViewMode(mode)}
+          >
+            {VIEW_BUTTON_LABEL[mode]}
+          </button>
+        ))}
       </div>
 
       <nav className="room-menu-nav">

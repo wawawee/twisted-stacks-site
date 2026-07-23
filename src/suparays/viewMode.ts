@@ -1,6 +1,6 @@
-export type ViewMode = "dev" | "company";
+export type ViewMode = "start" | "company" | "dev";
 
-/** Wiki topics visible in company / external view */
+/** Wiki topics visible in company / external view (not start) */
 export const COMPANY_WIKI_SLUGS = new Set([
   "competitors",
   "sensors",
@@ -12,6 +12,15 @@ export const COMPANY_WIKI_SLUGS = new Set([
 
 /** Wiki pages synced for agents but not shown in colab UI (use Idébox + Chat tools instead) */
 export const HIDDEN_WIKI_SLUGS = new Set(["ideas", "collab-chat"]);
+
+/** Human phase labels for Start (BAHA) mode — no tech jargon */
+export const START_PHASE_LABELS: Record<string, string> = {
+  "1": "Research",
+  "2": "Demo & möte",
+  "3": "Produkt",
+  "4": "Senare",
+  "5": "Finansiering",
+};
 
 const WIKI_SUBLABELS: Record<string, string> = {
   sensors: "Moduler & hårdvara",
@@ -37,8 +46,17 @@ export function buildMenuItems(
 ): MenuItem[] {
   const items: MenuItem[] = [
     { id: "overview", label: "Översikt", slug: null, kind: "overview", section: "overview" },
-    { id: "focus", label: "Nuvarande fokus", slug: "tasklist-focus", kind: "focus", section: "progress" },
   ];
+
+  if (mode !== "start") {
+    items.push({
+      id: "focus",
+      label: "Nuvarande fokus",
+      slug: "tasklist-focus",
+      kind: "focus",
+      section: "progress",
+    });
+  }
 
   const hasUseCases = wikiPages.some((p) => p.slug === "use-cases");
   const hasCompetitors = wikiPages.some((p) => p.slug === "competitors");
@@ -46,7 +64,12 @@ export function buildMenuItems(
   if (hasUseCases) {
     items.push({
       id: "wiki-use-cases",
-      label: mode === "company" ? "Kunder & segment" : "Användningsfall & kunder",
+      label:
+        mode === "start"
+          ? "Vad det används till"
+          : mode === "company"
+            ? "Kunder & segment"
+            : "Användningsfall & kunder",
       slug: "use-cases",
       kind: "topic",
       section: "wiki",
@@ -63,37 +86,41 @@ export function buildMenuItems(
     });
   }
 
-  items.push(
-    {
-      id: "tasklist",
-      label: mode === "company" ? "Framsteg" : "TASKLIST",
-      slug: mode === "company" ? "progress-summary" : "tasklist",
-      kind: "hub",
-      section: "progress",
-    },
-    { id: "history", label: "Historik", slug: "history", kind: "hub", section: "progress" },
-    {
-      id: "activity",
-      label: "Senaste aktivitet",
-      slug: "activity",
-      kind: "hub",
-      section: "progress",
-      devOnly: true,
-    },
-  );
+  items.push({
+    id: "tasklist",
+    label: mode === "dev" ? "TASKLIST" : "Framsteg",
+    slug: mode === "dev" ? "tasklist" : "progress-summary",
+    kind: "hub",
+    section: "progress",
+  });
 
-  for (const page of wikiPages) {
-    if (HIDDEN_WIKI_SLUGS.has(page.slug)) continue;
-    if (page.slug === "competitors" && mode === "company") continue;
-    if (page.slug === "use-cases") continue;
-    if (mode === "company" && !COMPANY_WIKI_SLUGS.has(page.slug)) continue;
-    items.push({
-      id: `wiki-${page.slug}`,
-      label: page.title,
-      slug: page.slug,
-      kind: page.category === "ideas" ? "ideas" : "topic",
-      section: "wiki",
-    });
+  if (mode !== "start") {
+    items.push({ id: "history", label: "Historik", slug: "history", kind: "hub", section: "progress" });
+  }
+
+  items.push({
+    id: "activity",
+    label: "Senaste aktivitet",
+    slug: "activity",
+    kind: "hub",
+    section: "progress",
+    devOnly: true,
+  });
+
+  if (mode !== "start") {
+    for (const page of wikiPages) {
+      if (HIDDEN_WIKI_SLUGS.has(page.slug)) continue;
+      if (page.slug === "competitors" && mode === "company") continue;
+      if (page.slug === "use-cases") continue;
+      if (mode === "company" && !COMPANY_WIKI_SLUGS.has(page.slug)) continue;
+      items.push({
+        id: `wiki-${page.slug}`,
+        label: page.title,
+        slug: page.slug,
+        kind: page.category === "ideas" ? "ideas" : "topic",
+        section: "wiki",
+      });
+    }
   }
 
   items.push(
@@ -146,6 +173,50 @@ export function buildGridSections(
   },
   mode: ViewMode,
 ): GridSection[] {
+  if (mode === "start") {
+    const hasUseCases = manifest.pages.some((p) => p.slug === "use-cases");
+    const sections: GridSection[] = [];
+    if (hasUseCases) {
+      sections.push({
+        id: "customers",
+        title: "Användning",
+        items: [
+          {
+            id: "wiki-use-cases",
+            label: "Vad det används till",
+            sublabel: "Vem som har nytta — utan tekniska detaljer",
+            slug: "use-cases",
+            kind: "topic",
+          },
+        ],
+      });
+    }
+    sections.push({
+      id: "progress",
+      title: "Läge",
+      items: [
+        {
+          id: "tasklist",
+          label: "Framsteg",
+          sublabel: manifest.stats.phaseProgress
+            ? `Fas ${manifest.stats.phaseProgress.activePhaseNum}: ${manifest.stats.phaseProgress.activePhasePct}%`
+            : `${manifest.stats.done}/${manifest.stats.total} klart`,
+          slug: "progress-summary",
+          kind: "hub",
+        },
+      ],
+    });
+    sections.push({
+      id: "tools",
+      title: "Samarbete",
+      items: [
+        { id: "chat", label: "Chat", slug: "chat", kind: "tool" },
+        { id: "ideabox", label: "Idébox", slug: "ideabox", kind: "tool" },
+      ],
+    });
+    return sections;
+  }
+
   const wikiPages = manifest.pages.filter(
     (p) => mode === "dev" || COMPANY_WIKI_SLUGS.has(p.slug),
   );
@@ -304,4 +375,15 @@ export function buildGridSections(
   });
 
   return sections;
+}
+
+export function viewModeLabel(mode: ViewMode): string {
+  switch (mode) {
+    case "start":
+      return "START";
+    case "company":
+      return "FÖRETAG";
+    case "dev":
+      return "DEV";
+  }
 }

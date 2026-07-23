@@ -3,6 +3,7 @@ import DetailPanel, { type HistoryData, type TasklistData } from "./DetailPanel"
 import ProjectGrid from "./ProjectGrid";
 import SideMenu from "./SideMenu";
 import OverviewPanel from "./OverviewPanel";
+import StartBareView from "./StartBareView";
 import ChatPanel from "./ChatPanel";
 import FilesPanel from "./FilesPanel";
 import IdeasPanel from "./IdeasPanel";
@@ -69,7 +70,7 @@ function LoginPanel({ onSuccess }: { onSuccess: (member: string) => void }) {
         <form className="room-login-card" onSubmit={submit}>
           <h1>SUPARAYS</h1>
           <p className="room-login-lede">
-            Projektrum för teamet — wiki, progress och samarbete.
+            Projektrum — börjar med en enkel översikt. Växla till Företag eller Dev när du vill se mer.
           </p>
 
           <div className="room-login-field">
@@ -144,7 +145,7 @@ interface Selection {
 export default function SuparaysRoom() {
   const [auth, setAuth] = useState<AuthState | null>(SKIP_AUTH ? { authenticated: true, member: "per" } : null);
   const [project, setProject] = useState<ProjectPayload | null>(null);
-  const [viewMode, setViewMode] = useState<ViewMode>("company");
+  const [viewMode, setViewMode] = useState<ViewMode>("start");
   const [selection, setSelection] = useState<Selection | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [markdown, setMarkdown] = useState("");
@@ -317,8 +318,8 @@ export default function SuparaysRoom() {
     if (id === "progress") {
       pick({
         id: "tasklist",
-        label: viewMode === "company" ? "Status & milstolpar" : "TASKLIST",
-        slug: viewMode === "company" ? "progress-summary" : "tasklist",
+        label: viewMode === "dev" ? "TASKLIST" : "Framsteg",
+        slug: viewMode === "dev" ? "tasklist" : "progress-summary",
         kind: "hub",
       });
       return;
@@ -332,13 +333,17 @@ export default function SuparaysRoom() {
 
   const panelContent =
     selection?.kind === "overview" && project ? (
-      <OverviewPanel
-        tasklist={project.tasklist}
-        history={project.history}
-        syncedAt={project.manifest.syncedAt}
-        viewMode={viewMode}
-        onNavigate={pick}
-      />
+      viewMode === "start" ? (
+        <StartBareView tasklist={project.tasklist} onNavigate={pick} />
+      ) : (
+        <OverviewPanel
+          tasklist={project.tasklist}
+          history={project.history}
+          syncedAt={project.manifest.syncedAt}
+          viewMode={viewMode}
+          onNavigate={pick}
+        />
+      )
     ) : selection?.slug === "chat" ? (
       <ChatPanel memberId={memberId} />
     ) : selection?.slug === "ideabox" ? (
@@ -382,7 +387,14 @@ export default function SuparaysRoom() {
             ) : null}
           </div>
         </div>
-        <div className="room-mobile-view-toggle" role="group" aria-label="Visningsläge">
+        <div className="room-mobile-view-toggle room-mobile-view-toggle-3" role="group" aria-label="Visningsläge">
+          <button
+            type="button"
+            className={`room-toggle${viewMode === "start" ? " active" : ""}`}
+            onClick={() => setViewMode("start")}
+          >
+            Start
+          </button>
           <button
             type="button"
             className={`room-toggle${viewMode === "company" ? " active" : ""}`}
@@ -408,7 +420,7 @@ export default function SuparaysRoom() {
           isDark={isDark}
           onToggleTheme={toggleTheme}
           onSelect={handleMenuSelect}
-          onToggleView={() => setViewMode((m) => (m === "dev" ? "company" : "dev"))}
+          onSetViewMode={setViewMode}
           onRefresh={loadProject}
           onLogout={SKIP_AUTH ? undefined : logout}
           syncedAt={project?.manifest.syncedAt || null}
@@ -419,7 +431,11 @@ export default function SuparaysRoom() {
           {projectLoading ? (
             <p className="room-loading">Laddar projekt…</p>
           ) : project ? (
-            isMobile && !selection ? (
+            viewMode === "start" && !selection ? (
+              <div className="suparays-mobile-home suparays-start-home">
+                <StartBareView tasklist={project.tasklist} onNavigate={pick} />
+              </div>
+            ) : isMobile && !selection ? (
               <div className="suparays-mobile-home">
                 <OverviewPanel
                   tasklist={project.tasklist}
