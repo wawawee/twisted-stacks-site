@@ -2,11 +2,11 @@ import { useCallback, useEffect, useState } from "react";
 
 export type Theme = "light" | "dark";
 
-const STORAGE_KEY = "suparays-theme";
+/** v2 resets stale dark prefs so investor landing opens bright. */
+const STORAGE_KEY = "suparays-theme-v2";
 
 /**
- * Prefer light on first visit (fresh investor look).
- * Saved preference still wins after the user toggles.
+ * Bright by default. Saved preference still wins after the user toggles.
  */
 export function useTheme() {
   const [theme, setThemeState] = useState<Theme>(() => {

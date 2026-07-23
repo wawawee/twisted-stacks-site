@@ -22,8 +22,8 @@ interface SideMenuProps {
 }
 
 const VIEW_BUTTON_LABEL: Record<ViewMode, string> = {
-  start: "Karta",
-  company: "Företag",
+  start: "Start",
+  company: "Biz",
   dev: "Dev",
 };
 

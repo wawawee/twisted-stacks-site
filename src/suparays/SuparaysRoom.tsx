@@ -393,14 +393,14 @@ export default function SuparaysRoom() {
             className={`room-toggle${viewMode === "start" ? " active" : ""}`}
             onClick={() => setViewMode("start")}
           >
-            Karta
+            Start
           </button>
           <button
             type="button"
             className={`room-toggle${viewMode === "company" ? " active" : ""}`}
             onClick={() => setViewMode("company")}
           >
-            Företag
+            Biz
           </button>
           <button
             type="button"

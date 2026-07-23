@@ -380,9 +380,9 @@ export function buildGridSections(
 export function viewModeLabel(mode: ViewMode): string {
   switch (mode) {
     case "start":
-      return "KARTA";
+      return "START";
     case "company":
-      return "FÖRETAG";
+      return "BIZ";
     case "dev":
       return "DEV";
   }

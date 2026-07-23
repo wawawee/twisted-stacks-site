@@ -26,7 +26,7 @@ const DEFAULT_PHASES: PhaseDef[] = [
 ];
 
 /**
- * Investor-facing start view (BAHA / Karta mode): whole project at a glance.
+ * Investor-facing start view (BAHA / Start mode): whole project at a glance.
  * No T-IDs, P0, hub/WS jargon — only phase progress + soft launchers.
  */
 export default function StartBareView({ tasklist, onNavigate }: StartBareViewProps) {
