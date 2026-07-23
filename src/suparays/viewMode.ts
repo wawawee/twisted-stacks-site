@@ -17,7 +17,7 @@ export const HIDDEN_WIKI_SLUGS = new Set(["ideas", "collab-chat"]);
 export const START_PHASE_LABELS: Record<string, string> = {
   "1": "Research",
   "2": "Demo & möte",
-  "3": "Produkt",
+  "3": "Pocket & kod",
   "4": "Senare",
   "5": "Finansiering",
 };

@@ -42,16 +42,46 @@ const PHASE_BY_PRIORITY = {
 
 const GATE_PHASE = { num: "5", name: "Funding gates (G1)" };
 
+/**
+ * Shipped foundation (Pocket / hub / vision) — used so Fas 3 does not read as
+ * "0% product" when open P2 backlog dilutes many completed build tasks.
+ */
+const PRODUCT_FOUNDATION_IDS = [
+  "T-020",
+  "T-027",
+  "T-035",
+  "T-045",
+  "T-046",
+  "T-047",
+  "T-051",
+  "T-054",
+];
+
+/** Notes that mean real progress even if the checkbox is still open. */
+const EVIDENCE_RE =
+  /dry-run|device smoke|iPhone|PerformanceTier|film|v7\.|Meta v|deck|pitch|levererad|shipped|live på|Bonjour|LiDAR|fusion|RoomPlan|ObjectCapture|pytest|xcodebuild/i;
+
 function attachPhase(task) {
   const phase = PHASE_BY_PRIORITY[task.priority] || { num: "4", name: "Backlog" };
+  const notes = task.notes || "";
   return {
     ...task,
     phaseNum: phase.num,
     phaseName: phase.name,
     phase: `Fas ${phase.num}`,
-    inProgress: /\bpending\b|in progress|\[~]/i.test(task.notes || ""),
+    inProgress: /\bpending\b|in progress|\[~\]/i.test(notes),
     deferred: false,
+    evidencePartial: EVIDENCE_RE.test(notes),
   };
+}
+
+/** 0..1 contribution for investor % (open work with proof ≠ zero). */
+function taskContribution(t) {
+  if (t.deferred) return null;
+  if (t.done) return 1;
+  if (t.inProgress) return 0.5;
+  if (t.evidencePartial) return 0.35;
+  return 0;
 }
 
 function gateTasks(gates) {
@@ -82,10 +112,25 @@ function computePhaseProgress(tasks, currentFocus = "") {
     .map(Number)
     .sort((a, b) => a - b);
 
-  function phasePct(num) {
+  const byId = new Map(tasks.map((t) => [t.id, t]));
+
+  function phaseRawRatio(num) {
     const nd = (byPhase.get(String(num)) || []).filter((t) => !t.deferred);
     if (!nd.length) return 0;
-    return nd.filter((t) => t.done).length / nd.length;
+    const sum = nd.reduce((acc, t) => acc + (taskContribution(t) ?? 0), 0);
+    return sum / nd.length;
+  }
+
+  /** Fas 3: blend checkbox math with foundation milestones (Pocket already ships). */
+  function phaseDisplayRatio(num) {
+    const raw = phaseRawRatio(num);
+    if (String(num) !== "3") return raw;
+    const foundation = PRODUCT_FOUNDATION_IDS.map((id) => byId.get(id)).filter(Boolean);
+    if (!foundation.length) return raw;
+    const foundationRatio =
+      foundation.reduce((acc, t) => acc + (taskContribution(t) ?? 0), 0) / foundation.length;
+    // Weight foundation so open P2 backlog cannot zero out shipped iOS/hub work
+    return Math.min(1, foundationRatio * 0.65 + raw * 0.35);
   }
 
   const focusMatch = currentFocus.match(/G1|investor|demo|pitch|stockholm/i);
@@ -96,26 +141,27 @@ function computePhaseProgress(tasks, currentFocus = "") {
     ((focusMatch || p0Open) ? 2 : null) ??
     (inProgressPhases.length ? Math.max(...inProgressPhases) : null) ??
     [...nums].reverse().find((n) => {
-      const pct = phasePct(n);
+      const pct = phaseDisplayRatio(n);
       return pct > 0 && pct < 1;
     }) ??
     2;
 
   // Prior phases ≥50% done count as delivered (investor roadmap — not strict 100% gate)
-  const phasesComplete = nums.filter((n) => Number(n) < activeNum && phasePct(n) >= 0.5).length;
+  const phasesComplete = nums.filter(
+    (n) => Number(n) < activeNum && phaseDisplayRatio(n) >= 0.5,
+  ).length;
 
   const apt = byPhase.get(String(activeNum)) || [];
   const nonDeferred = apt.filter((t) => !t.deferred);
   const activePhaseDone = nonDeferred.filter((t) => t.done).length;
   const activePhaseTotal = nonDeferred.length;
-  const activePhasePct =
-    activePhaseTotal > 0 ? Math.round((activePhaseDone / activePhaseTotal) * 100) : 0;
+  const activePhasePct = Math.round(phaseDisplayRatio(activeNum) * 100);
 
   const phaseSnapshots = nums.map((n) => {
     const nd = (byPhase.get(String(n)) || []).filter((t) => !t.deferred);
     const done = nd.filter((t) => t.done).length;
     const total = nd.length;
-    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+    const pct = Math.round(phaseDisplayRatio(n) * 100);
     return {
       num: String(n),
       name: nd[0]?.phaseName || `Fas ${n}`,
@@ -187,7 +233,9 @@ export function parseTasklist(md) {
   const focusQueue = parseFocusQueue(md);
 
   const tasks = [];
-  const sectionParts = md.split(/^### /m).slice(1);
+  // Only Active tasks — otherwise ## Recently completed (no checkbox col) dilutes P2 as open dupes
+  const activeBlock = md.split(/^## Active tasks\b/m)[1]?.split(/^## /m)[0] || md;
+  const sectionParts = activeBlock.split(/^### /m).slice(1);
   for (const part of sectionParts) {
     const heading = part.split("\n")[0] || "";
     const priority = priorityFromHeading(heading);
@@ -205,6 +253,21 @@ export function parseTasklist(md) {
           notes: stripMd(rest.join(" ")),
         }),
       );
+    }
+  }
+
+  // Prefer done=true if a T-ID somehow appears twice
+  const deduped = [];
+  const seen = new Map();
+  for (const t of tasks) {
+    const prev = seen.get(t.id);
+    if (!prev) {
+      seen.set(t.id, t);
+      deduped.push(t);
+    } else if (t.done && !prev.done) {
+      const idx = deduped.indexOf(prev);
+      seen.set(t.id, t);
+      deduped[idx] = t;
     }
   }
 
@@ -245,18 +308,18 @@ export function parseTasklist(md) {
       };
     });
 
-  const phasedTasks = [...tasks, ...gateTasks(gates)];
+  const phasedTasks = [...deduped, ...gateTasks(gates)];
   const recentWins = completed.slice(0, 6).map((c) => c.task);
 
   const stats = {
-    total: tasks.length,
-    done: tasks.filter((t) => t.done).length,
-    p0Open: tasks.filter((t) => t.priority === "P0" && !t.done).length,
-    p1Open: tasks.filter((t) => t.priority === "P1" && !t.done).length,
+    total: deduped.length,
+    done: deduped.filter((t) => t.done).length,
+    p0Open: deduped.filter((t) => t.priority === "P0" && !t.done).length,
+    p1Open: deduped.filter((t) => t.priority === "P1" && !t.done).length,
     phaseProgress: computePhaseProgress(phasedTasks, currentFocus),
   };
 
-  const focusTasks = openFocusTasks(tasks, focusQueue);
+  const focusTasks = openFocusTasks(deduped, focusQueue);
 
   return {
     lastUpdated,

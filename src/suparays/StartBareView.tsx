@@ -33,13 +33,9 @@ export default function StartBareView({ tasklist, onNavigate }: StartBareViewPro
   const stats = tasklist?.stats;
   const pp = stats?.phaseProgress;
 
-  const phasesTotal = Math.min(pp?.phasesTotal ?? DEFAULT_PHASES.length, DEFAULT_PHASES.length);
-  const phases = DEFAULT_PHASES.slice(0, Math.max(phasesTotal, 3));
+  const phases = DEFAULT_PHASES;
+  const snaps = pp?.phaseSnapshots ?? [];
   const activeNum = Number(pp?.activePhaseNum ?? pp?.heroPhaseNum ?? "2");
-  const activePct = Math.max(
-    0,
-    Math.min(100, Math.round(pp?.activePhasePct ?? pp?.heroPhasePct ?? 0)),
-  );
   const humanActive =
     START_PHASE_LABELS[String(activeNum)] ??
     pp?.activePhaseName ??
@@ -55,10 +51,24 @@ export default function StartBareView({ tasklist, onNavigate }: StartBareViewPro
   const seg = 100 / phases.length;
   const ring = phases.map((p) => {
     const n = Number(p.num);
-    const pct = n < activeNum ? 100 : n === activeNum ? activePct : 0;
-    const tone = n < activeNum ? "done" : n === activeNum ? "active" : "future";
+    const snap = snaps.find((s) => s.num === p.num);
+    const pct = Math.max(
+      0,
+      Math.min(
+        100,
+        Math.round(
+          snap?.pct ??
+            (n === activeNum ? (pp?.activePhasePct ?? 0) : n < activeNum ? (pp?.heroPhasePct ?? 0) : 0),
+        ),
+      ),
+    );
+    const tone =
+      n === activeNum ? "active" : pct >= 55 ? "done" : pct > 0 ? "active" : "future";
     return { ...p, pct, tone, active: n === activeNum };
   });
+
+  /** Center = samlat läge across the three tracks (not “0% demo” alone). */
+  const overallPct = Math.round(ring.reduce((sum, p) => sum + p.pct, 0) / Math.max(ring.length, 1));
 
   const launchers: Array<{ item: StartNavTarget; hint: string }> = [
     {
@@ -159,9 +169,9 @@ export default function StartBareView({ tasklist, onNavigate }: StartBareViewPro
               })}
             </svg>
             <div className="start-bare-donut-label">
-              <span className="start-bare-donut-kicker">Aktiv</span>
-              <span className="start-bare-donut-pct">{activePct}%</span>
-              <span className="start-bare-donut-fas">Fas {activeNum}</span>
+              <span className="start-bare-donut-kicker">Läge</span>
+              <span className="start-bare-donut-pct">{overallPct}%</span>
+              <span className="start-bare-donut-fas">3 spår</span>
             </div>
           </div>
 
