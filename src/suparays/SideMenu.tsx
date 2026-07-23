@@ -22,7 +22,7 @@ interface SideMenuProps {
 }
 
 const VIEW_BUTTON_LABEL: Record<ViewMode, string> = {
-  start: "Start",
+  start: "Karta",
   company: "Företag",
   dev: "Dev",
 };

@@ -393,7 +393,7 @@ export default function SuparaysRoom() {
             className={`room-toggle${viewMode === "start" ? " active" : ""}`}
             onClick={() => setViewMode("start")}
           >
-            Start
+            Karta
           </button>
           <button
             type="button"

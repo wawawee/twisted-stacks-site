@@ -26,7 +26,7 @@ const DEFAULT_PHASES: PhaseDef[] = [
 ];
 
 /**
- * Investor-facing start view (BAHA mode): whole project at a glance.
+ * Investor-facing start view (BAHA / Karta mode): whole project at a glance.
  * No T-IDs, P0, hub/WS jargon — only phase progress + soft launchers.
  */
 export default function StartBareView({ tasklist, onNavigate }: StartBareViewProps) {
@@ -36,7 +36,10 @@ export default function StartBareView({ tasklist, onNavigate }: StartBareViewPro
   const phasesTotal = Math.min(pp?.phasesTotal ?? DEFAULT_PHASES.length, DEFAULT_PHASES.length);
   const phases = DEFAULT_PHASES.slice(0, Math.max(phasesTotal, 3));
   const activeNum = Number(pp?.activePhaseNum ?? pp?.heroPhaseNum ?? "2");
-  const activePct = Math.max(0, Math.min(100, Math.round(pp?.activePhasePct ?? pp?.heroPhasePct ?? 0)));
+  const activePct = Math.max(
+    0,
+    Math.min(100, Math.round(pp?.activePhasePct ?? pp?.heroPhasePct ?? 0)),
+  );
   const humanActive =
     START_PHASE_LABELS[String(activeNum)] ??
     pp?.activePhaseName ??
@@ -63,7 +66,12 @@ export default function StartBareView({ tasklist, onNavigate }: StartBareViewPro
       hint: "Var vi är",
     },
     {
-      item: { id: "wiki-use-cases", label: "Vad det används till", slug: "use-cases", kind: "topic" },
+      item: {
+        id: "wiki-use-cases",
+        label: "Vad det används till",
+        slug: "use-cases",
+        kind: "topic",
+      },
       hint: "Nytta",
     },
     {
@@ -78,9 +86,13 @@ export default function StartBareView({ tasklist, onNavigate }: StartBareViewPro
 
   return (
     <div className="start-bare">
+      <div className="start-bare-wash" aria-hidden />
+
       <header className="start-bare-head">
         <div className="start-bare-brand">
-          <span className="start-bare-dot" aria-hidden />
+          <span className="start-bare-mark" aria-hidden>
+            <span className="start-bare-mark-core" />
+          </span>
           <div>
             <h1>SUPARAYS</h1>
             <p className="start-bare-tagline">Se det ögat missar — i telefonen och med sensorer</p>
@@ -92,21 +104,25 @@ export default function StartBareView({ tasklist, onNavigate }: StartBareViewPro
       </header>
 
       <p className="start-bare-lede">
-        En enkel karta över var projektet står. Ingen tekniklista — bara läge, nästa steg och sätt att
-        prata med teamet.
+        En enkel karta över var projektet står — läge, nästa steg och hur ni pratar med teamet.
       </p>
 
       <section className="start-bare-card" aria-label="Progress">
         <div className="start-bare-card-top">
           <span className="start-bare-card-title">
-            <span className="start-bare-dot start-bare-dot-sm" aria-hidden />
+            <span className="start-bare-pulse" aria-hidden />
             Progress
           </span>
           <button
             type="button"
             className="start-bare-link"
             onClick={() =>
-              onNavigate({ id: "tasklist", label: "Framsteg", slug: "progress-summary", kind: "hub" })
+              onNavigate({
+                id: "tasklist",
+                label: "Framsteg",
+                slug: "progress-summary",
+                kind: "hub",
+              })
             }
           >
             Mer framsteg →
@@ -134,7 +150,8 @@ export default function StartBareView({ tasklist, onNavigate }: StartBareViewPro
                     r="15.915"
                     fill="none"
                     className={`start-bare-donut-seg start-bare-donut-seg-${p.tone}`}
-                    strokeWidth={p.active ? 5 : 4}
+                    strokeWidth={p.active ? 5.2 : 4}
+                    strokeLinecap="butt"
                     strokeDasharray={`${filled} ${100 - filled}`}
                     strokeDashoffset={-(seg * i)}
                   />
@@ -150,7 +167,7 @@ export default function StartBareView({ tasklist, onNavigate }: StartBareViewPro
 
           <ul className="start-bare-legend">
             {ring.map((p) => (
-              <li key={p.num}>
+              <li key={p.num} className={p.active ? "is-active" : undefined}>
                 <div className="start-bare-legend-row">
                   <span className="start-bare-legend-label">
                     <span className={`start-bare-swatch start-bare-swatch-${p.tone}`} />
