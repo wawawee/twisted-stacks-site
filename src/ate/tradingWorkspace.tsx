@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import TradingChart from "./TradingChart";
-import type { CupHandleSignal, MacroAlert, MacroAlertsPayload, MacroPayload, MarketBar, MarketQuote, RegimeGateResult, TaFeatures } from "./tradingTypes";
+import type { CupHandleSignal, GeoIntelItem, GeoIntelPayload, MacroAlert, MacroAlertsPayload, MacroPayload, MarketBar, MarketQuote, RegimeGateResult, TaFeatures } from "./tradingTypes";
 import { WATCHLIST } from "./tradingTypes";
 
 const API = "/api/ate";
@@ -51,6 +51,8 @@ interface TradingContextValue {
   loadMacro: () => Promise<void>;
   macroAlerts: MacroAlert[];
   macroAlertsLoading: boolean;
+  geoIntel: GeoIntelItem[];
+  geoIntelLoading: boolean;
   isMobile: boolean;
   isDark: boolean;
   mobileTab: MobileTab;
@@ -85,6 +87,26 @@ const FALLBACK_MACRO_ALERTS: MacroAlert[] = [
     volume24h: 245_000,
     direction: "bullish",
     confidence: 0.87,
+    source: "mock",
+  },
+];
+
+const FALLBACK_GEO_INTEL: GeoIntelItem[] = [
+  {
+    kind: "conflict",
+    title: "Active conflict watch",
+    summary: "Tier-3 geo context — WorldMonitor MCP (context only).",
+    score: 45,
+    severity: 0.45,
+    source: "mock",
+  },
+  {
+    kind: "country_risk",
+    title: "US composite instability",
+    summary: "Mock CII snapshot.",
+    countryIso: "US",
+    score: 22,
+    severity: 0.22,
     source: "mock",
   },
 ];
@@ -152,6 +174,8 @@ export function TradingWorkspaceProvider({
   const [macroLoading, setMacroLoading] = useState(false);
   const [macroAlerts, setMacroAlerts] = useState<MacroAlert[]>([]);
   const [macroAlertsLoading, setMacroAlertsLoading] = useState(false);
+  const [geoIntel, setGeoIntel] = useState<GeoIntelItem[]>([]);
+  const [geoIntelLoading, setGeoIntelLoading] = useState(false);
   const [hitlOpen, setHitlOpen] = useState(false);
   const [hitlDecision, setHitlDecision] = useState<"pending" | "approved" | "rejected">("pending");
   const [requiresHitl, setRequiresHitl] = useState(false);
@@ -160,10 +184,12 @@ export function TradingWorkspaceProvider({
   const loadMacro = useCallback(async () => {
     setMacroLoading(true);
     setMacroAlertsLoading(true);
+    setGeoIntelLoading(true);
     try {
-      const [macroRes, alertsRes] = await Promise.all([
+      const [macroRes, alertsRes, geoRes] = await Promise.all([
         fetch(`${API}/macro`),
         fetch(`${API}/macro-alerts?limit=3`),
+        fetch(`${API}/geo-intel?limit=3`),
       ]);
       const data = (await macroRes.json()) as MacroPayload & { error?: string };
       if (!macroRes.ok) throw new Error(data.error || "Macro fetch failed");
@@ -175,12 +201,21 @@ export function TradingWorkspaceProvider({
       } else {
         setMacroAlerts(FALLBACK_MACRO_ALERTS);
       }
+
+      const geoData = (await geoRes.json()) as GeoIntelPayload & { error?: string };
+      if (geoRes.ok && geoData.items?.length) {
+        setGeoIntel(geoData.items);
+      } else {
+        setGeoIntel(FALLBACK_GEO_INTEL);
+      }
     } catch {
       setMacro(FALLBACK_MACRO);
       setMacroAlerts(FALLBACK_MACRO_ALERTS);
+      setGeoIntel(FALLBACK_GEO_INTEL);
     } finally {
       setMacroLoading(false);
       setMacroAlertsLoading(false);
+      setGeoIntelLoading(false);
     }
   }, []);
 
@@ -275,6 +310,8 @@ export function TradingWorkspaceProvider({
       loadMacro,
       macroAlerts,
       macroAlertsLoading,
+      geoIntel,
+      geoIntelLoading,
       isMobile,
       isDark,
       mobileTab,
@@ -309,6 +346,8 @@ export function TradingWorkspaceProvider({
       loadMacro,
       macroAlerts,
       macroAlertsLoading,
+      geoIntel,
+      geoIntelLoading,
       isMobile,
       isDark,
       mobileTab,
@@ -637,9 +676,11 @@ function TelemetrySubsection() {
 }
 
 function MacroScoutSection() {
-  const { macro, macroLoading, macroAlerts, macroAlertsLoading } = useTradingWorkspace();
+  const { macro, macroLoading, macroAlerts, macroAlertsLoading, geoIntel, geoIntelLoading } =
+    useTradingWorkspace();
   const data = macro ?? FALLBACK_MACRO;
   const alerts = macroAlerts.length ? macroAlerts : FALLBACK_MACRO_ALERTS;
+  const geo = geoIntel.length ? geoIntel : FALLBACK_GEO_INTEL;
   const isLive = data.source === "live" || data.source === "mixed";
 
   return (
@@ -656,6 +697,7 @@ function MacroScoutSection() {
               ? "Polymarket Gamma · partial fallback · 5m cache"
               : "Polymarket Gamma · 5m cache"
             : "Demo quotes — Polymarket unreachable"}
+        {" · context only (no fusion)"}
       </p>
       <ul className="ate-macro-quotes">
         {data.quotes.map((q) => (
@@ -673,6 +715,19 @@ function MacroScoutSection() {
               <span className="ate-macro-alert-title">{a.title}</span>
               <span className="ate-macro-alert-shift mono">
                 {macroAlertsLoading ? "…" : `${a.probShift >= 0 ? "+" : ""}${(a.probShift * 100).toFixed(0)}%`}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {geo.length > 0 && (
+        <ul className="ate-geo-intel" aria-label="WorldMonitor geo intel">
+          {geo.slice(0, 3).map((g) => (
+            <li key={`${g.kind}-${g.title}`} className="ate-geo-intel-item">
+              <span className="ate-geo-kind">{g.kind.replace("_", " ")}</span>
+              <span className="ate-geo-title">{g.title}</span>
+              <span className="ate-geo-sev mono">
+                {geoIntelLoading ? "…" : `${Math.round(g.severity * 100)}%`}
               </span>
             </li>
           ))}

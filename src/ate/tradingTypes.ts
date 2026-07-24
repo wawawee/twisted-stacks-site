@@ -88,6 +88,30 @@ export interface MacroAlertsPayload {
   fetchedAt: string;
 }
 
+export type GeoIntelKind =
+  | "country_risk"
+  | "conflict"
+  | "economic"
+  | "prediction_market"
+  | "news";
+
+export interface GeoIntelItem {
+  kind: GeoIntelKind;
+  title: string;
+  summary: string;
+  countryIso?: string;
+  score: number | null;
+  severity: number;
+  source: MacroQuoteSource;
+}
+
+export interface GeoIntelPayload {
+  source: MacroQuoteSource;
+  items: GeoIntelItem[];
+  fetchedAt: string;
+  policy?: "context_only";
+}
+
 export const WATCHLIST = [
   { symbol: "SPY", label: "S&P 500 ETF" },
   { symbol: "QQQ", label: "Nasdaq 100" },

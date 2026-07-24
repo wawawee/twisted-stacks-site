@@ -10,6 +10,7 @@ const routes: Record<string, () => Promise<{ default: (req: VercelRequest, res: 
   scan: () => import("./_handlers/scan.js"),
   macro: () => import("./_handlers/macro.js"),
   "macro-alerts": () => import("./_handlers/macro-alerts.js"),
+  "geo-intel": () => import("./_handlers/geo-intel.js"),
   hitl: () => import("./_handlers/hitl.js"),
 };
 
