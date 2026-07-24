@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 
-const MIN = 280;
-const MAX = 900;
-const DEFAULT = 640;
+const MIN = 320;
+const MAX = 1200;
+/** Right detail panel — holds most of the data; default wider than the card grid. */
+const DEFAULT = 820;
 
-export function useResizablePanel(storageKey = "suparays-panel-width-v2") {
+export function useResizablePanel(storageKey = "suparays-panel-width-v3") {
   const [width, setWidth] = useState(() => {
     const saved = localStorage.getItem(storageKey);
     const n = saved ? Number.parseInt(saved, 10) : DEFAULT;
