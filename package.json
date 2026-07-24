@@ -14,9 +14,10 @@
     "sync:wiki": "node scripts/sync-suparays-wiki.mjs",
     "sync:ate": "node scripts/sync-ate-wiki.mjs",
     "sync:space": "node scripts/sync-space-wiki.mjs",
-    "build": "npm run sync:wiki && npm run sync:ate && npm run sync:space && vite build",
+    "build:studio": "node scripts/build-studio.mjs",
+    "build": "npm run sync:wiki && npm run sync:ate && npm run sync:space && npm run build:studio && vite build",
     "preview": "vite preview",
-    "clean": "rm -rf dist",
+    "clean": "rm -rf dist public/studio .tmp-studio-src",
     "lint": "tsc --noEmit"
   },
   "dependencies": {

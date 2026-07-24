@@ -493,8 +493,8 @@
 
 .room-panel {
   flex-shrink: 0;
-  min-width: 280px;
-  max-width: 900px;
+  min-width: 320px;
+  max-width: 1200px;
   border-left: 3px solid var(--border);
   background: var(--surface);
   display: flex;
@@ -2183,6 +2183,7 @@
   box-shadow: 2px 2px 0 var(--border);
   cursor: pointer;
   text-align: left;
+  text-decoration: none;
   transition: background 0.15s ease, color 0.15s ease, transform 0.12s ease, box-shadow 0.12s ease;
 }
 

@@ -70,27 +70,41 @@ export default function StartBareView({ tasklist, onNavigate }: StartBareViewPro
   /** Center = samlat läge across the three tracks (not “0% demo” alone). */
   const overallPct = Math.round(ring.reduce((sum, p) => sum + p.pct, 0) / Math.max(ring.length, 1));
 
-  const launchers: Array<{ item: StartNavTarget; hint: string }> = [
+  const launchers: Array<{
+    item?: StartNavTarget;
+    href?: string;
+    label: string;
+    hint: string;
+    id: string;
+  }> = [
     {
+      id: "studio",
+      href: "/studio/?investor=1",
+      label: "Se demot",
+      hint: "Studio",
+    },
+    {
+      id: "tasklist",
       item: { id: "tasklist", label: "Framsteg", slug: "progress-summary", kind: "hub" },
+      label: "Framsteg",
       hint: "Var vi är",
     },
     {
+      id: "wiki-use-cases",
       item: {
         id: "wiki-use-cases",
         label: "Vad det används till",
         slug: "use-cases",
         kind: "topic",
       },
+      label: "Vad det används till",
       hint: "Nytta",
     },
     {
+      id: "chat",
       item: { id: "chat", label: "Chat", slug: "chat", kind: "tool" },
+      label: "Chat",
       hint: "Prata",
-    },
-    {
-      item: { id: "ideabox", label: "Idébox", slug: "ideabox", kind: "tool" },
-      hint: "Idéer",
     },
   ];
 
@@ -217,20 +231,30 @@ export default function StartBareView({ tasklist, onNavigate }: StartBareViewPro
       <section className="start-bare-launchers" aria-label="Utforska">
         <div className="start-bare-launchers-label">Utforska rummet</div>
         <div className="start-bare-launcher-grid">
-          {launchers.map(({ item, hint }) => (
-            <button
-              key={item.id}
-              type="button"
-              className="start-bare-launcher"
-              onClick={() => onNavigate(item)}
-            >
-              <span className="start-bare-launcher-hint">{hint}</span>
-              <span className="start-bare-launcher-label">
-                {item.label}
-                <span aria-hidden>→</span>
-              </span>
-            </button>
-          ))}
+          {launchers.map((row) =>
+            row.href ? (
+              <a key={row.id} className="start-bare-launcher" href={row.href}>
+                <span className="start-bare-launcher-hint">{row.hint}</span>
+                <span className="start-bare-launcher-label">
+                  {row.label}
+                  <span aria-hidden>→</span>
+                </span>
+              </a>
+            ) : (
+              <button
+                key={row.id}
+                type="button"
+                className="start-bare-launcher"
+                onClick={() => row.item && onNavigate(row.item)}
+              >
+                <span className="start-bare-launcher-hint">{row.hint}</span>
+                <span className="start-bare-launcher-label">
+                  {row.label}
+                  <span aria-hidden>→</span>
+                </span>
+              </button>
+            ),
+          )}
         </div>
       </section>
     </div>

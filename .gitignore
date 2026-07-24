@@ -13,3 +13,5 @@ coverage/
 suparays-wiki/
 space-wiki/
 ate-wiki/
+public/studio/
+.tmp-studio-src/
