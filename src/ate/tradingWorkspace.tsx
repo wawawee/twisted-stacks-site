@@ -802,7 +802,7 @@ export function TradingSideContent() {
           </li>
           <li className={topSignal && topSignal.vision_score > 0 ? "active" : ""}>
             <span>Vision</span>
-            <em>{topSignal && topSignal.vision_score > 0 ? "stub" : "soon"}</em>
+            <em>{topSignal && topSignal.vision_score > 0 ? "live" : "soon"}</em>
           </li>
           <li className={topSignal && topSignal.sequence_prob > 0 ? "active" : ""}>
             <span>Sequence</span>

@@ -4,6 +4,7 @@ import { buildMacroResponse } from "../_handlers/macro.js";
 import { classifyRegime } from "../_lib/regime-gate.js";
 import { applyRiskGate, DEFAULT_PAPER_EQUITY_USD } from "../_lib/risk-gate.js";
 import { computeTaFeatures } from "../_lib/ta-features.js";
+import { fetchVisionScore } from "../_lib/vision-score.js";
 import { fetchYahooBars } from "../_lib/yahoo.js";
 import { requireSession, type VercelRequest, type VercelResponse } from "../_lib/session.js";
 
@@ -39,6 +40,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const macroScore = macroLaneScore(macro.quotes);
 
     const top = signals[0];
+    const vision = top
+      ? await fetchVisionScore(symbol, timeframe)
+      : { score: 0, status: "no_signal", source: "none" as const };
+    if (top && vision.score > 0) {
+      top.vision_score = vision.score;
+    }
+
     const fusedScore = top
       ? fuseSignal(
           top.breakout_confidence,
@@ -67,6 +75,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       regime,
       ta,
       macro_score: macroScore,
+      vision: {
+        score: vision.score,
+        status: vision.status,
+        source: vision.source,
+        model_id: "model_id" in vision ? vision.model_id : undefined,
+      },
       fused_score: fusedScore,
       trade_allowed: allowed,
       requires_hitl: risk.requires_hitl,
