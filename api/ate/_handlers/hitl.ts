@@ -18,10 +18,6 @@ function postHitlStatus(decision: HitlDecision): string {
   return decision === "approved" ? "paper_ready" : "hitl_rejected";
 }
 
-function defaultWorkflowId(symbol: string): string {
-  return `paper-tick-${symbol.toUpperCase()}`;
-}
-
 function isTemporalConfigured(): boolean {
   const address = process.env.TEMPORAL_ADDRESS?.trim();
   const namespace = process.env.TEMPORAL_NAMESPACE?.trim();
@@ -42,9 +38,15 @@ async function signalTemporalProxy(params: {
     };
   }
 
+  const headers: HeadersInit = { "Content-Type": "application/json" };
+  const token = process.env.ATE_BRIDGE_TOKEN?.trim();
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
   const resp = await fetch(proxyUrl, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify({
       symbol: params.symbol,
       decision: params.decision,
@@ -91,7 +93,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     typeof body.fusion_score === "number" && Number.isFinite(body.fusion_score)
       ? body.fusion_score
       : null;
-  const workflowId = body.workflow_id?.trim() || defaultWorkflowId(symbol);
+  // Real id from scan → /paper/start. Do not guess paper-tick-{SYMBOL}.
+  const workflowId = body.workflow_id?.trim() || null;
 
   const record = {
     symbol,
@@ -106,16 +109,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   let temporalResult: { signaled: boolean; detail?: string; temporal?: unknown } | null = null;
   if (isTemporalConfigured()) {
-    temporalResult = await signalTemporalProxy({
-      symbol,
-      decision,
-      workflowId,
-      fusionScore,
-    });
-    if (temporalResult.signaled) {
-      console.info("[ate/hitl] temporal signaled", JSON.stringify(temporalResult.temporal));
-    } else {
+    if (!workflowId) {
+      temporalResult = {
+        signaled: false,
+        detail: "workflow_id required — start via scan /paper/start (no paper-tick-{SYMBOL} guess)",
+      };
       console.warn("[ate/hitl] temporal stub", temporalResult.detail);
+    } else {
+      temporalResult = await signalTemporalProxy({
+        symbol,
+        decision,
+        workflowId,
+        fusionScore,
+      });
+      if (temporalResult.signaled) {
+        console.info("[ate/hitl] temporal signaled", JSON.stringify(temporalResult.temporal));
+      } else {
+        console.warn("[ate/hitl] temporal stub", temporalResult.detail);
+      }
     }
   }
 
@@ -125,6 +136,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     ok: true,
     status,
     recorded: record,
+    workflow_id: workflowId,
     temporal: temporalResult,
   });
 }

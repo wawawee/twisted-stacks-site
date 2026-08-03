@@ -64,6 +64,7 @@ interface TradingContextValue {
   requiresHitl: boolean;
   hitlStatus: string;
   setHitlStatus: (s: string) => void;
+  workflowId: string | null;
 }
 
 function fmtTelemetryTime(d: Date) {
@@ -180,6 +181,7 @@ export function TradingWorkspaceProvider({
   const [hitlDecision, setHitlDecision] = useState<"pending" | "approved" | "rejected">("pending");
   const [requiresHitl, setRequiresHitl] = useState(false);
   const [hitlStatus, setHitlStatus] = useState("");
+  const [workflowId, setWorkflowId] = useState<string | null>(null);
 
   const loadMacro = useCallback(async () => {
     setMacroLoading(true);
@@ -253,9 +255,22 @@ export function TradingWorkspaceProvider({
       setTradeAllowed(typeof data.trade_allowed === "boolean" ? data.trade_allowed : null);
       const needsHitl = data.requires_hitl === true;
       setRequiresHitl(needsHitl);
+      const wid =
+        typeof data.workflow_id === "string" && data.workflow_id.trim()
+          ? data.workflow_id.trim()
+          : null;
+      setWorkflowId(wid);
       if (needsHitl) {
         setHitlDecision("pending");
-        setHitlStatus("");
+        const wfStatus =
+          typeof data.workflow?.status === "string" ? data.workflow.status : "";
+        setHitlStatus(
+          wid
+            ? `Workflow: ${wid}`
+            : wfStatus
+              ? `No Temporal workflow (${wfStatus}) — approve/reject is log-only`
+              : "No Temporal workflow — approve/reject is log-only",
+        );
         setHitlOpen(true);
       }
       setLastScan({
@@ -323,6 +338,7 @@ export function TradingWorkspaceProvider({
       requiresHitl,
       hitlStatus,
       setHitlStatus,
+      workflowId,
     }),
     [
       symbol,
@@ -355,6 +371,7 @@ export function TradingWorkspaceProvider({
       hitlDecision,
       requiresHitl,
       hitlStatus,
+      workflowId,
     ],
   );
 
@@ -373,6 +390,7 @@ function HitlModalStub() {
     setHitlDecision,
     setHitlStatus,
     hitlStatus,
+    workflowId,
   } = useTradingWorkspace();
   const [submitting, setSubmitting] = useState(false);
 
@@ -388,19 +406,33 @@ function HitlModalStub() {
             symbol,
             decision,
             fusion_score: fusedScore ?? undefined,
+            workflow_id: workflowId ?? undefined,
           }),
         });
-        const data = (await res.json()) as { error?: string; status?: string; ok?: boolean };
+        const data = (await res.json()) as {
+          error?: string;
+          status?: string;
+          ok?: boolean;
+          temporal?: { signaled?: boolean; detail?: string };
+        };
         if (!res.ok) throw new Error(data.error || "HITL submit failed");
         setHitlDecision(decision);
-        setHitlStatus(data.status ? `Server: ${data.status}` : "Recorded");
+        const temporalNote =
+          data.temporal?.signaled === false && data.temporal.detail
+            ? ` · ${data.temporal.detail}`
+            : data.temporal?.signaled
+              ? " · Temporal signaled"
+              : "";
+        setHitlStatus(
+          (data.status ? `Server: ${data.status}` : "Recorded") + temporalNote,
+        );
       } catch (err) {
         setHitlStatus(err instanceof Error ? err.message : "Submit failed");
       } finally {
         setSubmitting(false);
       }
     },
-    [symbol, fusedScore, setHitlDecision, setHitlStatus],
+    [symbol, fusedScore, workflowId, setHitlDecision, setHitlStatus],
   );
 
   if (!hitlOpen) return null;
@@ -436,6 +468,10 @@ function HitlModalStub() {
           <div>
             <dt>Invalidation</dt>
             <dd>{topSignal ? fmtPrice(topSignal.invalidation) : "—"}</dd>
+          </div>
+          <div>
+            <dt>Workflow</dt>
+            <dd>{workflowId ?? "—"}</dd>
           </div>
         </dl>
         {hitlDecision !== "pending" ? (

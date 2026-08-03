@@ -4,6 +4,7 @@ import { buildMacroResponse } from "../_handlers/macro.js";
 import { classifyRegime } from "../_lib/regime-gate.js";
 import { applyRiskGate, DEFAULT_PAPER_EQUITY_USD } from "../_lib/risk-gate.js";
 import { computeTaFeatures } from "../_lib/ta-features.js";
+import { startPaperTickWorkflow } from "../_lib/paper-start.js";
 import { fetchVisionScore } from "../_lib/vision-score.js";
 import { fetchYahooBars } from "../_lib/yahoo.js";
 import { requireSession, type VercelRequest, type VercelResponse } from "../_lib/session.js";
@@ -58,12 +59,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       : 0;
 
     const allowed = tradeAllowed(fusedScore);
+    const equity = Number.isFinite(equityUsd) ? equityUsd : DEFAULT_PAPER_EQUITY_USD;
     const risk = applyRiskGate({
       fusedScore,
       tradeAllowed: allowed,
       hasSignal: top != null,
-      equityUsd: Number.isFinite(equityUsd) ? equityUsd : DEFAULT_PAPER_EQUITY_USD,
+      equityUsd: equity,
     });
+
+    const paper =
+      risk.requires_hitl === true
+        ? await startPaperTickWorkflow({ symbol, equityUsd: equity })
+        : { workflow_id: null, run_id: null, status: "not_required", source: "none" as const };
 
     res.status(200).json({
       symbol,
@@ -84,6 +91,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       fused_score: fusedScore,
       trade_allowed: allowed,
       requires_hitl: risk.requires_hitl,
+      workflow_id: paper.workflow_id,
+      workflow: {
+        workflow_id: paper.workflow_id,
+        run_id: paper.run_id,
+        status: paper.status,
+        source: paper.source,
+      },
       risk: {
         requires_hitl: risk.requires_hitl,
         approved: risk.approved,
