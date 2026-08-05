@@ -379,41 +379,47 @@ export const PROJECTS: ProjectEntry[] = [
     ],
   },
 
-  /* ---------- 5. Anslag (info only, no live demo) ---------- */
+  /* ---------- 5. Anslag (live team tools) ---------- */
   {
     id: "system_anslag",
     name: "Anslag",
     version: "svenska fonder & stipendier",
-    status: "INFO ONLY",
+    status: "ACTIVE DEMO",
     tagline:
-      "Fri svensk anslagssökning över Vinnova, Formas, Almi och stiftelser.",
+      "Fri svensk anslagssökning över Vinnova, Formas, Almi och stiftelser — plus teamarbetsböcker.",
     description:
-      "Anslag är en fri svensk anslagssöknings- och utkaststjänst som hittar utlysningar, stipendier och stiftelser åt dig. Tjänsten söker över Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi och svenska stiftelser via Exa och de officiella källorna, och hjälper dig sedan att skriva själva ansökan på svenska. Motorn är samma OpenRouter-gateway som TwistedStacks själva använder för att skriva Almi-, ERUF- och Vinnova-ansökningar. Livesajten är för närvarande pausad — kortet finns kvar som referens för kapabiliteten och framtida releaser.",
+      "AnslagSITK är live för teamet: sök utlysningar via OpenRouter, generera ansökningsutkast på svenska, och koppla till redigerbara finansieringsarbetsböcker för alla elva TwistedStacks-projekt. Per, Joachim och Tony loggar in från twistedstacks.com/anslag och hoppar mellan AI-sökning och dossier-redigering.",
     longDescription:
-      "Anslag (SITK) är en fri svensk anslagssöknings- och utkaststjänst som hittar utlysningar, stipendier och stiftelser och hjälper dig skriva själva ansökan på svenska. It searches across Vinnova, Formas, Forte, VR, Tillväxtverket, EU programmes, Almi and Swedish stiftelser via Exa and the official sources, then helps draft the actual application in Swedish.\n\nThe frontend is Vite 7 + Tailwind v3 + shadcn/ui, the backend is Node 20 with an API on port 3001 and Vercel serverless. A multi-account OpenRouter gateway round-robins across up to seven keys for resilience, with `google/gemini-2.5-flash-lite` as the current best free model for structured output.\n\nThere are two search modes — bred (wide) and narrow — and a model-tier selector (auto/free/paid) so a small NGO can run on free models while a consultant on a deadline picks a paid model without changing the workflow. An optional Qdrant layer adds vector memory across past searches.\n\nThe engine is the same one used internally to draft the Almi, ERUF and Vinnova applications across REVISION, LAGA, CymWave and Relay. The public app is currently offline during a key rotation and a re-key of the model gateway — reopens when the new keys are wired.",
+      "Anslag (SITK) är TwistedStacks interna anslagsmotor — fri svensk sökning och utkaststjänst över Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi och svenska stiftelser.\n\nLive-appen kör på anslag.twistedstacks.com med teaminloggning (Per, Joachim, Tony). Frontend: Vite + Tailwind + shadcn/ui. Backend: Node 20 på Vercel med OpenRouter-gateway, modellkedja med gratis och betalda modeller, samt valfri Exa/Swecris/GDP för rikare discovery.\n\nParallellt finns finansieringsarbetsböckerna på twistedstacks.com/funding — elva redigerbara HTML-dossierer plus en studio-översikt (investor vs bidrag). Tony kan redigera texter i webbläsaren, spara lokalt eller exportera JSON, och skriva ut PDF.\n\nTeamflöde: 1) Redigera story och bolagsprofil i arbetsböcker → 2) Kopiera profil till AnslagSITK → 3) Kör discovery → 4) Generera utkast → 5) Finpolish i arbetsbok eller Word → 6) Checklista → submit.\n\nStarta från denna projektsida: Öppna AnslagSITK (inlogg + SSO) eller gå direkt till Arbetsböcker.",
     faq: [
       {
         q: "Vad är Anslag?",
-        a: "Anslag är en fri svensk anslagssöknings- och utkaststjänst som hittar utlysningar, stipendier och stiftelser (Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi, svenska stiftelser) och hjälper dig skriva själva ansökan på svenska.",
+        a: "AnslagSITK är en fri svensk anslagssöknings- och utkaststjänst som hittar utlysningar, stipendier och stiftelser och hjälper dig skriva själva ansökan på svenska.",
       },
       {
         q: "Är livesajten uppe just nu?",
-        a: "Nej — den publika appen är för närvarande pausad under ett nyckelbyte. Motorn används internt för TwistedStacks ansökningar och återöppnas när den nya gatewayen är på plats.",
+        a: "Ja — anslag.twistedstacks.com är live för teamet. Logga in via twistedstacks.com/anslag (samma lösenord som arbetsböckerna).",
+      },
+      {
+        q: "Var finns dossiererna?",
+        a: "På twistedstacks.com/funding — elva projekt-HTML-filer plus studio-översikt. Redigerbara i webbläsaren, export till JSON, skriv ut som PDF.",
       },
       {
         q: "Vilka källor söker Anslag i?",
-        a: "Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi och svenska stiftelser — via Exa och de officiella källorna. Inga hemliga datakällor; alla träffar går att spåra.",
+        a: "Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi och svenska stiftelser — via Exa och officiella källor när aktiverat.",
       },
       {
         q: "Kan jag köra Anslag på gratis-modeller?",
-        a: "Ja. Det finns en modell-tier-väljare (auto / gratis / betald) så att en liten förening kan köra på gratis-modeller medan en konsult med deadline väljer en betald modell — utan att byta arbetsflöde.",
+        a: "Ja. Modell-tier-väljaren (auto / gratis / betald) låter er köra på gratis OpenRouter-modeller eller välja betald modell vid deadline.",
       },
     ],
     stack: ["Vite", "Tailwind", "shadcn/ui", "OpenRouter", "Exa", "Node 20"],
-    href: null,
-    ctaLabel: "Read more",
+    href: "/anslag?next=app",
+    ctaLabel: "Öppna AnslagSITK",
+    collabHref: "/funding",
+    collabLabel: "Arbetsböcker",
     brandColor: "accent",
-    featured: false,
+    featured: true,
     keywords: [
       "Swedish grants",
       "Vinnova",
@@ -421,13 +427,14 @@ export const PROJECTS: ProjectEntry[] = [
       "Almi",
       "stipendier",
       "ansökningsutkast",
-      "free grant search",
+      "finansieringsarbetsböcker",
+      "AnslagSITK",
     ],
-    lastUpdated: "2026-07-08",
+    lastUpdated: "2026-08-05",
     telemetry: [
-      { label: "SÖK", value: "FONDER" },
-      { label: "UTKAST", value: "ANSÖKAN" },
-      { label: "STATUS", value: "PAUSAD" }
+      { label: "APP", value: "LIVE" },
+      { label: "BÖCKER", value: "11+1" },
+      { label: "STATUS", value: "TEAM" },
     ],
   },
 

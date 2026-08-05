@@ -5,6 +5,7 @@ import SuparaysRoom from './suparays/SuparaysRoom.tsx';
 import AteRoom from './ate/AteRoom.tsx';
 import SpaceRoom from './space/SpaceRoom.tsx';
 import FundingRoom from './funding/FundingRoom.tsx';
+import AnslagRoom from './anslag/AnslagRoom.tsx';
 import {LanguageProvider} from './i18n/context';
 import './index.css';
 
@@ -28,6 +29,9 @@ function Root() {
   }
   if (path === "/funding" || path.startsWith("/funding/")) {
     return <FundingRoom />;
+  }
+  if (path === "/anslag" || path.startsWith("/anslag/")) {
+    return <AnslagRoom />;
   }
   return (
     <LanguageProvider>

@@ -1,0 +1,127 @@
+.anslag-root {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0f1419;
+  color: #e8edf4;
+  font-family: system-ui, -apple-system, sans-serif;
+  padding: 1.5rem;
+}
+
+.anslag-card {
+  width: 100%;
+  max-width: 440px;
+  background: #1a222d;
+  border: 1px solid #334155;
+  border-radius: 14px;
+  padding: 1.75rem 1.5rem;
+}
+
+.anslag-card h1 {
+  margin: 0 0 0.35rem;
+  font-size: 1.35rem;
+}
+
+.anslag-lede {
+  margin: 0 0 1.25rem;
+  color: #94a3b8;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.anslag-field {
+  margin-bottom: 1rem;
+}
+
+.anslag-field label {
+  display: block;
+  font-size: 0.82rem;
+  color: #94a3b8;
+  margin-bottom: 0.35rem;
+}
+
+.anslag-field select,
+.anslag-field input {
+  width: 100%;
+  box-sizing: border-box;
+  background: #243040;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  color: #e8edf4;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.95rem;
+}
+
+.anslag-error {
+  color: #fb7185;
+  font-size: 0.88rem;
+  margin: 0 0 0.75rem;
+}
+
+.anslag-submit {
+  width: 100%;
+  background: #38bdf8;
+  color: #0f1419;
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.anslag-submit:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.anslag-hub-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 0.5rem;
+}
+
+.anslag-hub-btn {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.anslag-hub-btn-primary {
+  background: #38bdf8;
+  color: #0f1419;
+}
+
+.anslag-hub-btn-secondary {
+  background: #243040;
+  color: #e8edf4;
+  border: 1px solid #475569;
+}
+
+.anslag-muted {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  margin: 0.75rem 0 0;
+}
+
+.anslag-loading {
+  color: #94a3b8;
+}
+
+.anslag-back {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.anslag-back:hover {
+  color: #38bdf8;
+}

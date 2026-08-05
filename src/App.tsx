@@ -268,18 +268,18 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
     id: "system_anslag",
     name: "Anslag",
     version: "svenska fonder & stipendier",
-    status: "LAB / PAUSED",
-    tagline: "Fri svensk anslagssökning över Vinnova, Formas, Almi och stiftelser.",
+    status: "ACTIVE DEMO",
+    tagline: "Fri svensk anslagssökning — AnslagSITK live + finansieringsarbetsböcker för teamet.",
     description:
-      "Anslag är en fri svensk anslagssöknings- och utkaststjänst som hittar utlysningar, stipendier och stiftelser åt dig. Tjänsten söker över Vinnova, Formas, Forte, VR, Tillväxtverket, EU-program, Almi och svenska stiftelser via Exa och de officiella källorna, och hjälper dig sedan att skriva själva ansökan på svenska. Motorn är samma OpenRouter-gateway som TwistedStacks själva använder för att skriva Almi-, ERUF- och Vinnova-ansökningar. Livesajten är pausad — kortet finns kvar som referens för kapabiliteten.",
-    techStack: ["React", "Vite", "AI", "Svenska utlysningar"],
+      "AnslagSITK söker utlysningar och skriver ansökningsutkast på svenska. Finansieringsarbetsböckerna (11 projekt + studio-översikt) är redigerbara HTML för Per, Joachim och Tony. Logga in från /anslag eller /funding på twistedstacks.com.",
+    techStack: ["React", "Vite", "OpenRouter", "HTML-arbetsböcker"],
     telemetry: [
-      { label: "SÖK", value: "FONDER" },
-      { label: "UTKAST", value: "ANSÖKAN" },
-      { label: "STATUS", value: "PAUSAD" }
+      { label: "APP", value: "LIVE" },
+      { label: "BÖCKER", value: "11+1" },
+      { label: "STATUS", value: "TEAM" }
     ],
-    actionLabel: "Read more",
-    contactMessage: "Hej Per,\n\nJag vill veta mer om Anslag och hur det kan användas för våra ansökningar.\n\n"
+    href: "/anslag?next=app",
+    actionLabel: "Öppna AnslagSITK",
   },
   {
     id: "system_vr_superpowers",
@@ -4025,6 +4025,35 @@ export default function App() {
                         {loc.keywords.map((kw) => (
                           <span key={`${ext.id}-kw-${kw}`}>{kw}</span>
                         ))}
+                      </div>
+                    </section>
+                  ) : null}
+
+                  {ext.id === "system_anslag" ? (
+                    <section className="showroom-project-page-faq" aria-label="Teamverktyg">
+                      <h2 className="showroom-project-page-section-title">Teamverktyg</h2>
+                      <div className="showroom-project-detail-faq-item">
+                        <h3 className="showroom-project-detail-faq-q">AnslagSITK (live)</h3>
+                        <p className="showroom-project-detail-faq-a">
+                          AI-sökning och ansökningsutkast på{" "}
+                          <a href="https://anslag.twistedstacks.com" target="_blank" rel="noreferrer">
+                            anslag.twistedstacks.com
+                          </a>
+                          . Starta via knappen ovan — teaminloggning (Per, Joachim, Tony).
+                        </p>
+                      </div>
+                      <div className="showroom-project-detail-faq-item">
+                        <h3 className="showroom-project-detail-faq-q">Finansieringsarbetsböcker</h3>
+                        <p className="showroom-project-detail-faq-a">
+                          11 redigerbara projekt-HTML + studio-översikt på{" "}
+                          <a href="/funding">twistedstacks.com/funding</a>. Tony kan redigera, spara och exportera JSON.
+                        </p>
+                      </div>
+                      <div className="showroom-project-detail-faq-item">
+                        <h3 className="showroom-project-detail-faq-q">Workflow</h3>
+                        <p className="showroom-project-detail-faq-a">
+                          Redigera dossier → sök utlysning → generera utkast → finpolish → skicka. Hoppa mellan app och böcker via nav-länkarna.
+                        </p>
                       </div>
                     </section>
                   ) : null}
