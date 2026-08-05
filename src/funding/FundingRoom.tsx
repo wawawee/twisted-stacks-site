@@ -85,6 +85,13 @@ function LoginPanel({ onSuccess }: { onSuccess: (member: string) => void }) {
         <button type="submit" className="funding-submit" disabled={busy}>
           {busy ? "Loggar in…" : "Öppna arbetsböcker"}
         </button>
+
+        <p className="funding-login-lede" style={{ marginTop: "1.25rem", marginBottom: 0 }}>
+          AI-sökning &amp; ansökningsskrivning:{" "}
+          <a href="https://anslag.twistedstacks.com" target="_blank" rel="noopener">
+            AnslagSITK
+          </a>
+        </p>
       </form>
     </div>
   );
