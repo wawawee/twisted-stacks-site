@@ -50,8 +50,8 @@ function processFile(name, content) {
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
 if (!fs.existsSync(SRC_PROJECTS)) {
-  console.error("Saknar BIZ projects-html:", SRC_PROJECTS);
-  process.exit(1);
+  console.warn("⚠ BIZ projects-html saknas — behåller befintliga funding-workbooks/ (OK på Vercel).");
+  process.exit(0);
 }
 
 for (const entry of fs.readdirSync(SRC_PROJECTS)) {
