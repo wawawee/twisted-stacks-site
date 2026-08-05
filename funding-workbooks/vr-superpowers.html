@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SUPARAYS / VR-SuperPowers — Projektunderlag</title>
+  <style>
+    :root {
+      --bg: #0f1419; --surface: #1a222d; --surface2: #243040; --border: #334155;
+      --text: #e8edf4; --muted: #94a3b8; --accent: #38bdf8; --investor: #34d399;
+      --grant: #fbbf24; --warn: #fb7185; --radius: 12px;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.55; }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+    .topbar { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; position: sticky; top: 0; z-index: 5;
+      background: linear-gradient(var(--bg) 75%, transparent); padding: .5rem 0 1rem; }
+    button { border: 1px solid var(--border); background: var(--surface2); color: var(--text); border-radius: 8px;
+      padding: .45rem .8rem; font-size: .85rem; cursor: pointer; font-family: inherit; }
+    button:hover { border-color: var(--accent); }
+    button.primary { background: #0ea5e9; border-color: #0ea5e9; color: #041018; font-weight: 600; }
+    .status { margin-left: auto; font-size: .78rem; color: var(--muted); align-self: center; }
+    h1 { font-size: 1.55rem; margin: 0 0 .25rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.25rem; font-size: .82rem; }
+    .badge { background: var(--surface2); border: 1px solid var(--border); padding: .2rem .55rem; border-radius: 999px; }
+    .badge.p0 { border-color: #7f1d1d; color: #fecaca; }
+    .badge.p1 { border-color: #78350f; color: #fde68a; }
+    .badge.p2 { border-color: #1e3a5f; color: #bae6fd; }
+    nav.jump { display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: 1.5rem; }
+    nav.jump a { color: var(--muted); text-decoration: none; font-size: .82rem; padding: .3rem .55rem;
+      border: 1px solid var(--border); border-radius: 8px; }
+    nav.jump a:hover { color: var(--accent); border-color: var(--accent); }
+    section { margin-bottom: 2rem; scroll-margin-top: 5rem; }
+    section > h2 { font-size: 1.2rem; margin: 0 0 .75rem; padding-bottom: .4rem; border-bottom: 2px solid var(--surface2); }
+    .hint { font-size: .82rem; color: var(--muted); background: var(--surface2); border-left: 3px solid var(--accent);
+      padding: .6rem .85rem; border-radius: 0 8px 8px 0; margin-bottom: .75rem; }
+    .hint.inv { border-left-color: var(--investor); }
+    .hint.grt { border-left-color: var(--grant); }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; }
+    .editable { min-height: 2rem; outline: none; border: 1px dashed transparent; border-radius: 8px; padding: .5rem .65rem;
+      transition: border-color .15s, background .15s; }
+    .editable:hover { border-color: #475569; background: rgba(56,189,248,.04); }
+    .editable:focus { border-color: var(--accent); background: rgba(56,189,248,.07); }
+    .editable[data-placeholder]:empty::before { content: attr(data-placeholder); color: #64748b; }
+    .md-content h1,.md-content h2,.md-content h3,.md-content h4 { margin-top: 1rem; }
+    .md-content table { width: 100%; border-collapse: collapse; font-size: .85rem; margin: .75rem 0; }
+    .md-content th,.md-content td { border: 1px solid var(--border); padding: .45rem .55rem; vertical-align: top; }
+    .md-content th { background: var(--surface2); }
+    .md-content blockquote { margin: .5rem 0; padding-left: .75rem; border-left: 3px solid var(--border); color: var(--muted); }
+    .md-content code { font-family: ui-monospace, monospace; font-size: .85em; background: var(--surface2); padding: .1rem .3rem; border-radius: 4px; }
+    .md-content a { color: var(--accent); }
+    .back { font-size: .85rem; margin-bottom: 1rem; }
+    .back a { color: var(--accent); }
+    @media print { .topbar, nav.jump, .back { display: none !important; } body { background: #fff; color: #111; }
+      .card { break-inside: avoid; } .editable { border: none !important; padding: 0; } }
+    @media (max-width: 600px) { .status { margin-left: 0; width: 100%; } }
+  </style>
+</head>
+<body data-slug="vr-superpowers">
+  <div class="wrap">
+    <p class="back"><a href="/api/funding/doc?file=index.html">← Alla projekt</a> · <a href="/api/funding/doc?file=studio-workbook.html">Studio-arbetsbok</a></p>
+
+    <h1>SUPARAYS / VR-SuperPowers</h1>
+    <div class="meta">
+      <span class="badge p0">P0</span>
+      
+      
+      
+    </div>
+
+    <div class="topbar">
+      <button class="primary" type="button" onclick="saveNow()">💾 Spara</button>
+      <button type="button" onclick="exportJson()">⬇ Exportera</button>
+      <button type="button" onclick="importJson()">⬆ Importera</button>
+      <button type="button" onclick="window.print()">🖨 PDF / Skriv ut</button>
+      <span class="status" id="saveStatus">Redigera genom att klicka i texterna</span>
+    </div>
+
+    <nav class="jump">
+      <a href="#investor">Investerare</a>
+      <a href="#grant">Bidrag</a>
+      <a href="#dossier">Dossier</a>
+      <a href="#funding">Finansieringsplan</a>
+      <a href="#notes">Anteckningar</a>
+    </nav>
+
+    <section id="investor">
+      <h2>Investerare — vad framhäva</h2>
+      <div class="hint inv">Fokus: marknad, traction, unit economics, moat — inte bidragsspråk.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="investor_pitch" data-placeholder="Skriv investerarpitch för detta projekt…">
+          <p><em>Fyll i: problem → lösning → traction → ask → varför nu. Se dossier §1–3 nedan som källa.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="grant">
+      <h2>Bidrag & stöd — vad framhäva</h2>
+      <div class="hint grt">Fokus: innovation, samhällsnytta, regional nytta, budget, TRL — en vertikal i taget.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="grant_pitch" data-placeholder="Skriv grant-vinkel för detta projekt…">
+          <p><em>Fyll i: innovationshöjd, samhällsnytta Gävleborg, budgetposter, sökande (AB vs Per). Se finansieringsplan nedan.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="dossier">
+      <h2>Dossier (från dossier.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="dossier"><h1>TWISTEDSTACKS AB — Investment/Grant Dossier &amp; ROI Model</h1>
+<p><strong>Entity:</strong> TWISTEDSTACKS AB · Sandviken, Gävleborg, Sweden</p>
+<p><strong>Product:</strong> SUPARAYS / SuperSenses / VR-SuperPowers — modular AR <strong>sensor mesh</strong> that visualizes <strong>14 “invisible” machine senses</strong> for trades, accessibility (DHH), and facility/energy use (see NotebookLM section below)</p>
+<p><strong>Prepared:</strong> 2026-07-25 by Raymarch · <strong>product truth refreshed 2026-07-25 from NotebookLM</strong></p>
+<p><strong>Grounding (authority):</strong> <strong>NotebookLM notebook</strong> <code>a0ab2519-47c5-460d-a8aa-bd817ca70439</code> = primary product/tech reality → <code>research/NOTEBOOKLM-AS-FUNDING-TRUTH.md</code>. Hyper <code>from-github/funding/</code> = secondary for product; keep for VERIFIED grant amounts. Repo docs (<code>INVESTOR-BUDGET-AND-PROCUREMENT.md</code>, <code>BUDGET-FRAMEWORK.md</code>, <code>SENSOR-MODULE-CATALOG.md</code>, <code>SHOPPING-LIST.md</code>, <code>TRUTH-STATUS.md</code>) support BOM/gates when they agree with notes.</p>
+<p><strong>Currency:</strong> SEK/MSEK (Sweden). FX: 1 EUR ≈ 11.4 SEK, 1 USD ≈ 10.5 SEK (Assumption A1).</p>
+<blockquote><strong>Scope note — this is a <em>lean, grant-scaled</em> plan.</strong> NotebookLM notes (and the repo investor deck) mention an illustrative <strong>$2–4M seed</strong> (~21–42 MSEK). This dossier deliberately models <strong>three much smaller, grant-realistic 24-month budgets (0.8 / 2.5 / 5.0 MSEK)</strong> appropriate to Swedish/EU non-dilutive instruments for a Sandviken micro-company. All numbers are <strong>illustrative planning ranges</strong>, not a term sheet or committed forecast. BOM/retail figures inherit the honesty rule: retail €299–399 is a <em>hypothesis to validate at gate G1</em>, never booked as ARR.</blockquote>
+<hr>
+<h2>Från NotebookLM (kanonisk verklighet)</h2>
+<p><strong>Notebook:</strong> <a href="https://notebooklm.google.com/notebook/a0ab2519-47c5-460d-a8aa-bd817ca70439" target="_blank">SUPARAYS — Visionsfilm och implementeringsplan för nummerskyltsavläsning</a> · dump: <code>research/notebooklm-sources/notes/</code> · policy: <code>research/NOTEBOOKLM-AS-FUNDING-TRUTH.md</code></p>
+<ul>
+<li><strong>Plattform:</strong> 14 maskinsinnen (STRUCTURE, POWER, WATER, HEAT, RADIO, SOUND, …) i world-locked AR; <em>“phone = screen, mesh = truth.”</em></li>
+<li><strong>Stack (notes):</strong> iPhone 13 Pro+ / ARKit·RealityKit · ESP32-S3 mesh · Python WebSocket hub + fusion · SuperSenses Studio (React/Three) · optional Quest / Xreal·RayNeo mirror.</li>
+<li><strong>Y1-wedge:</strong> hantverkare (el/VVS/HVAC) med billiga mesh-moduler (t.ex. AC-fält ~30 SEK); kit-BOM ~1 500–1 900 SEK.</li>
+<li><strong>Sekundärt:</strong> DHH-accessibility (Sound/3D-captions) via grant + HRF/RISE — inte Year-1 sales lead.</li>
+<li><strong>ALPR / nummerskylt:</strong> parallellt R&amp;D-spår (delar hub/brand); <strong>Gate G5 / Tranche D</strong>; <strong>ej</strong> grant-huvudberättelse (dual-use — §6).</li>
+<li><strong>Disciplin:</strong> TRUTH-STATUS Live/Proxy/Sim/Planned; EST.-badge på proxy (t.ex. iPhone-termik).</li>
+<li><strong>Visionsfilm:</strong> notes/sources beskriver film + implementeringsplan som narrativ/asset — inte som claim att allt är Live.</li>
+<li><strong>TODO (notes still growing):</strong> full Live-vs-Planned-matris per sinne; ALPR-implementeringsplan mer än titel/källa <code>PLATE-ALPR-PARALLEL-PLAN.md</code>; studio artifacts = slides/infographic/mind map/flashcards only (no audio/video yet).</li>
+</ul>
+<hr>
+<h2>1. Cost &amp; unit-economics anchors (from repo / notes, verified where cited)</h2>
+<table>
+<tr><th>Item</th><th>Value</th><th>Source</th></tr>
+<tr><td>Craftsman pilot <strong>kit BOM</strong></td><td><strong>~1,500–1,900 SEK/kit</strong> (~€140–180)</td><td><code>SENSOR-MODULE-CATALOG.md</code>, <code>INVESTOR-BUDGET-AND-PROCUREMENT.md</code> §3.2</td></tr>
+<tr><td><strong>AC-field module</strong> BOM</td><td><strong>~30 SEK</strong> (LM358 + coil)</td><td>README / <code>SHOPPING-LIST.md</code></td></tr>
+<tr><td>Thermal wand (MLX90640) BOM</td><td><strong>~550–700 SEK/unit</strong></td><td><code>SHOPPING-LIST.md</code> (main cost driver of kit)</td></tr>
+<tr><td><strong>100-kit</strong> manufacturing run (incl. enclosure, assembly, QA, freight)</td><td><strong>~230,000–290,000 SEK</strong> (~$22–28k)</td><td><code>INVESTOR-BUDGET-AND-PROCUREMENT.md</code> §3.2</td></tr>
+<tr><td>Lab / first-articles</td><td><strong>~9,000–14,000 SEK</strong></td><td>§3.1</td></tr>
+<tr><td>AR-glasses bakeoff (4–5 units, test only)</td><td><strong>~25,000–30,000 SEK</strong></td><td>§2</td></tr>
+<tr><td>Retail hypothesis (kit)</td><td><strong>€299–399</strong> (≈ 3,400–4,550 SEK) — <em>validate at G1</em></td><td><code>MARKET-RESEARCH.md</code> §3.1</td></tr>
+<tr><td>Hub SaaS hypothesis</td><td><strong>€29–99/mo</strong> — <em>validate at G1</em></td><td><code>BUDGET-FRAMEWORK.md</code></td></tr>
+<tr><td>Loaded cost, 1 developer FTE</td><td><strong>~65,000–90,000 SEK/mo</strong></td><td>§4 (Swedish loaded incl. employer fees)</td></tr>
+<tr><td>Loaded cost, 1 business/ops FTE</td><td><strong>~45,000–65,000 SEK/mo</strong></td><td>§4</td></tr>
+</table>
+<p><strong>Gross-margin reality (honest):</strong> at €349 retail and ~1,700 SEK BOM, unit <strong>gross margin ≈ (3,975 − 1,700)/3,975 ≈ 57%</strong> <em>before</em> support, warranty, returns, CE/EMC amortization and channel margin. After realistic support + distribution, plan for <strong>35–45% net kit margin</strong> in early volumes (Assumption A13). Hardware is a <strong>thin-margin, working-capital-hungry</strong> business — the SaaS hub subscription is what carries long-run margin (software GM ~80%+). This is called out explicitly to investors/reviewers.</p>
+<hr>
+<h2>2. Three 24-month budget scenarios</h2>
+<h3>Scenario summary</h3>
+<table>
+<tr><th></th><th><strong>Lean / bootstrap</strong></th><th><strong>Grant-backed</strong></th><th><strong>Grant + co-invest</strong></th></tr>
+<tr><td><strong>Budget (24 mo)</strong></td><td><strong>0.8 MSEK</strong></td><td><strong>2.5 MSEK</strong></td><td><strong>5.0 MSEK</strong></td></tr>
+<tr><td>Primary capital source</td><td>Founder + Almi mikrolån + 1 small grant</td><td>Vinnova + Energimyndigheten + Almi + Region Gävleborg</td><td>Above + Eurostars/EIC co-financing + private co-invest</td></tr>
+<tr><td>Team (FTE incl. founder)</td><td><strong>1.0–1.3</strong> (Per + fractional)</td><td><strong>2.5</strong> (Per + 1 dev + 0.5 business)</td><td><strong>3.5–4</strong> (Per + 2 dev + 1 business)</td></tr>
+<tr><td>Kits manufactured</td><td><strong>~20–30</strong> (hand-built)</td><td><strong>~100</strong> (1 CM run)</td><td><strong>~250</strong> (2 runs)</td></tr>
+<tr><td>CE/EMC</td><td>Deferred / self-declaration prep only</td><td><strong>Pre-compliance + 1 module CE</strong></td><td><strong>Full CE/EMC on kit</strong></td></tr>
+<tr><td>Geographic reach</td><td>Sandviken/Gävleborg pilots</td><td>Sweden pilots</td><td>Sweden → Nordics</td></tr>
+<tr><td>Break-even (illustrative)</td><td>Not reached in 24 mo (grant/loan-funded runway)</td><td>~Month 22–28 on blended kit+SaaS+pilots</td><td>~Month 20–26 with Nordic ramp</td></tr>
+</table>
+<hr>
+<h3>2.1 Scenario A — Lean / bootstrap (0.8 MSEK, 24 mo)</h3>
+<p><strong>Thesis:</strong> survive and prove G1 (willingness-to-pay + module priority) on minimal capital; stay founder-led; hand-build kits; defer everything deferrable.</p>
+<p><strong>Use of funds (0.8 MSEK):</strong></p>
+<table>
+<tr><th>Category</th><th>SEK</th><th>%</th><th>Notes</th></tr>
+<tr><td>HW / BOM (lab + ~25 hand-built kits)</td><td>55,000</td><td>7%</td><td>Lab ~12k + 25 kits × ~1,700 ≈ 43k</td></tr>
+<tr><td>SW dev (mostly founder; small contractor bursts)</td><td>120,000</td><td>15%</td><td>AI-agent-assisted (repo pattern); ad-hoc contractor</td></tr>
+<tr><td>CE/EMC certification</td><td>20,000</td><td>3%</td><td>Pre-study/self-declaration prep only (no full test house)</td></tr>
+<tr><td>Pilots (travel, field, LOIs)</td><td>90,000</td><td>11%</td><td>Gävleborg + Stockholm trades interviews</td></tr>
+<tr><td>GTM (content, demo kit, domains, Apple/CI)</td><td>40,000</td><td>5%</td><td>Studio online, film assets exist</td></tr>
+<tr><td>AR-glasses bakeoff (2 units only)</td><td>15,000</td><td>2%</td><td>Minimal display test</td></tr>
+<tr><td>Founder stipend / opex (fractional)</td><td>400,000</td><td>50%</td><td>~16–17k SEK/mo partial founder draw + admin</td></tr>
+<tr><td>Contingency</td><td>60,000</td><td>7%</td><td></td></tr>
+</table>
+<p><strong>Team FTE:</strong> Per (founder, ~0.8 FTE effective) + occasional contractor (~0.2–0.5 FTE). Kris/Joachim advisory (equity, not cash).</p>
+<p><strong>Milestones (24 mo):</strong> M0–3 lab + AC/thermal first articles; M3–6 20 trades interviews + 3 LOIs (G1); M6–12 25 hand-built pilot kits shipped, first paid pilots; M12–18 accessibility HRF intro + 1 grant application; M18–24 iterate, prepare Scenario-B grant round.</p>
+<p><strong>Revenue paths (conservative):</strong> ~15–40 kits sold @ ~3,500 SEK + 5–15 SaaS seats + 1–2 tiny pilots → <strong>~0.10–0.25 MSEK revenue over 24 mo.</strong> Does <strong>not</strong> cover burn; the 0.8 MSEK (grant/loan/founder) <em>is</em> the runway.</p>
+<hr>
+<h3>2.2 Scenario B — Grant-backed (2.5 MSEK, 24 mo) — <strong>recommended base case</strong></h3>
+<p><strong>Thesis:</strong> non-dilutive stack (Vinnova + Energimyndigheten + Almi + Region Gävleborg) funds one CM kit run, a first developer hire, and one CE module — reaching G1→G3 (paid pilots) and a live accessibility pilot.</p>
+<p><strong>Use of funds (2.5 MSEK):</strong></p>
+<table>
+<tr><th>Category</th><th>SEK</th><th>%</th><th>Notes</th></tr>
+<tr><td>HW / BOM (lab + 100-kit CM run)</td><td>320,000</td><td>13%</td><td>Lab ~14k + 100-kit run ~250–290k</td></tr>
+<tr><td>SW dev (1 dev FTE loaded, ~20 mo)</td><td>1,050,000</td><td>42%</td><td>Firmware + iOS/hub + glasses mirror</td></tr>
+<tr><td>CE/EMC certification (1 module + pre-compliance)</td><td>180,000</td><td>7%</td><td>EMC pre-scan + one CE-marked SKU (see risk R2)</td></tr>
+<tr><td>Pilots (Sweden trades + accessibility co-design)</td><td>260,000</td><td>10%</td><td>Travel, stipends, LOIs, HRF/region</td></tr>
+<tr><td>GTM (content, events, case studies)</td><td>150,000</td><td>6%</td><td>Installatörsföretagen channel, trade social</td></tr>
+<tr><td>AR-glasses bakeoff (4–5 units)</td><td>30,000</td><td>1%</td><td>Full bakeoff per §2</td></tr>
+<tr><td>Business/ops (0.5 FTE loaded)</td><td>400,000</td><td>16%</td><td>Grant admin, interviews, pilot success</td></tr>
+<tr><td>Contingency / opex reserve</td><td>110,000</td><td>4%</td><td></td></tr>
+</table>
+<p><strong>Team FTE:</strong> Per + <strong>1 developer</strong> + <strong>0.5 business/ops</strong> = <strong>~2.5 FTE</strong>. CM handles kit assembly (0 SE headcount). Kris/Joachim advisory.</p>
+<p><strong>Milestones:</strong> M0–3 grant close + lab + glasses bakeoff decision; M2–3 G1 (20 interviews, 3 LOIs); M3–5 100-kit first ship; M4 G2 (HRF/region + accessibility co-design); M6–9 G3 (5 paying pilots or €25k committed); M9–18 CE module + Nordic prep + accessibility pilot live; M18–24 scale prep / Eurostars application.</p>
+<p><strong>Revenue paths (see model §3):</strong> kit + SaaS + pilots → <strong>~1.1–2.0 MSEK over 24 mo</strong>; blended with grant, cash-flow-positive on an operating basis around <strong>M22–28</strong>.</p>
+<hr>
+<h3>2.3 Scenario C — Grant + co-invest (5.0 MSEK, 24 mo)</h3>
+<p><strong>Thesis:</strong> add Eurostars/EIC-style co-financed R&amp;D + a modest private co-invest (angel/Almi Invest-class) to fund a second developer, full CE on the kit, and a Nordic expansion — reaching G3 sustained and a defensible SaaS base.</p>
+<p><strong>Use of funds (5.0 MSEK):</strong></p>
+<table>
+<tr><th>Category</th><th>SEK</th><th>%</th><th>Notes</th></tr>
+<tr><td>HW / BOM (lab + 2× ~100-kit runs = ~250 kits)</td><td>620,000</td><td>12%</td><td>Two CM runs + enclosure tooling</td></tr>
+<tr><td>SW dev (2 dev FTE loaded, ~22 mo)</td><td>2,100,000</td><td>42%</td><td>Firmware #1+#2 + iOS/glasses UX</td></tr>
+<tr><td>CE/EMC certification (full kit + accessibility conformance EN 301 549)</td><td>350,000</td><td>7%</td><td>Full EMC test house + CE on kit + a11y conformance</td></tr>
+<tr><td>Pilots (Sweden + Nordics + accessibility)</td><td>450,000</td><td>9%</td><td>Nordic pilot sites, DHH co-design at scale</td></tr>
+<tr><td>GTM (events, case studies, channel)</td><td>350,000</td><td>7%</td><td>Nordic case studies, distributor conversations</td></tr>
+<tr><td>AR-glasses bakeoff + winning-SKU volume</td><td>120,000</td><td>2%</td><td>Bakeoff + volume buy of chosen SKU</td></tr>
+<tr><td>Business/ops (1 FTE loaded)</td><td>650,000</td><td>13%</td><td>Grant admin, sales/pilot success</td></tr>
+<tr><td>Opex reserve (≥6 mo) + contingency</td><td>360,000</td><td>7%</td><td>Repo reserve rule</td></tr>
+</table>
+<p><strong>Team FTE:</strong> Per + <strong>2 developers</strong> + <strong>1 business/ops</strong> = <strong>~3.5–4 FTE</strong>.</p>
+<p><strong>Milestones:</strong> all of Scenario B, plus M9–15 Nordic pilots, M12–18 full CE kit + EN 301 549 conformance, M18–24 SaaS base + Series-A/EIC-blended-finance readiness.</p>
+<hr>
+<h2>3. 24-month revenue &amp; cash model (per scenario)</h2>
+<p><strong>Model assumptions (all flagged, A13–A16):</strong></p>
+<ul>
+<li>Kit ASP <strong>3,500 SEK</strong> net of channel (≈ €307), <strong>net margin 40%</strong> → <strong>1,400 SEK gross profit/kit</strong> (A13).</li>
+<li>Hub SaaS <strong>50 SEK/mo</strong> (≈ €4.4... — <em>note: repo hypothesis is €29–99/mo; modeled low at ~490 SEK/mo blended for B2B, 50 SEK/mo consumer; here use blended <strong>300 SEK/mo</strong> per active subscription</em>, A14). <strong>SaaS GM 85%.</strong></li>
+<li>Pilots/consulting <strong>80,000 SEK avg</strong> each, <strong>60% margin</strong> (A15).</li>
+<li>Revenue ramps back-loaded (hardware + grant timelines) (A16).</li>
+</ul>
+<h3>Scenario B (2.5 MSEK) — illustrative revenue build</h3>
+<table>
+<tr><th>Stream</th><th>Units/volume (24 mo)</th><th>Gross revenue</th><th>Gross profit</th></tr>
+<tr><td>(1) Kit sales</td><td>150 kits × 3,500 SEK</td><td><strong>525,000</strong></td><td>210,000 (@40%)</td></tr>
+<tr><td>(2) SaaS hub</td><td>~60 active subs × ~10 mo avg × 300 SEK</td><td><strong>~180,000</strong></td><td>~153,000 (@85%)</td></tr>
+<tr><td>(3) Pilots/consulting</td><td>8 × 80,000 SEK</td><td><strong>640,000</strong></td><td>384,000 (@60%)</td></tr>
+<tr><td><strong>Total (24 mo)</strong></td><td></td><td><strong>~1.35 MSEK</strong></td><td><strong>~0.75 MSEK gross profit</strong></td></tr>
+</table>
+<ul>
+<li><strong>Cash bridge:</strong> grant+loan inflow 2.5 MSEK − 24-mo opex ~2.5 MSEK + gross profit ~0.75 MSEK → <strong>positive operating cash by ~M22–28</strong> as pilot + SaaS revenue compounds. Kit revenue alone does <strong>not</strong> carry it; <strong>pilots + SaaS do the heavy lifting</strong>.</li>
+</ul>
+<h3>Break-even sensitivity (Scenario B monthly run-rate ≈ 105,000 SEK/mo opex at 2.5 FTE)</h3>
+<p>Monthly gross profit needed to break even ≈ <strong>105,000 SEK</strong>. Combinations that reach it:</p>
+<table>
+<tr><th>Lever</th><th>To hit break-even monthly GP (~105k SEK)</th></tr>
+<tr><td>Kits only (@1,400 GP/kit)</td><td><strong>~75 kits/mo</strong> — <em>unrealistic early</em></td></tr>
+<tr><td>SaaS only (@255 GP/sub/mo)</td><td><strong>~410 active subs</strong> — moderate-term target</td></tr>
+<tr><td>Pilots only (@48k GP each)</td><td><strong>~2.2 pilots/mo</strong> — plausible in a good B2B quarter</td></tr>
+<tr><td><strong>Blended (recommended)</strong></td><td><strong>~25 kits + 150 subs + 1 pilot / mo</strong> → mixed path, reachable by M20–28</td></tr>
+</table>
+<p><strong>Sensitivity flags:</strong></p>
+<ul>
+<li>If <strong>kit net margin</strong> falls from 40% → 25% (BOM overrun / support cost), kit GP/kit drops to ~875 SEK and break-even kit volume rises ~60%. <strong>Hardware margin risk is the single biggest model sensitivity.</strong></li>
+<li>If <strong>SaaS attach</strong> doubles (120 subs vs 60), operating cash-flow-positive pulls ~4–6 months earlier — <strong>SaaS is the highest-leverage variable.</strong></li>
+<li>Scenario A never reaches break-even in 24 mo by design (runway-funded). Scenario C reaches it ~M20–26 via Nordic volume but carries higher burn.</li>
+</ul>
+<hr>
+<h2>4. Grant narrative angles (map product → funder logic)</h2>
+<table>
+<tr><th>Angle</th><th>Funder logic</th><th>Which SUPARAYS layer</th><th>Instruments (see <code>funding-plan.md</code>)</th></tr>
+<tr><td><strong>Energy efficiency &amp; buildings</strong></td><td>EU <strong>EPBD</strong> renovation wave needs cheap diagnosis of thermal bridges, leaks, hidden wiring</td><td>Thermal + AC + moisture Mesh</td><td><strong>Energimyndigheten</strong>, Vinnova, EU energy calls</td></tr>
+<tr><td><strong>SME digitalization / deeptech</strong></td><td>AR + IoT mesh = digital tool for a low-digitalization trade sector</td><td>Whole platform + hub</td><td><strong>Vinnova Innovativa startups</strong>, EIT Digital/Manufacturing, Eurostars</td></tr>
+<tr><td><strong>Accessibility &amp; inclusion</strong></td><td><strong>EU Accessibility Act</strong> + WHO DHH need; spatial sound-viz is novel assistive tech</td><td>Sound layer (captions + direction in AR)</td><td><strong>Vinnova social innovation / Medtech4Health</strong>, EU accessibility, Region Gävleborg</td></tr>
+<tr><td><strong>Regional development / jobs</strong></td><td>Micro-company creating deeptech jobs in Gävleborg</td><td>Whole company</td><td><strong>Region Gävleborg</strong> utvecklingsmedel, Almi</td></tr>
+<tr><td><strong>Education / STEM</strong> (soft angle)</td><td>&quot;See the invisible&quot; as a physics/STEM education tool</td><td>Studio + kits</td><td>Region/foundation soft-funding</td></tr>
+</table>
+<p><strong>Positioning line for every application:</strong> <em>&quot;An affordable AR tool that lets tradespeople and inspectors see energy losses and hidden hazards, and lets deaf/hard-of-hearing people see sound — built by a Swedish SME, piloted in Gävleborg.&quot;</em> No RF/surveillance language anywhere.</p>
+<hr>
+<h2>5. Risks (honest, no hype)</h2>
+<table>
+<tr><th>#</th><th>Risk</th><th>Severity</th><th>Mitigation</th></tr>
+<tr><td><strong>R1</strong></td><td><strong>Hardware / BOM &amp; supply</strong> — MLX90640 thermal is the cost + supply driver (~550–700 SEK/unit); component shortages, FX on €/$ BOM, and enclosure tooling overruns can blow margin</td><td><strong>High</strong></td><td>Dual-source sensors; start with AC module (~30 SEK) as wedge; CM (China) for volume; keep kit modular so a pricey sensor can be omitted; validate WTP (G1) before bulk buy</td></tr>
+<tr><td><strong>R2</strong></td><td><strong>CE / EMC certification</strong> — an ESP32/RF mesh device sold in EU needs CE (RED/EMC/LVD) marking; a full test-house EMC campaign is <strong>~150,000–350,000+ SEK</strong> and can force PCB redesign</td><td><strong>High</strong></td><td>Design for EMC early (PCB zoning per repo <code>ENGINEERING-ARCHITECTURE.md</code>); pre-compliance scan before test house; certify one SKU first (Scenario B); receive-only default reduces RED burden</td></tr>
+<tr><td><strong>R3</strong></td><td><strong>DUAL-USE OPTICS / RF — MUST AVOID</strong></td><td><strong>Critical (funding-killer)</strong></td><td><strong>See §6 below — actively design and market away from this.</strong></td></tr>
+<tr><td><strong>R4</strong></td><td><strong>Key-person / single founder</strong> — TWISTEDSTACKS AB is effectively Per + agents + advisors; illness or departure halts everything; grants often score team depth</td><td><strong>High</strong></td><td>First hire = developer (Scenario B) to reduce bus-factor; formalize Kris/Joachim advisory + equity; document everything (repo already strong); phase hiring to gates</td></tr>
+<tr><td><strong>R5</strong></td><td><strong>Thermal/CSI capability gaps</strong> — iPhone thermal is a <em>proxy</em>, CSI firmware is <em>stub</em>, Quest E2E incomplete (<code>TRUTH-STATUS.md</code>)</td><td>Medium</td><td>Honesty labels already in product; fund the Mesh thermal module to make thermal <em>real</em>; don't claim through-wall/clinical</td></tr>
+<tr><td><strong>R6</strong></td><td><strong>Free-incumbent accessibility</strong> — Google/Apple give captions away and could add spatial layers</td><td>Medium</td><td>Compete on <strong>spatial + multi-sensor fusion</strong>, not transcription; pursue grant-funded co-design moat + DHH community</td></tr>
+<tr><td><strong>R7</strong></td><td><strong>Margin/working capital</strong> — hardware ties up cash; grants reimburse in arrears</td><td>Medium–High</td><td>Lead with SaaS + pilots for margin; use Almi loan for working-capital bridge against grant receivables</td></tr>
+<tr><td><strong>R8</strong></td><td><strong>Grant timing/co-financing</strong> — Swedish grants often need 30–50% co-financing and reimburse after spend</td><td>Medium</td><td>Stack instruments so one grant's disbursement + Almi loan covers another's co-finance; sequence applications (see <code>funding-plan.md</code>)</td></tr>
+</table>
+<hr>
+<h2>6. DUAL-USE — the risk to actively avoid (expanded)</h2>
+<p><strong>Why it matters:</strong> Civilian innovation grants (Vinnova, Energimyndigheten, EIT, Horizon Europe/EIC) screen for <strong>dual-use, defense, and surveillance</strong> applications. Under the EU financial regulation and Horizon Europe rules, projects with a primary military/surveillance purpose are <strong>ineligible</strong>, and even a strong <em>surveillance framing</em> can sink an otherwise civilian application. SUPARAYS contains three features that a careless pitch could frame as dual-use:</p>
+<ol>
+<li><strong>RF/spectrum sensing</strong> (Flipper/SDR bridge) → could read as &quot;signals interception / SIGINT.&quot;</li>
+<li><strong>WiFi CSI through-wall presence</strong> → could read as &quot;see people through walls / covert tracking.&quot;</li>
+<li><strong>Any optics/RF that resemble ANPR/biometric capture</strong> (the repo's ALPR scaffold) → clearly surveillance-adjacent.</li>
+</ol>
+<p><strong>Mandatory guardrails (product + narrative):</strong></p>
+<ul>
+<li><strong>Never</strong> use the words surveillance, interception, SIGINT, TSCM, spy, covert, ANPR/biometric, or &quot;see people through walls&quot; in any funding document, pitch, or demo.</li>
+<li><strong>Reframe RF</strong> strictly as <strong>Wi-Fi coverage/interference diagnostics and EMC/energy</strong> (&quot;find the dead zone,&quot; &quot;find the interfering source for network reliability/energy&quot;).</li>
+<li><strong>Reframe CSI/occupancy</strong> strictly as <strong>camera-free occupancy for HVAC/energy efficiency and comfort</strong> (privacy-preserving <em>because</em> no camera), motion-only, never identity.</li>
+<li><strong>Exclude ALPR entirely</strong> from grant scope — keep it out of the applicant's grant narrative (repo already labels it scaffold-only, <code>Do not start</code> without founder OK).</li>
+<li><strong>Keep the &quot;receive-only by default&quot;</strong> posture and EN-standard RF compliance front-and-center.</li>
+<li><strong>Lead every application with energy + accessibility + SME digitalization</strong> — the three unambiguously civilian, grant-favored themes.</li>
+</ul>
+<p><strong>Net:</strong> treated correctly, SUPARAYS is a textbook <strong>green + inclusion + digitalization</strong> SME story. Treated carelessly, the same hardware reads as surveillance. The framing discipline in this dossier is a <em>funding requirement</em>, not cosmetic.</p>
+<hr>
+<p><em>All figures illustrative planning ranges grounded in repo BOM/budget docs + 2026 market data. Not a term sheet or committed forecast. Validate retail/subscription WTP at gate G1 before booking any revenue. Assumptions A1–A16 consolidated in <code>sources.md</code>.</em></p></div>
+      </div>
+    </section>
+
+    <section id="funding">
+      <h2>Finansieringsplan (från funding-plan.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="funding"><p>&lt;!-- Deadlines/amounts verified vs official sources 2026-07-25 by Hyper. VERIFIED:date = confirmed at source; UNVERIFIED = not confirmable / see note. Product narrative refreshed 2026-07-25 from NotebookLM (primary). --&gt;</p>
+<h1>SUPARAYS — Funding Plan (Top 5 Instruments, Ranked)</h1>
+<p><strong>Applicant:</strong> TWISTEDSTACKS AB · Sandviken, Gävleborg, Sweden</p>
+<p><strong>Prepared:</strong> 2026-07-25 by Raymarch · <strong>product framing from NotebookLM 2026-07-25</strong></p>
+<p><strong>Product (canonical):</strong> Modular AR <strong>14-sense</strong> platform (SUPARAYS / SuperSenses) — phone screen + ESP32 mesh truth; Year-1 <strong>trades/energy</strong> wedge + grant-backed <strong>DHH accessibility</strong>; ALPR = parallel R&amp;D only (not grant lead). See <code>research/NOTEBOOKLM-AS-FUNDING-TRUTH.md</code>.</p>
+<p><strong>Stage today:</strong> Working iOS/Studio demo + partial Mesh hardware; pre-revenue; solo-founder micro-AB. Estimated <strong>TRL 4–5</strong> (validated components/demo; hardware kit not yet field-proven or CE-marked).</p>
+<p><strong>Currency:</strong> EUR for EU instruments, SEK/MSEK for Swedish. All amounts/deadlines <strong>date-stamped</strong>; unverified items flagged <strong>&quot;unverified as of 2026-07-25.&quot;</strong> Hyper VERIFIED amounts kept; NotebookLM &gt; Hyper for product/tech truth.</p>
+<blockquote><strong>Sequencing thesis:</strong> TWISTEDSTACKS is early, solo, and hardware-heavy. The right path is a <strong>non-dilutive stack</strong> that starts small and civilian-framed (Swedish national + regional + soft loan), proves gates, then steps up to EU collaborative/blended finance. Every instrument is chosen to fit <strong>energy efficiency + SME digitalization + accessibility</strong> — never surveillance (see <code>dossier.md</code> §6).</blockquote>
+<hr>
+<h2>Ranking method</h2>
+<p>Scored on five factors: <strong>(1) fit to TRL/stage</strong>, <strong>(2) amount vs. need</strong>, <strong>(3) probability for a solo micro-AB</strong>, <strong>(4) co-financing burden / dilution</strong>, <strong>(5) framing safety</strong> (civilian-grant fit). The result is a <strong>sequence</strong>, not a menu — several stack together in the same 24 months.</p>
+<hr>
+<h2>Från NotebookLM (kanonisk verklighet)</h2>
+<p>Pointers: <code>research/notebooklm-sources/notes/</code> · <code>research/NOTEBOOKLM-AS-FUNDING-TRUTH.md</code> · notebook <code>a0ab2519-47c5-460d-a8aa-bd817ca70439</code></p>
+<ul>
+<li>Lead applications with <strong>trades Mesh kit + energy/building diagnostics + DHH Sound</strong>, not “14 senses everywhere” as shipped claims.</li>
+<li>Gated capital A–D / G1–G5 from notes aligns with Scenario B sequencing below.</li>
+<li><strong>ALPR / nummerskyltsavläsning</strong> = parallel track (notebook title + <code>PLATE-ALPR-PARALLEL-PLAN</code>); defer to G5 / Tranche D — <strong>omit from grant scope</strong>.</li>
+<li><strong>TODO:</strong> notes still growing — re-sync before final Vinnova text; do not invent Live capabilities.</li>
+</ul>
+<hr>
+<h2>TOP 5 (ranked by fit)</h2>
+<h3>#1 — Vinnova · Innovativa startups (steg 1, then steg 2)</h3>
+<table>
+<tr><th>Field</th><th>Detail</th></tr>
+<tr><td><strong>Instrument</strong></td><td>Innovativa startups (steg 1 → steg 2) — grant for young, knowledge-based, internationally scalable startups</td></tr>
+<tr><td><strong>Funder</strong></td><td>Vinnova (Sweden's innovation agency)</td></tr>
+<tr><td><strong>Typical amount</strong></td><td><strong>Steg 1: max 500,000 SEK</strong> at <strong>up to 100% of eligible costs</strong> (no co-financing) [VERIFIED:2026-07-25]. <strong>Steg 2: up to ~900,000 SEK</strong>, requires completed steg 1 + <strong>≥10% co-financing</strong> [VERIFIED:2026-07-25]</td></tr>
+<tr><td><strong>Co-financing %</strong></td><td>Steg 1: <strong>0%</strong>. Steg 2: <strong>≥10%</strong> [VERIFIED:2026-07-25]</td></tr>
+<tr><td><strong>TRL / stage fit</strong></td><td>Excellent for TRL 3–6 early startups; steg 1 funds concept/feasibility, steg 2 funds development</td></tr>
+<tr><td><strong>Deadline / cadence</strong></td><td><strong>2026 call: opens 2026-10-12, deadline 2027-01-12</strong> [VERIFIED:2026-07-25 K-DEADLINES] <em>(tidigare UNVERIFIED via hittafonden / “~3 months” — resolved)</em>. Runs annually</td></tr>
+<tr><td><strong>Why it fits SUPARAYS</strong></td><td>Purpose-built for exactly this company profile (young Swedish AB, deeptech, international ambition). 100%-funded steg 1 = <strong>zero-dilution, zero-co-finance runway</strong> to hit gate G1</td></tr>
+<tr><td><strong>Application angle</strong></td><td>Lead with <strong>SME digitalization + energy</strong> (&quot;affordable AR diagnostic tool for the EPBD renovation wave&quot;) with accessibility as impact upside. Steg 1 funds the trades WTP validation + one CE module pre-study</td></tr>
+</table>
+<p><strong>Rank rationale:</strong> best stage fit, no co-financing at steg 1, highest probability for a solo micro-AB, and civilian-safe framing. <strong>Start here.</strong></p>
+<hr>
+<h3>#2 — Almi · Innovationslån (+ Mikrolån for working-capital bridge)</h3>
+<table>
+<tr><th>Field</th><th>Detail</th></tr>
+<tr><td><strong>Instrument</strong></td><td>Innovationslån (early-stage innovation loan); Mikrolån (small/startup); Företagslån (general)</td></tr>
+<tr><td><strong>Funder</strong></td><td>Almi Företagspartner (state-owned; regional office serves Gävleborg)</td></tr>
+<tr><td><strong>Typical amount</strong></td><td><strong>Innovationslån: ~50,000–500,000 SEK</strong> [VERIFIED:2026-07-25] (some sources to 5 MSEK) [UNVERIFIED]; <strong>Mikrolån: up to 250,000 SEK</strong> (no external co-finance) [VERIFIED:2026-07-25]; Företagslån: no fixed ceiling</td></tr>
+<tr><td><strong>Co-financing %</strong></td><td>Innovationslån: Almi covers <strong>up to 50% of project cost</strong> (you provide the rest) [VERIFIED:2026-07-25]; Mikrolån: typically <strong>none</strong> [VERIFIED:2026-07-25]; Företagslån: Almi covers ~30–50% of capital need</td></tr>
+<tr><td><strong>Interest</strong></td><td>~<strong>7–10%</strong> (innovationslån); ~6–9% (mikrolån) [UNVERIFIED — källa 2026-07-25: almi.se anger att räntan sätts individuellt utifrån risk, ingen fast procentsats publicerad, almi.se]; ~2–3 pts above bank rate (företagslån) [UNVERIFIED — källa 2026-07-25: almi.se anger 2–3 procentenheter över bankränta för Mikrolån, almi.se] (driva-foretag.se / almi.se — verified 2026-07-25)</td></tr>
+<tr><td><strong>TRL / stage fit</strong></td><td>Good across early stages; debt, so <strong>non-dilutive</strong> but repayable</td></tr>
+<tr><td><strong>Deadline / cadence</strong></td><td><strong>Rolling / no deadline</strong> — apply any time [VERIFIED:2026-07-25] (verified 2026-07-25)</td></tr>
+<tr><td><strong>Why it fits SUPARAYS</strong></td><td>Fills the classic gap: grants reimburse <strong>in arrears</strong> and need co-financing. An Almi mikrolån/innovationslån provides the <strong>working-capital bridge</strong> against grant receivables and covers grant co-financing (see <code>dossier.md</code> R7/R8)</td></tr>
+<tr><td><strong>Application angle</strong></td><td>Present the grant-backed plan (Scenario B) as the business case; use the loan specifically for <strong>BOM/working capital and grant co-finance</strong>, not opex</td></tr>
+</table>
+<p><strong>Rank rationale:</strong> rolling access, non-dilutive, and it <em>unblocks</em> the grants by solving co-financing and arrears timing. Nearly every scenario uses Almi.</p>
+<hr>
+<h3>#3 — Energimyndigheten · Energi-innovation (energy-innovation grants)</h3>
+<table>
+<tr><th>Field</th><th>Detail</th></tr>
+<tr><td><strong>Instrument</strong></td><td>Energy-innovation calls — e.g. &quot;Robust energisystem genom innovationskluster,&quot; &quot;Pilot och demonstration,&quot; &quot;Konceptutveckling av innovationer med affärsfokus&quot;</td></tr>
+<tr><td><strong>Funder</strong></td><td>Energimyndigheten (Swedish Energy Agency)</td></tr>
+<tr><td><strong>Typical amount</strong></td><td>Varies by call: innovationskluster <strong>up to 3 MSEK/cluster over 3 yr @ up to 50%</strong> [UNVERIFIED — källa 2026-07-25: aktuell utlysning &quot;Robust energisystem genom innovationskluster&quot; anger ca 15 MSEK totalt för utlysningen, inget publicerat tak på 3 MSEK/kluster eller 3-årsvillkor; SMF-innovationsstöd max 50% enl. GBER art.28, energimyndigheten.se]; <strong>startfas etableringsstöd up to 100% capped at 500,000 SEK (first 12 mo)</strong> [UNVERIFIED — ingen officiell sida på energimyndigheten.se bekräftar detta stöd/belopp per 2026-07-25]; concept/pilot calls in the low-MSEK range (energimyndigheten.se — verified 2026-07-25)</td></tr>
+<tr><td><strong>Co-financing %</strong></td><td>Typically <strong>50%</strong> for project parties [VERIFIED:2026-07-25] (0% for the capped startfas establishment support) [UNVERIFIED]</td></tr>
+<tr><td><strong>TRL / stage fit</strong></td><td>Strong for TRL 4–7 energy-relevant demonstration/pilot</td></tr>
+<tr><td><strong>Deadline / cadence</strong></td><td>Multiple rolling calls; e.g. innovationskluster <strong>deadline 2026-10-15</strong> [VERIFIED:2026-07-25] (verified 2026-07-25). Cadence varies per call — <strong>check portal at application time (some specific 2026 concept calls unverified)</strong></td></tr>
+<tr><td><strong>Why it fits SUPARAYS</strong></td><td>Directly funds the <strong>energy-efficiency / building-diagnostics</strong> use case tied to EPBD. This is the <em>strongest thematic match</em> to the primary wedge</td></tr>
+<tr><td><strong>Application angle</strong></td><td>Frame SUPARAYS thermal+AC+moisture Mesh as a tool that <strong>accelerates energy-renovation diagnosis</strong> (find thermal bridges/leaks fast, cheaply). Pursue a <strong>pilot/demonstration</strong> or concept call; consider joining/forming an innovationskluster for the larger envelope</td></tr>
+</table>
+<p><strong>Rank rationale:</strong> highest thematic alignment to the revenue beachhead + EPBD tailwind; 50% co-finance is the main friction (solve with Almi/Region). Slightly lower probability than #1 because calls are competitive and often consortium-oriented.</p>
+<hr>
+<h3>#4 — Vinnova · Innovationsprojekt i företag / Test &amp; demo (SME)</h3>
+<table>
+<tr><th>Field</th><th>Detail</th></tr>
+<tr><td><strong>Instrument</strong></td><td>Innovationsprojekt i små och medelstora företag; <strong>Test och demo för SMF 2026</strong></td></tr>
+<tr><td><strong>Funder</strong></td><td>Vinnova</td></tr>
+<tr><td><strong>Typical amount</strong></td><td>Innovationsprojekt SMF: <strong>max ~2 MSEK @ up to 50%</strong> [VERIFIED:2026-07-25]; <strong>Test &amp; demo för SMF 2026: max 1 MSEK @ up to 70%</strong> [VERIFIED:2026-07-25] (vinnova.se — verified 2026-07-25)</td></tr>
+<tr><td><strong>Co-financing %</strong></td><td>Innovationsprojekt: <strong>~50%</strong>; Test &amp; demo: <strong>~30%</strong> (i.e. 70% funded) [VERIFIED:2026-07-25]</td></tr>
+<tr><td><strong>TRL / stage fit</strong></td><td>Good for TRL 5–8 development + test/demo — fits <em>after</em> G1, when the kit needs field testing and hardening</td></tr>
+<tr><td><strong>Deadline / cadence</strong></td><td>Periodic calls (typically 1–2 windows/yr). <strong>Test &amp; demo för SMF 2026</strong> is a live 2026 call — <strong>verify exact deadline on vinnova.se at application time</strong> (specific date unverified as of 2026-07-25)</td></tr>
+<tr><td><strong>Why it fits SUPARAYS</strong></td><td>The <strong>Test &amp; demo (70% funded)</strong> call is ideal for funding <strong>real field pilots + CE/EMC hardening</strong> of the Mesh kit — the Scenario B/C step after willingness-to-pay is proven</td></tr>
+<tr><td><strong>Application angle</strong></td><td>Position as <strong>test &amp; demonstration of an energy-diagnostic AR tool with SME/end-users</strong> (installers, energy inspectors). 70% funding rate makes co-financing manageable</td></tr>
+</table>
+<p><strong>Rank rationale:</strong> larger amounts and higher funding rate (Test &amp; demo 70%), but best applied <strong>after</strong> #1 has de-risked the concept — hence #4 in sequence, not #1.</p>
+<hr>
+<h3>#5 — Region Gävleborg · Regionala utvecklingsmedel / företagsstöd</h3>
+<table>
+<tr><th>Field</th><th>Detail</th></tr>
+<tr><td><strong>Instrument</strong></td><td>Företagsstöd (regional business/innovation grants); mikrobidrag; regional project funds</td></tr>
+<tr><td><strong>Funder</strong></td><td>Region Gävleborg (the applicant's home region — Sandviken)</td></tr>
+<tr><td><strong>Typical amount</strong></td><td>Typically <strong>25–50% of investment cost</strong> [VERIFIED:2026-07-25]; <strong>mikrobidrag</strong> for costs up to ~60,000 SEK [VERIFIED:2026-07-25]; general regional support to non-AB capped 500k SEK/5yr [UNVERIFIED]; <strong>de minimis ceiling ~3,000,000 SEK / 3 yr</strong> [VERIFIED:2026-07-25] (regiongavleborg.se — verified 2026-07-25)</td></tr>
+<tr><td><strong>Co-financing %</strong></td><td><strong>50–75%</strong> (region covers 25–50%)</td></tr>
+<tr><td><strong>TRL / stage fit</strong></td><td>Flexible; funds specific investments (equipment, consultants, market entry) rather than TRL-gated R&amp;D</td></tr>
+<tr><td><strong>Deadline / cadence</strong></td><td>Rolling / needs-assessed; contact Region Gävleborg näringsliv/innovation directly [VERIFIED:2026-07-25] (verified 2026-07-25)</td></tr>
+<tr><td><strong>Why it fits SUPARAYS</strong></td><td><strong>Home-region advantage</strong> — a Sandviken deeptech micro-company creating local jobs is exactly the regional-development mandate. Smaller amounts, but high probability + relationship-building for later co-financing</td></tr>
+<tr><td><strong>Application angle</strong></td><td>Frame as <strong>regional deeptech job creation + energy/inclusion impact in Gävleborg</strong>; use for specific line items (glasses bakeoff, lab, consultants, pilot travel) that complement the national grants</td></tr>
+</table>
+<p><strong>Rank rationale:</strong> smaller cheques and co-financing needed, but <strong>highest local probability</strong> and a strategic relationship for the region's co-financing role in bigger applications. Rounds out the stack.</p>
+<hr>
+<h2>Recommended sequence (24 months)</h2>
+<p>```</p>
+<p>M0 ── Vinnova Innovativa startups steg 1 (500k, 100%) + Almi mikrolån (working capital)</p>
+<p>      + Region Gävleborg företagsstöd (lab/glasses/consultants)</p>
+<p>        │  → funds G1 (trades WTP) + first hand-built kits</p>
+<p>M3 ── Energimyndigheten pilot/concept call (energy diagnostics, ~50%)</p>
+<p>M6 ── Vinnova steg 2 (up to 900k, 10% co-finance) [after steg 1 complete]</p>
+<p>M9 ── Vinnova Test &amp; demo SMF (1M, 70%) → field pilots + CE/EMC hardening</p>
+<p>M12+ Eurostars (see below) for Nordic/EU R&amp;D collaboration → Scenario C</p>
+<p>```</p>
+<p>This stack can plausibly assemble <strong>~2.0–3.5 MSEK non-dilutive</strong> over 24 months (Scenario B) without any single instrument carrying the whole plan, and reserves EU collaborative/blended finance for when TRL and traction justify it.</p>
+<hr>
+<h2>Evaluated but DEPRIORITIZED (with reasons)</h2>
+<table>
+<tr><th>Instrument</th><th>Why not top-5 (now)</th><th>When to revisit</th></tr>
+<tr><td><strong>Eurostars 3</strong> (Vinnova/EUREKA)</td><td>Strong fit later — <strong>max 5 MSEK for a Swedish SME, 50% co-financing</strong> [VERIFIED:2026-07-25], but <strong>requires an international consortium (≥2 countries)</strong> [VERIFIED:2026-07-25] and 2 registered annual reports [VERIFIED:2026-07-25] (vinnova.se — verified 2026-07-25). TWISTEDSTACKS is solo/early with no partner yet</td><td>Month 12+ (Scenario C) once a Nordic/EU partner + traction exist. <strong>Best &quot;step-up&quot; instrument</strong></td></tr>
+<tr><td><strong>Horizon Europe EIC Accelerator</strong></td><td><strong>Grant up to €2.5M (TRL 6–8) + blended equity €1–10M (to €30M)</strong> [VERIFIED:2026-07-25], but requires <strong>≥TRL 5–6, is intensely competitive (~single-digit % success), and the blended-finance equity component is dilutive</strong> (EIC WP 2026 — verified 2026-07-25). Way ahead of current stage</td><td>Post-Series-A-readiness / Scenario C+ with strong traction &amp; CE product</td></tr>
+<tr><td><strong>EIT Digital — Open Innovation Factory</strong></td><td>Grants <strong>up to €400k</strong> [UNVERIFIED] but needs a <strong>≥2-country consortium</strong> and typically an <strong>equity/dilutive</strong> model (grantedai.com/EIT — verified 2026-07-25)</td><td>Month 12+ if a consortium forms; more relevant to digitalization angle than energy</td></tr>
+<tr><td><strong>EIT Manufacturing — Accelerate</strong></td><td><strong>€50k–€500k</strong> sub-grants [UNVERIFIED] but targets <strong>TRL ≥6 B2B</strong> and uses <strong>SAFE/equity</strong> structures (eitmanufacturing.eu — verified 2026-07-25)</td><td>When kit hits TRL 6+ and a manufacturing/B2B angle is proven; dilutive</td></tr>
+<tr><td><strong>EU accessibility funding</strong> (EAA-linked, AccessibleEU, ESF+/national accessibility programs)</td><td>The <strong>EU Accessibility Act (2019/882, in force 2025-06-28)</strong> creates demand and <em>removes the &quot;disproportionate burden&quot; defense when accessibility funding exists</em> (EU Commission — verified 2026-07-25), but there is <strong>no single dedicated startup grant instrument</strong>; accessibility funding flows via Vinnova social-innovation/Medtech4Health, Horizon clusters, and regional/ESF+ channels</td><td>Pursue the <strong>accessibility angle inside Vinnova (#1/#4) and Region Gävleborg (#5)</strong> rather than as a standalone instrument; watch AccessibleEU/national calls</td></tr>
+<tr><td><strong>Vinnova Innovativa startups steg 2</strong> <em>(folded into #1)</em></td><td>Not a separate application path — it's the follow-on to steg 1 (up to 900k, 10% co-finance) [VERIFIED:2026-07-25]</td><td>Automatically, after steg 1 completes</td></tr>
+</table>
+<p><strong>Why the deprioritized set is deprioritized in one line:</strong> the EU collaborative/blended instruments (Eurostars, EIC, EIT) are <strong>bigger but demand consortia, higher TRL, and/or dilution</strong> that a solo TRL-4–5 Sandviken micro-AB can't yet satisfy — they are the <strong>step-up</strong> once the Swedish national/regional stack has proven the gates. Accessibility funding is real leverage but is best captured <strong>through</strong> the top-5 civilian channels, not as a standalone grant.</p>
+<hr>
+<p><em>Amounts and deadlines verified against funder domains (vinnova.se, almi.se, energimyndigheten.se, regiongavleborg.se, ec.europa.eu / eic.ec.europa.eu) on 2026-07-25 via web research; items marked &quot;unverified as of 2026-07-25&quot; need confirmation on the funder portal at application time. Grant rules change — re-verify before applying. Full source list in <code>sources.md</code>.</em></p>
+<hr>
+<h2>K-DEADLINES sync + deferred (2026-07-25)</h2>
+<ul>
+<li>Innovativa Startups öppning <strong>2026-10-12</strong> / stängning <strong>2027-01-12</strong> nu <strong>VERIFIED</strong> (K-DEADLINES) — tidigare UNVERIFIED “~3 months” resolved. Master: <code>00-MASTER/INVENTORY/kimi-deadlines-2026-07.md</code>.</li>
+<li><strong>Deferred:</strong> användare fyller mer SUPARAYS-content senare — <strong>ej nagga</strong> som missing urgently (GAP-AUDIT).</li>
+</ul></div>
+      </div>
+    </section>
+
+    <section id="notes">
+      <h2>Gemensamma anteckningar</h2>
+      <div class="card">
+        <div class="editable" data-key="notes" data-placeholder="Anteckningar inför ansökan…" style="min-height:8rem;"></div>
+      </div>
+    </section>
+  </div>
+  <input type="file" id="importFile" accept="application/json,.json" hidden />
+  <script>
+    const STORAGE_KEY = 'ts_project_vr-superpowers_v1';
+    let saveTimer = null;
+    function collectData() {
+      const data = { slug: 'vr-superpowers', version: 1, savedAt: new Date().toISOString(), fields: {} };
+      document.querySelectorAll('.editable[data-key]').forEach(el => { data.fields[el.dataset.key] = el.innerHTML; });
+      return data;
+    }
+    function applyData(data) {
+      if (!data?.fields) return;
+      document.querySelectorAll('.editable[data-key]').forEach(el => {
+        if (data.fields[el.dataset.key] !== undefined) el.innerHTML = data.fields[el.dataset.key];
+      });
+    }
+    function saveNow() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(collectData()));
+      document.getElementById('saveStatus').textContent = 'Sparat ' + new Date().toLocaleString('sv-SE');
+    }
+    function scheduleSave() { clearTimeout(saveTimer); document.getElementById('saveStatus').textContent = 'Sparar…'; saveTimer = setTimeout(saveNow, 800); }
+    function exportJson() {
+      saveNow();
+      const blob = new Blob([JSON.stringify(collectData(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'vr-superpowers-workbook-' + new Date().toISOString().slice(0,10) + '.json';
+      a.click(); URL.revokeObjectURL(a.href);
+    }
+    function importJson() { document.getElementById('importFile').click(); }
+    document.getElementById('importFile').addEventListener('change', e => {
+      const f = e.target.files[0]; if (!f) return;
+      const r = new FileReader();
+      r.onload = () => { try { applyData(JSON.parse(r.result)); saveNow(); alert('Importerat!'); } catch { alert('Ogiltig JSON'); } };
+      r.readAsText(f); e.target.value = '';
+    });
+    document.querySelectorAll('.editable[data-key]').forEach(el => el.addEventListener('input', scheduleSave));
+    try { const s = localStorage.getItem(STORAGE_KEY); if (s) { applyData(JSON.parse(s)); } } catch {}
+  </script>
+
+<div id="funding-toolbar" style="position:fixed;bottom:12px;right:12px;z-index:9999;display:flex;gap:8px;font-family:system-ui,sans-serif;font-size:13px;">
+  <a href="/api/funding/doc?file=index.html" style="background:#1a222d;color:#38bdf8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Alla projekt</a>
+  <a href="/funding" style="background:#1a222d;color:#94a3b8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Inlogg</a>
+  <button type="button" onclick="logoutFunding()" style="background:#1a222d;color:#fb7185;border:1px solid #334155;padding:6px 12px;border-radius:8px;cursor:pointer;">Logga ut</button>
+</div>
+<script>
+async function logoutFunding() {
+  await fetch('/api/funding/auth', { method: 'DELETE', credentials: 'include' });
+  location.href = '/funding';
+}
+</script>
+</body>
+</html>

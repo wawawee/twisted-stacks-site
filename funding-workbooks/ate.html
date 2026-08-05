@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ATE — Agentic Trading Engine — Projektunderlag</title>
+  <style>
+    :root {
+      --bg: #0f1419; --surface: #1a222d; --surface2: #243040; --border: #334155;
+      --text: #e8edf4; --muted: #94a3b8; --accent: #38bdf8; --investor: #34d399;
+      --grant: #fbbf24; --warn: #fb7185; --radius: 12px;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.55; }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+    .topbar { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; position: sticky; top: 0; z-index: 5;
+      background: linear-gradient(var(--bg) 75%, transparent); padding: .5rem 0 1rem; }
+    button { border: 1px solid var(--border); background: var(--surface2); color: var(--text); border-radius: 8px;
+      padding: .45rem .8rem; font-size: .85rem; cursor: pointer; font-family: inherit; }
+    button:hover { border-color: var(--accent); }
+    button.primary { background: #0ea5e9; border-color: #0ea5e9; color: #041018; font-weight: 600; }
+    .status { margin-left: auto; font-size: .78rem; color: var(--muted); align-self: center; }
+    h1 { font-size: 1.55rem; margin: 0 0 .25rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.25rem; font-size: .82rem; }
+    .badge { background: var(--surface2); border: 1px solid var(--border); padding: .2rem .55rem; border-radius: 999px; }
+    .badge.p0 { border-color: #7f1d1d; color: #fecaca; }
+    .badge.p1 { border-color: #78350f; color: #fde68a; }
+    .badge.p2 { border-color: #1e3a5f; color: #bae6fd; }
+    nav.jump { display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: 1.5rem; }
+    nav.jump a { color: var(--muted); text-decoration: none; font-size: .82rem; padding: .3rem .55rem;
+      border: 1px solid var(--border); border-radius: 8px; }
+    nav.jump a:hover { color: var(--accent); border-color: var(--accent); }
+    section { margin-bottom: 2rem; scroll-margin-top: 5rem; }
+    section > h2 { font-size: 1.2rem; margin: 0 0 .75rem; padding-bottom: .4rem; border-bottom: 2px solid var(--surface2); }
+    .hint { font-size: .82rem; color: var(--muted); background: var(--surface2); border-left: 3px solid var(--accent);
+      padding: .6rem .85rem; border-radius: 0 8px 8px 0; margin-bottom: .75rem; }
+    .hint.inv { border-left-color: var(--investor); }
+    .hint.grt { border-left-color: var(--grant); }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; }
+    .editable { min-height: 2rem; outline: none; border: 1px dashed transparent; border-radius: 8px; padding: .5rem .65rem;
+      transition: border-color .15s, background .15s; }
+    .editable:hover { border-color: #475569; background: rgba(56,189,248,.04); }
+    .editable:focus { border-color: var(--accent); background: rgba(56,189,248,.07); }
+    .editable[data-placeholder]:empty::before { content: attr(data-placeholder); color: #64748b; }
+    .md-content h1,.md-content h2,.md-content h3,.md-content h4 { margin-top: 1rem; }
+    .md-content table { width: 100%; border-collapse: collapse; font-size: .85rem; margin: .75rem 0; }
+    .md-content th,.md-content td { border: 1px solid var(--border); padding: .45rem .55rem; vertical-align: top; }
+    .md-content th { background: var(--surface2); }
+    .md-content blockquote { margin: .5rem 0; padding-left: .75rem; border-left: 3px solid var(--border); color: var(--muted); }
+    .md-content code { font-family: ui-monospace, monospace; font-size: .85em; background: var(--surface2); padding: .1rem .3rem; border-radius: 4px; }
+    .md-content a { color: var(--accent); }
+    .back { font-size: .85rem; margin-bottom: 1rem; }
+    .back a { color: var(--accent); }
+    @media print { .topbar, nav.jump, .back { display: none !important; } body { background: #fff; color: #111; }
+      .card { break-inside: avoid; } .editable { border: none !important; padding: 0; } }
+    @media (max-width: 600px) { .status { margin-left: 0; width: 100%; } }
+  </style>
+</head>
+<body data-slug="ate">
+  <div class="wrap">
+    <p class="back"><a href="/api/funding/doc?file=index.html">← Alla projekt</a> · <a href="/api/funding/doc?file=studio-workbook.html">Studio-arbetsbok</a></p>
+
+    <h1>ATE — Agentic Trading Engine</h1>
+    <div class="meta">
+      <span class="badge p0">P0</span>
+      
+      
+      
+    </div>
+
+    <div class="topbar">
+      <button class="primary" type="button" onclick="saveNow()">💾 Spara</button>
+      <button type="button" onclick="exportJson()">⬇ Exportera</button>
+      <button type="button" onclick="importJson()">⬆ Importera</button>
+      <button type="button" onclick="window.print()">🖨 PDF / Skriv ut</button>
+      <span class="status" id="saveStatus">Redigera genom att klicka i texterna</span>
+    </div>
+
+    <nav class="jump">
+      <a href="#investor">Investerare</a>
+      <a href="#grant">Bidrag</a>
+      <a href="#dossier">Dossier</a>
+      <a href="#funding">Finansieringsplan</a>
+      <a href="#notes">Anteckningar</a>
+    </nav>
+
+    <section id="investor">
+      <h2>Investerare — vad framhäva</h2>
+      <div class="hint inv">Fokus: marknad, traction, unit economics, moat — inte bidragsspråk.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="investor_pitch" data-placeholder="Skriv investerarpitch för detta projekt…">
+          <p><em>Fyll i: problem → lösning → traction → ask → varför nu. Se dossier §1–3 nedan som källa.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="grant">
+      <h2>Bidrag & stöd — vad framhäva</h2>
+      <div class="hint grt">Fokus: innovation, samhällsnytta, regional nytta, budget, TRL — en vertikal i taget.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="grant_pitch" data-placeholder="Skriv grant-vinkel för detta projekt…">
+          <p><em>Fyll i: innovationshöjd, samhällsnytta Gävleborg, budgetposter, sökande (AB vs Per). Se finansieringsplan nedan.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="dossier">
+      <h2>Dossier (från dossier.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="dossier"><h1>ATE — Funding Dossier: 24-Month Burn, Use-of-Funds &amp; ROI</h1>
+<p><strong>Prepared:</strong> 2026-07-25 · <strong>Analyst:</strong> Quantum</p>
+<p><strong>Applicant (assumed):</strong> <strong>TwistedStacks AB</strong> — <em>(FLAG: confirm this is the legal applicant entity; the repo references twistedstacks.com/ate but the AB registration/ownership must be verified before any grant or investor submission.)</em></p>
+<p><strong>Product:</strong> ATE — Agentic Trading Engine (<code>wawawee/ATE</code>). Pre-Phase-0, <strong>paper-only</strong>, no audited backtest, no live track record.</p>
+<blockquote><strong>Revenue guardrail (non-negotiable).</strong> All revenue in this dossier is <strong>infrastructure / SaaS / licensing</strong> (see <code>market-research.md</code> §2). <strong>Zero</strong> revenue is trading P&amp;L, performance fees, or AUM. All milestones are <strong>product/customer</strong> milestones — never performance milestones. No returns, Sharpe, win-rate, or backtest stats appear anywhere.</blockquote>
+<p><strong>Currency:</strong> SEK for the entity model. Rough FX context for readers (<strong>Assumption A8</strong>, verify): ~SEK 10.5/USD, ~SEK 11.4/EUR as of mid-2026.</p>
+<hr>
+<h2>1. Cost assumptions (Sweden, 2026)</h2>
+<blockquote><strong>Assumption call-out A9.</strong> Fully-loaded cost = gross salary + ~31.42% employer social contributions (arbetsgivaravgift) + overhead (pension, tools, workspace, admin). Figures are planning estimates for a Stockholm-area deep-tech startup; verify against actual offers and accountant guidance.</blockquote>
+<table>
+<tr><th>Role</th><th>Monthly gross (SEK)</th><th>Fully-loaded /mo (SEK)</th><th>Fully-loaded /yr (SEK)</th></tr>
+<tr><td>Founder/technical lead (below-market)</td><td>45,000</td><td>~62,000</td><td>~744,000</td></tr>
+<tr><td>Senior backend/agent engineer</td><td>65,000</td><td>~90,000</td><td>~1,080,000</td></tr>
+<tr><td>ML/quant engineer</td><td>65,000</td><td>~90,000</td><td>~1,080,000</td></tr>
+<tr><td>Frontend/UI (React Flow ops)</td><td>55,000</td><td>~76,000</td><td>~912,000</td></tr>
+<tr><td>DevRel / founder-led sales (part-time→full)</td><td>45,000</td><td>~62,000</td><td>~744,000</td></tr>
+</table>
+<p><strong>Non-payroll monthly opex (Assumption A10):</strong></p>
+<table>
+<tr><th>Item</th><th>SEK / mo</th></tr>
+<tr><td>Cloud/infra (Temporal Cloud, Supabase, compute) — pre-live, modest</td><td>8,000–20,000</td></tr>
+<tr><td>GPU for vision training (bursty; amortized)</td><td>5,000–15,000</td></tr>
+<tr><td>Data licenses (Finnhub/Databento/Alpaca paper) — <em>paper phase = low</em></td><td>3,000–12,000</td></tr>
+<tr><td>SaaS/tooling (Cursor, Logfire/LangSmith, GitHub, etc.)</td><td>5,000–10,000</td></tr>
+<tr><td>Legal/accounting/compliance opinion (amortized)</td><td>5,000–15,000</td></tr>
+<tr><td>Misc/admin/travel</td><td>5,000–10,000</td></tr>
+</table>
+<blockquote><strong>Assumption A11.</strong> Data + GPU costs stay <strong>deliberately low</strong> because ATE is paper-only until Phase 8; no expensive live market-data or colocation is needed pre-live. This is a genuine capital-efficiency advantage to highlight to grant reviewers (low burn, no speculative capital at risk).</blockquote>
+<hr>
+<h2>2. Three funding levels (proposed SEK)</h2>
+<table>
+<tr><th>Scenario</th><th>Raise (SEK)</th><th>Runway target</th><th>Team (peak FTE)</th><th>Purpose</th></tr>
+<tr><td><strong>Lean</strong></td><td><strong>1.5 MSEK</strong></td><td>~12–15 mo</td><td>1.5 (founder + 1 part-time)</td><td>Ship Phases 1–4 (classical → vision → fusion/risk → agent swarm) to a credible paper demo; validate design-partner interest.</td></tr>
+<tr><td><strong>Seed</strong></td><td><strong>6 MSEK</strong></td><td>~24 mo</td><td>3.5–4</td><td>Ship Phases 1–6 (through React Flow ops UI + MCP), sign <strong>3–5 paying design-partners</strong>, stand up open-core cloud beta.</td></tr>
+<tr><td><strong>Seed+</strong></td><td><strong>12 MSEK</strong></td><td>~24 mo (faster, deeper)</td><td>5–6</td><td>Phases 1–6 hardened + Path-2/Path-3 commercial motion, EU expansion of design-partner base, licensable Risk/HITL/observability module GA.</td></tr>
+</table>
+<blockquote><strong>Assumption A12.</strong> These are <em>planning</em> raise sizes calibrated to Swedish pre-seed/seed norms and the cost base above. Lean is bootstrap/loan/angel-scale; Seed is angel+pre-seed VC or Almi loan + grant blend; Seed+ is institutional pre-seed/seed. See <code>funding-plan.md</code> for instrument mapping.</blockquote>
+<hr>
+<h2>3. Use-of-funds</h2>
+<h3>3.1 Lean — 1.5 MSEK (~12–15 mo)</h3>
+<table>
+<tr><th>Category</th><th>SEK</th><th>%</th><th>Notes</th></tr>
+<tr><td>Founder salary (below-market, 12 mo)</td><td>744,000</td><td>50%</td><td>Single technical founder</td></tr>
+<tr><td>Part-time ML/quant contractor</td><td>300,000</td><td>20%</td><td>Vision + fusion validation</td></tr>
+<tr><td>Cloud/GPU/data (paper phase)</td><td>240,000</td><td>16%</td><td>Kept low; paper-only</td></tr>
+<tr><td>Legal/compliance opinion + accounting</td><td>120,000</td><td>8%</td><td>&quot;Infra-not-advice&quot; opinion (critical)</td></tr>
+<tr><td>Tooling/misc</td><td>96,000</td><td>6%</td><td></td></tr>
+<tr><td><strong>Total</strong></td><td><strong>1,500,000</strong></td><td>100%</td><td></td></tr>
+</table>
+<p><strong>Outcome:</strong> Phases 1–4 to paper demo; NOT yet a full commercial motion. Bridges to Seed.</p>
+<h3>3.2 Seed — 6 MSEK (~24 mo)</h3>
+<table>
+<tr><th>Category</th><th>SEK</th><th>%</th><th>Notes</th></tr>
+<tr><td>Payroll (3.5–4 FTE ramp over 24 mo)</td><td>3,900,000</td><td>65%</td><td>Founder + 2 eng + part-time sales</td></tr>
+<tr><td>Cloud/GPU/data</td><td>720,000</td><td>12%</td><td>Ops cloud beta + vision training</td></tr>
+<tr><td>Legal/compliance/accounting</td><td>360,000</td><td>6%</td><td>Ongoing regulatory posture + contracts</td></tr>
+<tr><td>Sales/marketing/DevRel/travel</td><td>480,000</td><td>8%</td><td>Design-partner acquisition</td></tr>
+<tr><td>Contingency (buffer)</td><td>540,000</td><td>9%</td><td>~1.5 mo runway reserve</td></tr>
+<tr><td><strong>Total</strong></td><td><strong>6,000,000</strong></td><td>100%</td><td></td></tr>
+</table>
+<p><strong>Outcome:</strong> Phases 1–6 shipped; 3–5 paying design-partners; open-core cloud beta live.</p>
+<h3>3.3 Seed+ — 12 MSEK (~24 mo, deeper)</h3>
+<table>
+<tr><th>Category</th><th>SEK</th><th>%</th><th>Notes</th></tr>
+<tr><td>Payroll (5–6 FTE)</td><td>8,400,000</td><td>70%</td><td>Adds 2nd ML eng + full-time commercial</td></tr>
+<tr><td>Cloud/GPU/data</td><td>1,200,000</td><td>10%</td><td>Managed cloud GA + heavier training</td></tr>
+<tr><td>Legal/compliance/IP</td><td>720,000</td><td>6%</td><td>Module licensing contracts, EU expansion</td></tr>
+<tr><td>Sales/marketing/EU GTM</td><td>960,000</td><td>8%</td><td>Broader design-partner + module sales</td></tr>
+<tr><td>Contingency</td><td>720,000</td><td>6%</td><td></td></tr>
+<tr><td><strong>Total</strong></td><td><strong>12,000,000</strong></td><td>100%</td><td></td></tr>
+</table>
+<p><strong>Outcome:</strong> Phases 1–6 hardened; Risk/HITL/observability <strong>module GA</strong>; multi-market design-partner base; positioned for a priced seed/Series-A.</p>
+<hr>
+<h2>4. Team FTE plan (Seed scenario, illustrative ramp)</h2>
+<table>
+<tr><th>Quarter</th><th>FTEs</th><th>Focus</th></tr>
+<tr><td>Q1–Q2 (mo 1–6)</td><td>2 (founder + eng)</td><td>Phases 1–3: classical scanner, vision channel, fusion + risk gate (paper)</td></tr>
+<tr><td>Q3–Q4 (mo 7–12)</td><td>3 (add ML/quant)</td><td>Phase 4–5: agent swarm + hybrid memory + Temporal/MCP</td></tr>
+<tr><td>Q5–Q6 (mo 13–18)</td><td>3.5 (add part-time UI + sales)</td><td>Phase 6: React Flow ops UI; first design-partner pilots</td></tr>
+<tr><td>Q7–Q8 (mo 19–24)</td><td>4</td><td>Harden, convert design-partners to paid, module packaging</td></tr>
+</table>
+<hr>
+<h2>5. Milestone timeline → first PAYING design-partners (product/customer milestones ONLY)</h2>
+<blockquote>These are <strong>engineering and customer</strong> milestones mapped to the repo's Phase plan (<code>docs/ULTIMATE_PLAN.md</code> §7). <strong>No performance milestone exists</strong> (no Sharpe/return target as a fundable milestone — paper metrics are internal engineering signals only, never a claim).</blockquote>
+<table>
+<tr><th>Milestone</th><th>Phase</th><th>Target (Seed, mo)</th><th>Nature</th></tr>
+<tr><td>M1 — Classical cup-and-handle scanner + VectorBT paper harness (SPY/BTC)</td><td>1</td><td>mo 3</td><td>Product</td></tr>
+<tr><td>M2 — Vision channel (YOLOv8) integrated + typed <code>VisionScore</code></td><td>2</td><td>mo 6</td><td>Product</td></tr>
+<tr><td>M3 — Fusion + <strong>Risk Officer</strong> (veto + CVaR sizing + HITL pause) on paper</td><td>3</td><td>mo 9</td><td>Product</td></tr>
+<tr><td>M4 — Agent swarm (Pydantic AI + LangGraph) + hybrid memory live</td><td>4</td><td>mo 12</td><td>Product</td></tr>
+<tr><td>M5 — Temporal durable workflows + MCP control plane (Hummingbot/Alpaca paper)</td><td>5</td><td>mo 15</td><td>Product</td></tr>
+<tr><td>M6 — React Flow swarm/ops <strong>observability UI</strong> (design-partner-demoable)</td><td>6</td><td>mo 18</td><td>Product</td></tr>
+<tr><td><strong>M7 — First 3–5 signed paying design-partners</strong> (self-host or cloud beta)</td><td>—</td><td><strong>mo 18–24</strong></td><td><strong>Customer/revenue (infra/SaaS/licensing)</strong></td></tr>
+<tr><td>M8 — Licensable Risk/HITL/observability module in pilot</td><td>—</td><td>mo 24</td><td>Customer/revenue</td></tr>
+</table>
+<hr>
+<h2>6. Revenue model &amp; break-even logic (infra/SaaS/licensing ONLY)</h2>
+<p><strong>Revenue lines (from <code>market-research.md</code> §2):</strong></p>
+<ol>
+<li><strong>Open-core cloud ops/hosting</strong> — USD 200–1,500 / seat / mo (Assumption A4)</li>
+<li><strong>B2B prop-desk/team licenses</strong> — USD 25k–75k (Team) to 100k–300k (Enterprise) / yr (Assumption A5)</li>
+<li><strong>Risk/HITL/observability module license</strong> — USD 20k–100k / yr (Assumption A6)</li>
+</ol>
+<h3>6.1 Break-even math (Seed scenario)</h3>
+<p><strong>Assumption A13.</strong> Steady-state monthly burn at ~4 FTE ≈ <strong>SEK 460k/mo</strong> (≈ SEK 5.5M/yr; payroll-dominant). Break-even = recurring gross margin ≥ monthly burn.</p>
+<table>
+<tr><th>Path to break-even</th><th>Deals needed</th><th>Logic</th></tr>
+<tr><td><strong>Enterprise-led</strong></td><td><strong>~2–4 enterprise licenses</strong> at USD 150k/yr (~SEK 1.6M/yr each)</td><td>4 × SEK 1.6M ≈ SEK 6.3M/yr &gt; SEK 5.5M burn → <strong>break-even ~4 enterprise logos</strong></td></tr>
+<tr><td><strong>Team-license-led</strong></td><td><strong>~15–25 team licenses</strong> at USD 40k/yr (~SEK 420k/yr each)</td><td>15 × SEK 420k ≈ SEK 6.3M/yr → break-even ~15 team logos</td></tr>
+<tr><td><strong>Cloud-seat-led</strong></td><td><strong>~400–600 paid seats</strong> at USD 100/mo (~SEK 1,050/mo)</td><td>slower/lower-ACV; realistically a <em>complement</em>, not the primary path pre-Series-A</td></tr>
+</table>
+<blockquote><strong>Read.</strong> The <strong>fastest credible path to break-even is enterprise/team B2B licensing (2–4 enterprise or ~15 team logos)</strong>, not retail cloud seats. This is also the <em>lowest-regulatory-risk</em> path (professional operators, not consumers). Cloud seats and module licenses layer on top.</blockquote>
+<h3>6.2 Sensitivity</h3>
+<table>
+<tr><th>Variable</th><th>Downside</th><th>Base</th><th>Upside</th><th>Effect on break-even</th></tr>
+<tr><td>ACV (enterprise)</td><td>USD 100k</td><td>150k</td><td>300k</td><td>Logos needed: ~6 / ~4 / ~2</td></tr>
+<tr><td>Sales cycle</td><td>12 mo</td><td>6–9 mo</td><td>3–4 mo</td><td>Pushes/pulls break-even by 6–12 mo</td></tr>
+<tr><td>Burn (FTE count)</td><td>6 FTE (SEK 700k/mo)</td><td>4 FTE (460k)</td><td>3 FTE (350k)</td><td>Higher burn → more logos / faster raise needed</td></tr>
+<tr><td>OSS→paid conversion</td><td>0.5%</td><td>1–2%</td><td>3%</td><td>Governs cloud-seat contribution</td></tr>
+</table>
+<p><strong>Assumption A14.</strong> B2B fintech-infra sales cycles are long (often 6–12 mo) with a small buyer universe (prop desks, quant teams). Break-even inside 24 months is <strong>plausible only under the base/upside enterprise-led case</strong> and likely requires the Seed or Seed+ raise; Lean is a bridge, not a break-even plan.</p>
+<h3>6.3 ROI framing for funders (software multiples, not trading returns)</h3>
+<blockquote><strong>Guardrail.</strong> ROI here = <em>equity/loan</em> return via a software business (ARR × SaaS multiple), <strong>never</strong> trading P&amp;L. Illustrative only: if ATE reaches, say, SEK 6–12M ARR at a typical infra-SaaS revenue multiple, the equity value supports a standard seed→Series-A step-up. Actual outcomes depend on execution and are <strong>not</strong> guaranteed. <strong>No performance-based return is offered or implied.</strong></blockquote>
+<hr>
+<h2>7. Red flags for grants — and how to neutralize each</h2>
+<p>Grant bodies (Vinnova, Almi, EIC) and many angels are <strong>allergic</strong> to trading/speculation optics. ATE must be pre-emptively de-risked.</p>
+<table>
+<tr><th>#</th><th>Red flag</th><th>Why it kills funding</th><th>Neutralization</th></tr>
+<tr><td>R1</td><td><strong>Gambling / speculation optics</strong> (&quot;a bot that trades for money&quot;)</td><td>Public grants fund <em>civilian innovation / dev-tools / safety</em>, not speculation; reviewers reject P&amp;L-seeking projects</td><td>Frame ATE as <strong>developer/infrastructure tooling + responsible-AI risk-governance</strong>. Lead with typed-swarm, HITL, observability, auditability. Trading is the <em>domain</em>, not the <em>pitch</em>. Emphasize <strong>paper-only, no capital at risk</strong>.</td></tr>
+<tr><td>R2</td><td><strong>Unlicensed-advice / fund risk</strong></td><td>If ATE looks like it advises or manages money, it needs MiFID/MiCA/FI authorization → grants won't touch it</td><td>Hold the <strong>&quot;infra, not advice&quot;</strong> line (<code>market-research.md</code> §3): no custody, no advice, no execution-for-clients, customer-operated. Attach a <strong>legal opinion</strong> confirming non-regulated status.</td></tr>
+<tr><td>R3</td><td><strong>&quot;AI hedge fund&quot; framing</strong></td><td>Signals a fund (AIFMD/MiFID), performance claims, and hype-risk; reviewers/angels discount it</td><td><strong>Ban the phrase.</strong> Position as <em>trading infrastructure for teams/desks</em>. Contrast explicitly with &quot;no-human-intervention&quot; agent funds (e.g., Fund Slug) — ATE is <strong>HITL-by-default</strong>.</td></tr>
+<tr><td>R4</td><td><strong>No track record / fabricated performance</strong></td><td>Any invented Sharpe/return is instantly disqualifying and reputationally fatal</td><td><strong>Invent nothing.</strong> Use <code>TRUTH-STATUS.md</code> verbatim posture. Sell <strong>architecture + methodology + governance</strong>, and state plainly that performance <em>would need independent audit</em> before any claim.</td></tr>
+<tr><td>R5</td><td><strong>Entity ambiguity</strong></td><td>Grants require a clear, eligible Swedish legal applicant</td><td><strong>Confirm TwistedStacks AB</strong> registration, ownership, SME status, and de-minimis state-aid history before applying.</td></tr>
+<tr><td>R6</td><td><strong>Crowded &quot;agent trading&quot; category</strong></td><td>2026 has many entrants (Piythia, QuantOptimus, KelAI, Nick, Fere AI…) → &quot;why you?&quot;</td><td>Differentiate on <strong>openness (OSS core) + typed contracts + durable HITL + observability + honesty</strong>. Defensibility is the <em>governance/coordination substrate</em>, not another autonomous fund.</td></tr>
+</table>
+<hr>
+<h2>8. Recommendation</h2>
+<ul>
+<li><strong>Raise the Seed (6 MSEK)</strong> as the primary plan: it funds Phases 1–6 and the path to first paying design-partners (M7) within 24 months, with a credible enterprise-led break-even at ~4 logos.</li>
+<li><strong>Blend instruments</strong> (see <code>funding-plan.md</code>): angel/pre-seed VC + Almi innovationslån as the backbone, a <em>narrowly-scoped</em> responsible-AI/dev-tools grant angle where defensible, accelerator for network/validation.</li>
+<li><strong>Bank the capital-efficiency story:</strong> paper-only, low data/GPU burn, no speculative capital at risk — a rare &quot;safe&quot; profile in a hype-heavy category.</li>
+<li><strong>Confirm TwistedStacks AB</strong> and secure the &quot;infra-not-advice&quot; legal opinion <em>before</em> any submission.</li>
+</ul>
+<p><em>All assumptions (A1–A14) consolidated in <code>sources.md</code>. Cost/FX figures are planning estimates to be verified with an accountant.</em></p></div>
+      </div>
+    </section>
+
+    <section id="funding">
+      <h2>Finansieringsplan (från funding-plan.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="funding"><p>&lt;!-- Deadlines/amounts verified vs official sources 2026-07-25 by Hyper. VERIFIED:date = confirmed at source; UNVERIFIED = not confirmable / see note. Narrative unchanged. --&gt;</p>
+<h1>ATE — Funding Plan: Ranked Instruments</h1>
+<p><strong>Prepared:</strong> 2026-07-25 · <strong>Analyst:</strong> Quantum</p>
+<p><strong>Applicant (assumed):</strong> <strong>TwistedStacks AB</strong> <em>(FLAG: confirm entity before any application)</em></p>
+<p><strong>Product:</strong> ATE — Agentic Trading Engine. Pre-Phase-0, <strong>paper-only</strong>, no track record. Positioned as <strong>trading infrastructure / dev-tooling / responsible-AI risk-safety</strong>, NOT a fund or advice.</p>
+<blockquote><strong>Core thesis of this plan.</strong> Pure trading/fintech-speculation is a <strong>weak fit</strong> for civilian-innovation grants (Vinnova, EU). ATE is fundable <strong>only via its defensible infra / developer-tools / risk-safety / responsible-AI angle</strong>, and primarily through <strong>equity/loan</strong> instruments that are comfortable with fintech-infra. Naive &quot;Vinnova-for-a-trading-bot&quot; is <strong>deprioritized</strong> and would likely be rejected. All amounts/deadlines are <strong>date-stamped and marked unverified</strong> where not confirmed on an official page.</blockquote>
+<hr>
+<h2>Ranking summary (Top 5, by realistic fit)</h2>
+<table>
+<tr><th>Rank</th><th>Instrument</th><th>Type</th><th>Amount</th><th>Fit for ATE</th><th>Why</th></tr>
+<tr><td><strong>1</strong></td><td><strong>Angels / pre-seed VC</strong> (fintech + devtools)</td><td>Equity</td><td>SEK 1.5–12M</td><td><strong>Strong</strong></td><td>Comfortable with fintech-infra + AI-agent thesis; 2026 capital actively flowing to the category.</td></tr>
+<tr><td><strong>2</strong></td><td><strong>Almi Innovationslån</strong></td><td>Soft loan</td><td>SEK 50k–500k [VERIFIED:2026-07-25]</td><td><strong>Strong</strong></td><td>Non-dilutive, sector-agnostic, backs early Swedish deep-tech; pairs with equity.</td></tr>
+<tr><td><strong>3</strong></td><td><strong>Fintech accelerators</strong> (Nordic/EU)</td><td>Equity + program</td><td>~€100k–300k [VERIFIED:2026-07-25]</td><td><strong>Good</strong></td><td>Network, validation, design-partner access; several active 2026 programs.</td></tr>
+<tr><td><strong>4</strong></td><td><strong>Vinnova</strong> — <em>only</em> via infra/dev-tools/responsible-AI/risk-safety angle</td><td>Grant</td><td>up to SEK 500k–1M [VERIFIED:2026-07-25]</td><td><strong>Conditional / narrow</strong></td><td>Fundable <em>only</em> if reframed as responsible-AI/HITL/observability dev-tooling — NOT as trading.</td></tr>
+<tr><td><strong>5</strong></td><td><strong>Revenue-first / bootstrapping</strong></td><td>Non-dilutive</td><td>n/a</td><td><strong>Viable complement</strong></td><td>Low paper-phase burn (no live-capital, cheap data) makes design-partner-funded development realistic.</td></tr>
+<tr><td>(later)</td><td><strong>EIC Accelerator</strong></td><td>Grant + equity</td><td>€2.5M grant + €1–10M equity [VERIFIED:2026-07-25]</td><td><strong>Later-stage</strong></td><td>Requires TRL/traction ATE lacks pre-Phase-6; strong once Phases 1–6 shipped + design-partners.</td></tr>
+</table>
+<hr>
+<h2>1. Angels / pre-seed VC (fintech + devtools) — <strong>RANK 1</strong></h2>
+<table>
+<tr><th>Field</th><th>Detail</th></tr>
+<tr><td><strong>Amount</strong></td><td>SEK 1.5M (angel/lean) → 6–12M (pre-seed/seed round)</td></tr>
+<tr><td><strong>Stage fit</strong></td><td>Pre-seed now; seed after Phases 4–6 + design-partners</td></tr>
+<tr><td><strong>Cadence/deadline</strong></td><td>Rolling (no deadline). <em>Unverified — depends on specific investors.</em></td></tr>
+<tr><td><strong>Why it fits</strong></td><td>Fintech-infra + AI-agent-tooling is squarely in-thesis for devtools/fintech angels and pre-seed funds. 2026 shows real appetite: <strong>Fere AI raised $1.3M (Apr 2026)</strong>; multiple agent-trading startups funded (Piythia, QuantOptimus, KelAI, Strike, Nick). Investors here <em>understand</em> infra economics (open-core, seats, licensing).</td></tr>
+<tr><td><strong>Angle</strong></td><td><strong>&quot;Governance/observability substrate for agentic trading — typed swarm + durable HITL + audit.&quot;</strong> Lead with architecture, capital-efficiency (paper-only, low burn), and honesty (no fabricated performance) as a <em>differentiator</em> vs. hype-fund peers. Explicitly contrast with &quot;no-human&quot; agent funds.</td></tr>
+<tr><td><strong>Watch-outs</strong></td><td>Must avoid &quot;AI hedge fund&quot; framing (see <code>dossier.md</code> R3); crowded category → &quot;why you?&quot; answered by openness + governance + honesty.</td></tr>
+</table>
+<h2>2. Almi Innovationslån — <strong>RANK 2</strong></h2>
+<table>
+<tr><th>Field</th><th>Detail</th></tr>
+<tr><td><strong>Amount</strong></td><td><strong>SEK 50,000–500,000</strong> [VERIFIED:2026-07-25]; typically requires co-financing (up to ~50% of project cost) [VERIFIED:2026-07-25]; repayment 3–5 yrs (max 8) [VERIFIED:2026-07-25]</td></tr>
+<tr><td><strong>Stage fit</strong></td><td>Early-stage idea/dev — fits Lean/Seed bridge</td></tr>
+<tr><td><strong>Cadence/deadline</strong></td><td><strong>Rolling</strong> application (no fixed deadline) [VERIFIED:2026-07-25]. <em>Confirm current terms on almi.se — verified as of 2026-07-25.</em></td></tr>
+<tr><td><strong>Why it fits</strong></td><td>Non-dilutive, <strong>sector-agnostic</strong> (no requirement to be &quot;civilian tech&quot;), designed for early Swedish innovation; pairs cleanly with an angel round or grant. Almi assesses the <em>business</em>, not trading optics — but still present ATE as infra/dev-tools.</td></tr>
+<tr><td><strong>Angle</strong></td><td>Fund Phases 1–4 engineering + the &quot;infra-not-advice&quot; legal opinion. Frame as <strong>deep-tech developer infrastructure</strong> with a clear commercialization path (B2B licensing).</td></tr>
+<tr><td><strong>Watch-outs</strong></td><td>Co-financing requirement (need matching capital/revenue); repayment obligation (it's a loan, not a grant).</td></tr>
+</table>
+<h2>3. Fintech accelerators (Nordic/EU) — <strong>RANK 3</strong></h2>
+<p>Real, active 2026 programs (verify current cohort dates before applying):</p>
+<table>
+<tr><th>Program</th><th>Location</th><th>Offer</th><th>Notes</th></tr>
+<tr><td><strong>Antler</strong> (Nordics)</td><td>Stockholm, Oslo, Copenhagen, Helsinki</td><td><strong>€200k</strong> (€100k for 8.5% + €100k uncapped convertible) + <strong>€300k</strong> pre-committed follow-on [VERIFIED:2026-07-25]</td><td>Inception-stage; strong for a Nordic founder pre-team/pre-round.</td></tr>
+<tr><td><strong>Techstars — ABN AMRO Future of Finance</strong></td><td>Amsterdam</td><td><strong>$220k</strong> investment + 3-month mentorship; focus on <strong>AI-native finance infrastructure</strong> [VERIFIED:2026-07-25]</td><td>6th edition applications opened Apr 2026 [VERIFIED:2026-07-25]. <em>Fit is strong: &quot;AI-native finance infrastructure&quot; ≈ ATE.</em></td></tr>
+<tr><td><strong>Tenity — European Fin/Tech Accelerator</strong></td><td>Zurich, London, Copenhagen</td><td>up to <strong>€300k</strong> co-investment (pre-seed/seed) + program fee + equity [VERIFIED:2026-07-25]</td><td>Fintech-specialized; Copenhagen node is Nordic-accessible.</td></tr>
+<tr><td><strong>The FinTechers</strong> (CEE)</td><td>CEE / remote</td><td>up to <strong>€100k</strong> (~5% via convertible) + 3-mo core + up to 2 yrs support [UNVERIFIED]</td><td>Broader CEE reach.</td></tr>
+<tr><td><strong>SPRINT by The Fintech House</strong></td><td>Portugal</td><td>5-month program: validation, GTM, fundraising</td><td>Non-Nordic option.</td></tr>
+</table>
+<table>
+<tr><th>Field</th><th>Detail</th></tr>
+<tr><td><strong>Amount</strong></td><td>~€100k–300k (+network) [VERIFIED:2026-07-25]</td></tr>
+<tr><td><strong>Stage fit</strong></td><td>Pre-seed; best once there's a demoable paper build (Phases 1–3+)</td></tr>
+<tr><td><strong>Cadence/deadline</strong></td><td>Cohort-based; <strong>dates vary — all UNVERIFIED, confirm on each program site.</strong> (Techstars ABN AMRO 6th edition apps opened ~Apr 2026 [VERIFIED:2026-07-25].)</td></tr>
+<tr><td><strong>Why it fits</strong></td><td>Validation, fintech-specific mentorship, and <strong>design-partner/customer access</strong> — directly de-risks ATE's #1 gap (no customers yet). &quot;AI-native finance infrastructure&quot; framing (Techstars ABN AMRO) is an ideal match.</td></tr>
+<tr><td><strong>Angle</strong></td><td>Enter as <strong>fintech developer-infrastructure + responsible-AI</strong>, not a trading product. Use the program to source B2B design-partners (prop desks/quant teams).</td></tr>
+<tr><td><strong>Watch-outs</strong></td><td>Equity cost + program fees (Tenity); relocation/time commitment; ensure the program values infra over consumer fintech.</td></tr>
+</table>
+<h2>4. Vinnova — <strong>RANK 4 (conditional / narrow angle only)</strong></h2>
+<blockquote><strong>Deprioritized as a naive &quot;trading&quot; grant.</strong> Vinnova funds <em>civilian innovation</em>; a trading engine pitched as a trading engine is a <strong>poor fit and likely rejected</strong>. It becomes viable <strong>only</strong> if reframed around a <strong>defensible non-trading public-good angle.</strong></blockquote>
+<table>
+<tr><th>Program (2026)</th><th>Amount</th><th>Deadline</th><th>Fit</th></tr>
+<tr><td><strong>Innovativa startups / Innovative Startups 2026</strong></td><td>up to <strong>SEK 500,000</strong> [VERIFIED:2026-07-25]</td><td>Call <strong>opens 2026-10-12</strong>, closes <strong>2027-01-12 14:00</strong> [VERIFIED:2026-07-25 K-DEADLINES] <em>(tidigare Hyper UNVERIFIED “~3 months” — resolved)</em></td><td>Conditional — only via responsible-AI/dev-tools angle</td></tr>
+<tr><td><strong>Test och demo för SMF (Test &amp; Demo for SMEs) 2026</strong></td><td>up to <strong>SEK 1,000,000</strong> (max 70% of cost) [VERIFIED:2026-07-25]</td><td><strong>Deadline 2026-09-08</strong> <em>(verified as of 2026-07-25)</em> [VERIFIED:2026-07-25]</td><td>Possible if framed as testing a <strong>responsible-AI HITL/observability platform</strong></td></tr>
+</table>
+<table>
+<tr><th>Field</th><th>Detail</th></tr>
+<tr><td><strong>Amount</strong></td><td>SEK 500k (Innovative Startups) / up to SEK 1M (Test &amp; Demo) [VERIFIED:2026-07-25]</td></tr>
+<tr><td><strong>Stage fit</strong></td><td>Early; requires the <em>angle</em>, not just the product</td></tr>
+<tr><td><strong>Cadence/deadline</strong></td><td>Innovative Startups 2026 <strong>opens 2026-10-12</strong> / closes <strong>2027-01-12</strong> [VERIFIED:2026-07-25 K-DEADLINES]; Test &amp; Demo SME <strong>deadline 2026-09-08</strong> [VERIFIED:2026-07-25]. <em>Re-confirm on vinnova.se before submitting.</em></td></tr>
+<tr><td><strong>Why it (can) fit</strong></td><td>Fundable <strong>only</strong> as: <strong>responsible-AI with human-in-the-loop</strong>, <strong>auditable/observable AI systems</strong>, <strong>risk-safety/governance developer tooling</strong>, or <strong>trustworthy-AI infrastructure</strong> — where the <em>trading</em> domain is incidental and the <em>innovation</em> is the typed-swarm + HITL + observability substrate.</td></tr>
+<tr><td><strong>Angle (the ONLY defensible ones)</strong></td><td>(a) <strong>Human-in-the-loop governance for autonomous AI agents</strong> (safety); (b) <strong>Observability/auditability of multi-agent AI systems</strong> (trustworthy AI); (c) <strong>Typed, durable orchestration for high-stakes AI</strong> (reliability/dev-tools). Trading is a <em>demonstration domain</em>, not the pitch.</td></tr>
+<tr><td><strong>Angles that are TOO WEAK (name-and-avoid)</strong></td><td>❌ &quot;AI that trades to make returns&quot; (speculation — out of scope). ❌ &quot;Better backtesting/connectors&quot; (not novel; OSS already does it). ❌ &quot;AI hedge fund / alpha generation&quot; (fund optics, performance claims — disqualifying). ❌ Anything implying financial advice or capital deployment.</td></tr>
+<tr><td><strong>Watch-outs</strong></td><td>High rejection risk if trading optics leak through; reviewers are sophisticated. Only apply if the responsible-AI/HITL/observability framing is genuine and central. Do <strong>not</strong> burn founder time on a naive Vinnova-trading application.</td></tr>
+</table>
+<h2>5. Revenue-first / bootstrapping — <strong>RANK 5 (complement, not either/or)</strong></h2>
+<table>
+<tr><th>Field</th><th>Detail</th></tr>
+<tr><td><strong>Amount</strong></td><td>n/a (customer-funded)</td></tr>
+<tr><td><strong>Stage fit</strong></td><td>Any; especially strong given ATE's <strong>low paper-phase burn</strong></td></tr>
+<tr><td><strong>Cadence/deadline</strong></td><td>Continuous</td></tr>
+<tr><td><strong>Why it fits</strong></td><td>Paper-only means <strong>no live-capital, cheap data, modest GPU</strong> (<code>dossier.md</code> A11) → development can be partly funded by <strong>paid design-partner pilots</strong> (Path 2 licensing). This <em>also</em> de-risks every other instrument (traction beats decks).</td></tr>
+<tr><td><strong>Angle</strong></td><td>Convert early prop-desk/quant-team interest into <strong>paid design-partner contracts</strong> (even discounted) for the Risk/HITL/observability value. Reference logos + revenue → stronger angel/Almi/EIC position.</td></tr>
+<tr><td><strong>Watch-outs</strong></td><td>Slow; founder-sales-dependent; small buyer universe with long cycles (<code>dossier.md</code> A14). Best as a <em>complement</em> to Rank 1–2, not the sole plan.</td></tr>
+</table>
+<hr>
+<h2>Later-stage: EIC Accelerator (do NOT apply yet)</h2>
+<table>
+<tr><th>Field</th><th>Detail</th></tr>
+<tr><td><strong>Amount</strong></td><td><strong>up to €2.5M grant + €1–10M equity</strong> (blended finance) [VERIFIED:2026-07-25]</td></tr>
+<tr><td><strong>Stage fit</strong></td><td><strong>Too early now</strong> — needs higher TRL, a real product (Phases 1–6 shipped), IP, and ideally revenue/design-partners</td></tr>
+<tr><td><strong>Deadline</strong></td><td>2026 full-proposal cutoffs <strong>~2026-09-02 and 2026-11-04</strong> <em>(verified as of 2026-07-25; re-confirm on the EIC/EUACC pages — programme details shift)</em> [VERIFIED:2026-07-25]. Vinnova also runs a <strong>&quot;Fast track to EIC Accelerator&quot;</strong> support call.</td></tr>
+<tr><td><strong>Why (later)</strong></td><td>Excellent non-dilutive+equity blend for a deep-tech <strong>responsible-AI infrastructure</strong> company — <em>once</em> ATE has a shipped platform and traction. The responsible-AI/HITL/observability angle is EIC-appropriate; &quot;trading&quot; must again be de-emphasized.</td></tr>
+<tr><td><strong>Angle</strong></td><td><strong>Trustworthy, auditable, human-in-the-loop multi-agent AI infrastructure</strong> (deep-tech, EU-strategic). Apply after M6/M7 (<code>dossier.md</code>).</td></tr>
+<tr><td><strong>Watch-outs</strong></td><td>Highly competitive; long process; premature application wastes a strong future shot. Prepare via Vinnova's Fast-track first.</td></tr>
+</table>
+<hr>
+<h2>Explicitly named weak/avoid angles (so nobody wastes effort)</h2>
+<table>
+<tr><th>Angle</th><th>Verdict</th><th>Reason</th></tr>
+<tr><td>Vinnova for &quot;a trading bot / alpha engine&quot;</td><td><strong>Avoid</strong></td><td>Speculation optics; out of civilian-innovation scope; near-certain rejection.</td></tr>
+<tr><td>Any grant framed on <strong>returns/performance</strong></td><td><strong>Avoid</strong></td><td>No track record (fabrication is disqualifying); performance is not a fundable milestone.</td></tr>
+<tr><td>&quot;AI hedge fund&quot; to <em>any</em> funder</td><td><strong>Avoid</strong></td><td>Triggers fund/advice regulatory optics (MiFID/AIFMD) and hype-skepticism.</td></tr>
+<tr><td>&quot;Better connectors / backtester&quot; positioning</td><td><strong>Weak</strong></td><td>OSS incumbents (NautilusTrader/Hummingbot/LEAN/vectorbt) already own this; not novel or defensible.</td></tr>
+<tr><td>Retail consumer &quot;let AI trade your money&quot; app</td><td><strong>Avoid</strong></td><td>Regulated broker-dealer/CASP territory + optics; not ATE's model.</td></tr>
+</table>
+<hr>
+<h2>Recommended sequence</h2>
+<ol>
+<li><strong>Now (mo 0–6):</strong> Almi Innovationslån (Rank 2) + angel/pre-seed conversations (Rank 1) to fund Phases 1–4. Secure &quot;infra-not-advice&quot; legal opinion. Confirm <strong>TwistedStacks AB</strong>.</li>
+<li><strong>mo 3–9:</strong> Apply to a fintech accelerator (Rank 3) — target <strong>Techstars ABN AMRO (&quot;AI-native finance infrastructure&quot;)</strong> and/or <strong>Antler Nordics</strong> — for network + design-partners.</li>
+<li><strong>mo 6–12:</strong> <em>Only if</em> the responsible-AI/HITL/observability framing is genuine, submit a <strong>narrowly-scoped Vinnova</strong> application (Rank 4, Test &amp; Demo or Innovative Startups). Otherwise skip.</li>
+<li><strong>Continuous:</strong> Convert design-partner interest into paid pilots (Rank 5).</li>
+<li><strong>After Phases 1–6 + traction (mo 18–24+):</strong> Prepare <strong>EIC Accelerator</strong> via Vinnova Fast-track.</li>
+</ol>
+<p><em>All amounts/deadlines: see <code>sources.md</code> with access dates. Deadlines marked &quot;verified as of 2026-07-25&quot; were read from official pages today but programme windows change — re-confirm before submitting. Investor/accelerator cohort dates are UNVERIFIED and must be checked per program.</em></p>
+<p><strong>K-DEADLINES 2026-07-25:</strong> Innovativa Startups open <strong>2026-10-12</strong> = <strong>VERIFIED</strong> (resolved prior UNVERIFIED). Master: <code>00-MASTER/INVENTORY/kimi-deadlines-2026-07.md</code>.</p></div>
+      </div>
+    </section>
+
+    <section id="notes">
+      <h2>Gemensamma anteckningar</h2>
+      <div class="card">
+        <div class="editable" data-key="notes" data-placeholder="Anteckningar inför ansökan…" style="min-height:8rem;"></div>
+      </div>
+    </section>
+  </div>
+  <input type="file" id="importFile" accept="application/json,.json" hidden />
+  <script>
+    const STORAGE_KEY = 'ts_project_ate_v1';
+    let saveTimer = null;
+    function collectData() {
+      const data = { slug: 'ate', version: 1, savedAt: new Date().toISOString(), fields: {} };
+      document.querySelectorAll('.editable[data-key]').forEach(el => { data.fields[el.dataset.key] = el.innerHTML; });
+      return data;
+    }
+    function applyData(data) {
+      if (!data?.fields) return;
+      document.querySelectorAll('.editable[data-key]').forEach(el => {
+        if (data.fields[el.dataset.key] !== undefined) el.innerHTML = data.fields[el.dataset.key];
+      });
+    }
+    function saveNow() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(collectData()));
+      document.getElementById('saveStatus').textContent = 'Sparat ' + new Date().toLocaleString('sv-SE');
+    }
+    function scheduleSave() { clearTimeout(saveTimer); document.getElementById('saveStatus').textContent = 'Sparar…'; saveTimer = setTimeout(saveNow, 800); }
+    function exportJson() {
+      saveNow();
+      const blob = new Blob([JSON.stringify(collectData(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'ate-workbook-' + new Date().toISOString().slice(0,10) + '.json';
+      a.click(); URL.revokeObjectURL(a.href);
+    }
+    function importJson() { document.getElementById('importFile').click(); }
+    document.getElementById('importFile').addEventListener('change', e => {
+      const f = e.target.files[0]; if (!f) return;
+      const r = new FileReader();
+      r.onload = () => { try { applyData(JSON.parse(r.result)); saveNow(); alert('Importerat!'); } catch { alert('Ogiltig JSON'); } };
+      r.readAsText(f); e.target.value = '';
+    });
+    document.querySelectorAll('.editable[data-key]').forEach(el => el.addEventListener('input', scheduleSave));
+    try { const s = localStorage.getItem(STORAGE_KEY); if (s) { applyData(JSON.parse(s)); } } catch {}
+  </script>
+
+<div id="funding-toolbar" style="position:fixed;bottom:12px;right:12px;z-index:9999;display:flex;gap:8px;font-family:system-ui,sans-serif;font-size:13px;">
+  <a href="/api/funding/doc?file=index.html" style="background:#1a222d;color:#38bdf8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Alla projekt</a>
+  <a href="/funding" style="background:#1a222d;color:#94a3b8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Inlogg</a>
+  <button type="button" onclick="logoutFunding()" style="background:#1a222d;color:#fb7185;border:1px solid #334155;padding:6px 12px;border-radius:8px;cursor:pointer;">Logga ut</button>
+</div>
+<script>
+async function logoutFunding() {
+  await fetch('/api/funding/auth', { method: 'DELETE', credentials: 'include' });
+  location.href = '/funding';
+}
+</script>
+</body>
+</html>

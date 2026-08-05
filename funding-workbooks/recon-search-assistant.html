@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Recon Search Assistant — Projektunderlag</title>
+  <style>
+    :root {
+      --bg: #0f1419; --surface: #1a222d; --surface2: #243040; --border: #334155;
+      --text: #e8edf4; --muted: #94a3b8; --accent: #38bdf8; --investor: #34d399;
+      --grant: #fbbf24; --warn: #fb7185; --radius: 12px;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.55; }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+    .topbar { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; position: sticky; top: 0; z-index: 5;
+      background: linear-gradient(var(--bg) 75%, transparent); padding: .5rem 0 1rem; }
+    button { border: 1px solid var(--border); background: var(--surface2); color: var(--text); border-radius: 8px;
+      padding: .45rem .8rem; font-size: .85rem; cursor: pointer; font-family: inherit; }
+    button:hover { border-color: var(--accent); }
+    button.primary { background: #0ea5e9; border-color: #0ea5e9; color: #041018; font-weight: 600; }
+    .status { margin-left: auto; font-size: .78rem; color: var(--muted); align-self: center; }
+    h1 { font-size: 1.55rem; margin: 0 0 .25rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.25rem; font-size: .82rem; }
+    .badge { background: var(--surface2); border: 1px solid var(--border); padding: .2rem .55rem; border-radius: 999px; }
+    .badge.p0 { border-color: #7f1d1d; color: #fecaca; }
+    .badge.p1 { border-color: #78350f; color: #fde68a; }
+    .badge.p2 { border-color: #1e3a5f; color: #bae6fd; }
+    nav.jump { display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: 1.5rem; }
+    nav.jump a { color: var(--muted); text-decoration: none; font-size: .82rem; padding: .3rem .55rem;
+      border: 1px solid var(--border); border-radius: 8px; }
+    nav.jump a:hover { color: var(--accent); border-color: var(--accent); }
+    section { margin-bottom: 2rem; scroll-margin-top: 5rem; }
+    section > h2 { font-size: 1.2rem; margin: 0 0 .75rem; padding-bottom: .4rem; border-bottom: 2px solid var(--surface2); }
+    .hint { font-size: .82rem; color: var(--muted); background: var(--surface2); border-left: 3px solid var(--accent);
+      padding: .6rem .85rem; border-radius: 0 8px 8px 0; margin-bottom: .75rem; }
+    .hint.inv { border-left-color: var(--investor); }
+    .hint.grt { border-left-color: var(--grant); }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; }
+    .editable { min-height: 2rem; outline: none; border: 1px dashed transparent; border-radius: 8px; padding: .5rem .65rem;
+      transition: border-color .15s, background .15s; }
+    .editable:hover { border-color: #475569; background: rgba(56,189,248,.04); }
+    .editable:focus { border-color: var(--accent); background: rgba(56,189,248,.07); }
+    .editable[data-placeholder]:empty::before { content: attr(data-placeholder); color: #64748b; }
+    .md-content h1,.md-content h2,.md-content h3,.md-content h4 { margin-top: 1rem; }
+    .md-content table { width: 100%; border-collapse: collapse; font-size: .85rem; margin: .75rem 0; }
+    .md-content th,.md-content td { border: 1px solid var(--border); padding: .45rem .55rem; vertical-align: top; }
+    .md-content th { background: var(--surface2); }
+    .md-content blockquote { margin: .5rem 0; padding-left: .75rem; border-left: 3px solid var(--border); color: var(--muted); }
+    .md-content code { font-family: ui-monospace, monospace; font-size: .85em; background: var(--surface2); padding: .1rem .3rem; border-radius: 4px; }
+    .md-content a { color: var(--accent); }
+    .back { font-size: .85rem; margin-bottom: 1rem; }
+    .back a { color: var(--accent); }
+    @media print { .topbar, nav.jump, .back { display: none !important; } body { background: #fff; color: #111; }
+      .card { break-inside: avoid; } .editable { border: none !important; padding: 0; } }
+    @media (max-width: 600px) { .status { margin-left: 0; width: 100%; } }
+  </style>
+</head>
+<body data-slug="recon-search-assistant">
+  <div class="wrap">
+    <p class="back"><a href="/api/funding/doc?file=index.html">← Alla projekt</a> · <a href="/api/funding/doc?file=studio-workbook.html">Studio-arbetsbok</a></p>
+
+    <h1>Recon Search Assistant</h1>
+    <div class="meta">
+      <span class="badge p1">P1</span>
+      
+      
+      
+    </div>
+
+    <div class="topbar">
+      <button class="primary" type="button" onclick="saveNow()">💾 Spara</button>
+      <button type="button" onclick="exportJson()">⬇ Exportera</button>
+      <button type="button" onclick="importJson()">⬆ Importera</button>
+      <button type="button" onclick="window.print()">🖨 PDF / Skriv ut</button>
+      <span class="status" id="saveStatus">Redigera genom att klicka i texterna</span>
+    </div>
+
+    <nav class="jump">
+      <a href="#investor">Investerare</a>
+      <a href="#grant">Bidrag</a>
+      <a href="#dossier">Dossier</a>
+      <a href="#funding">Finansieringsplan</a>
+      <a href="#notes">Anteckningar</a>
+    </nav>
+
+    <section id="investor">
+      <h2>Investerare — vad framhäva</h2>
+      <div class="hint inv">Fokus: marknad, traction, unit economics, moat — inte bidragsspråk.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="investor_pitch" data-placeholder="Skriv investerarpitch för detta projekt…">
+          <p><em>Fyll i: problem → lösning → traction → ask → varför nu. Se dossier §1–3 nedan som källa.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="grant">
+      <h2>Bidrag & stöd — vad framhäva</h2>
+      <div class="hint grt">Fokus: innovation, samhällsnytta, regional nytta, budget, TRL — en vertikal i taget.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="grant_pitch" data-placeholder="Skriv grant-vinkel för detta projekt…">
+          <p><em>Fyll i: innovationshöjd, samhällsnytta Gävleborg, budgetposter, sökande (AB vs Per). Se finansieringsplan nedan.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="dossier">
+      <h2>Dossier (från dossier.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="dossier"><h1>Recon Search Assistant — Dossier</h1>
+<p><strong>Slug:</strong> recon-search-assistant · <strong>Path:</strong> <code>/Users/perbrinell/Documents/Recon-Search-Assistant</code></p>
+<p><strong>Sökande:</strong> TWISTEDSTACKS AB · <strong>P1</strong> · <strong>COMPLETE</strong> · <strong>2026-07-25</strong></p>
+<h2>Meta</h2>
+<table>
+<tr><th>Fält</th><th>Värde</th></tr>
+<tr><td>Sektor</td><td>Cybersecurity / bug bounty tooling / SaaS</td></tr>
+<tr><td>TRL</td><td>Beta v2 — dorks, AI analysis, auth scaffolds; Stripe Pro planned</td></tr>
+<tr><td>Intäkt</td><td>Free 50 searches/mån · Pro ~19 USD/mån (plan)</td></tr>
+<tr><td>Känslighet</td><td><strong>Endast defensiv, auktoriserad</strong> användning — aldrig offensiv framing</td></tr>
+</table>
+<h2>1. Beskrivning</h2>
+<p>Sökmotor för säkerhetsforskare: 115+ Google dorks, AI-sårbarhetsanalys, dashboard, findings management. Hjälper hitta exponering <strong>inom tillåtet scope</strong>.</p>
+<h2>2. Potential</h2>
+<p>SMB/ideella saknar säkerhetsbudget; bug bounty-jägare behöver workflow. Digital resiliens-narrativ (DIGITAL Europe / Internetstiftelsen).</p>
+<h2>3. ROI</h2>
+<table>
+<tr><th>Scenario</th><th>Invest 12 mån</th><th>Intäkt Y2</th></tr>
+<tr><td>Konservativ</td><td>400 k</td><td>200 k (≈100 Pro)</td></tr>
+<tr><td>Bas</td><td>900 k</td><td>1,2 MSEK (≈500–700 Pro + B2B)</td></tr>
+<tr><td>Optimistisk</td><td>1,5 MSEK</td><td>4 MSEK</td></tr>
+</table>
+<h2>4. Konkurrenter</h2>
+<table>
+<tr><th>Aktör</th><th>Typ</th><th>Prissignal (2026, research)</th></tr>
+<tr><td>Google dorks manuellt</td><td>Substitut</td><td>Gratis</td></tr>
+<tr><td>SpiderFoot HX</td><td>OSINT SaaS</td><td>Free → ~$79/mo Freelancer → ~$249–899/mo</td></tr>
+<tr><td>Recon-ng / Amass / theHarvester / Nuclei / ZAP</td><td>OSS CLI</td><td>Gratis (DIY-drift)</td></tr>
+<tr><td>Maltego</td><td>Grafisk OSINT</td><td>Free → ~$1 000/år Pro</td></tr>
+<tr><td>Shodan</td><td>Exponering</td><td>Free → ~$69/mo</td></tr>
+<tr><td>Detectify / Intruder</td><td>EASM/DAST</td><td>Entry ~$70–149/mo; Enterprise 10k–100k+/år</td></tr>
+<tr><td>Burp Suite Pro / DAST</td><td>AST</td><td>~$475–499/anv/år; DAST 6k–50k/år</td></tr>
+<tr><td>HackerOne / Bugcrowd / Synack</td><td>Bug bounty-plattformar</td><td>1,2k–400k+/år (komplement, ej substitut)</td></tr>
+</table>
+<p><strong>Sweet spot (research 2026-07):</strong> Pro ~$19/mo (~$228/år) mellan OSS-DIY och SpiderFoot/Intruder — outnyttjat segment för <em>auktoriserad defensiv recon + findings management</em>. Detaljer: <a href="research/comps-defensive-2026-07.md" target="_blank"><code>research/comps-defensive-2026-07.md</code></a>.</p>
+<h2>5. Marknad</h2>
+<p>ICP: bug bounty hunters, pentest-konsulter, små org säkerhetsansvariga (auktoriserad self-recon).</p>
+<p><strong>Positionering:</strong> &quot;digital resiliens&quot; / authorized recon — undvik scan/exploit/attack i copy. Koppla CRA/NIS2/DORA defensivt (EU-fonder).</p>
+<h2>6. Budget (Almi-utkast 75 k + större fas)</h2>
+<p>Almi: pentest 30k · user tests 20k · juridik 15k · market 10k.</p>
+<p>Nästa fas 900 k: eng, infra, compliance, sales.</p>
+<p><strong>Billing-norm (research):</strong> Stripe Checkout + Billing; årsvis default (−20%); 14-dagars Pro-trial; Free = search-cap, inte feature-cap.</p>
+<h2>7–8</h2>
+<p>Stabilisera Pro billing → 10 beta hunters → security audit → B2B education packs.</p>
+<p>Legal: domain-verification innan target; ToS kräver auktorisation.</p>
+<h3>Finansiering</h3>
+<p>Almi verifiering 75k (utkast) + Innovationslån som skalsteg; Internetstiftelsen / ISOC Common Good Cyber (defensiv framing); DIGITAL Europe UPTAKE/CYBERAI (nästa omgång, UNVERIFIED); Vinnova; EIC senare.</p>
+<h3>Next</h3>
+<p>Omforma <code>05_RECON_*</code> + <code>ANSOKAN-ALMI-2026.md</code>; ta bort offensivt språk överallt.</p></div>
+      </div>
+    </section>
+
+    <section id="funding">
+      <h2>Finansieringsplan (från funding-plan.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="funding"><h1>Recon Search Assistant — Finansieringsplan</h1>
+<p><strong>Sökande:</strong> TWISTEDSTACKS AB · COMPLETE · 2026-07-25 · <strong>ej Hyper</strong></p>
+<p><strong>Framing:</strong> endast defensiv/auktoriserad. Deadlines <strong>VERIFY LIVE</strong>.</p>
+<table>
+<tr><th>#</th><th>Källa</th><th>Max</th><th>Deadline</th><th>Ver</th><th>Fit</th><th>Vinkel</th></tr>
+<tr><td>1</td><td>Almi verifieringsmedel</td><td>~75 000</td><td>löpande</td><td>VERIFIED:2026-07-25</td><td>5</td><td>10 jägare + proxy-audit + juridik</td></tr>
+<tr><td>2</td><td>Almi Innovationslån</td><td>300k–5M</td><td>löpande</td><td>UNVERIFIED (comps 2026-07)</td><td>4</td><td>MVP→skalning efter verifiering</td></tr>
+<tr><td>3</td><td>Internetstiftelsen</td><td>varierar</td><td>löpande</td><td>UNVERIFIED (ingen öppen utlysning funnen 2026-07-25)</td><td>5</td><td>Tryggt internet / säkerhetskunskap</td></tr>
+<tr><td>4</td><td>ISOC Foundation Common Good Cyber</td><td>$3.5M+ pool</td><td>2026–2029</td><td>UNVERIFIED</td><td>3</td><td>Globalt; kontakta Internetstiftelsen parallellt</td></tr>
+<tr><td>5</td><td>Vinnova Innovativa Startups</td><td>500 k</td><td>2027-01-12</td><td>VERIFIED:2026-07-25</td><td>4</td><td>SaaS-validering Pro</td></tr>
+<tr><td>6</td><td>DIGITAL Europe UPTAKE (SME cyber)</td><td>€15M call</td><td>nästa 2026–27</td><td>UNVERIFIED</td><td>4</td><td><strong>Defensiv</strong> CRA/NIS2-framing; konsortium</td></tr>
+<tr><td>7</td><td>DIGITAL Europe CYBERAI</td><td>€15M call</td><td>nästa (mars 2026 stängd)</td><td>UNVERIFIED</td><td>3</td><td>AI-driven hotdetektion</td></tr>
+<tr><td>8</td><td>Movexum</td><td>in-kind</td><td>löpande</td><td>VERIFIED:2026-07-25</td><td>3</td><td>Regional</td></tr>
+<tr><td>9</td><td>EIC Accelerator</td><td>≤€2.5M + equity</td><td>fönster t.o.m. 2026-12-17</td><td>UNVERIFIED</td><td>2</td><td>För tidigt; AI+cyber SaaS later</td></tr>
+</table>
+<p><strong>Research:</strong> <a href="research/comps-defensive-2026-07.md" target="_blank"><code>research/comps-defensive-2026-07.md</code></a> — comps, prisgap $19/mo, Stripe-normer, EU-fonder med defensiv framing.</p>
+<p><strong>Omformning:</strong></p>
+<ul>
+<li><code>Recon-Search-Assistant/ANSOKAN-ALMI-2026.md</code></li>
+<li><code>TWISTEDSTACKS_ANSOKNINGAR_2026/01_twistedstacks_utkast/05_RECON_SEARCH_ASSISTANT_RESPONSIBLE_CYBER.md</code></li>
+</ul>
+<p><strong>Draft angle:</strong> &quot;Defensiv, auktoriserad sök- och analysmiljö som hjälper små organisationer och forskare förstå exponering — med AI-stöd och tydliga scope-gränser.&quot;</p>
+<p><strong>Gap kvar:</strong> Stripe Pro live vs planned — bekräfta i dossier innan Innovativa Startups. UPTAKE/CYBERAI deadlines VERIFY LIVE.</p></div>
+      </div>
+    </section>
+
+    <section id="notes">
+      <h2>Gemensamma anteckningar</h2>
+      <div class="card">
+        <div class="editable" data-key="notes" data-placeholder="Anteckningar inför ansökan…" style="min-height:8rem;"></div>
+      </div>
+    </section>
+  </div>
+  <input type="file" id="importFile" accept="application/json,.json" hidden />
+  <script>
+    const STORAGE_KEY = 'ts_project_recon-search-assistant_v1';
+    let saveTimer = null;
+    function collectData() {
+      const data = { slug: 'recon-search-assistant', version: 1, savedAt: new Date().toISOString(), fields: {} };
+      document.querySelectorAll('.editable[data-key]').forEach(el => { data.fields[el.dataset.key] = el.innerHTML; });
+      return data;
+    }
+    function applyData(data) {
+      if (!data?.fields) return;
+      document.querySelectorAll('.editable[data-key]').forEach(el => {
+        if (data.fields[el.dataset.key] !== undefined) el.innerHTML = data.fields[el.dataset.key];
+      });
+    }
+    function saveNow() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(collectData()));
+      document.getElementById('saveStatus').textContent = 'Sparat ' + new Date().toLocaleString('sv-SE');
+    }
+    function scheduleSave() { clearTimeout(saveTimer); document.getElementById('saveStatus').textContent = 'Sparar…'; saveTimer = setTimeout(saveNow, 800); }
+    function exportJson() {
+      saveNow();
+      const blob = new Blob([JSON.stringify(collectData(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'recon-search-assistant-workbook-' + new Date().toISOString().slice(0,10) + '.json';
+      a.click(); URL.revokeObjectURL(a.href);
+    }
+    function importJson() { document.getElementById('importFile').click(); }
+    document.getElementById('importFile').addEventListener('change', e => {
+      const f = e.target.files[0]; if (!f) return;
+      const r = new FileReader();
+      r.onload = () => { try { applyData(JSON.parse(r.result)); saveNow(); alert('Importerat!'); } catch { alert('Ogiltig JSON'); } };
+      r.readAsText(f); e.target.value = '';
+    });
+    document.querySelectorAll('.editable[data-key]').forEach(el => el.addEventListener('input', scheduleSave));
+    try { const s = localStorage.getItem(STORAGE_KEY); if (s) { applyData(JSON.parse(s)); } } catch {}
+  </script>
+
+<div id="funding-toolbar" style="position:fixed;bottom:12px;right:12px;z-index:9999;display:flex;gap:8px;font-family:system-ui,sans-serif;font-size:13px;">
+  <a href="/api/funding/doc?file=index.html" style="background:#1a222d;color:#38bdf8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Alla projekt</a>
+  <a href="/funding" style="background:#1a222d;color:#94a3b8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Inlogg</a>
+  <button type="button" onclick="logoutFunding()" style="background:#1a222d;color:#fb7185;border:1px solid #334155;padding:6px 12px;border-radius:8px;cursor:pointer;">Logga ut</button>
+</div>
+<script>
+async function logoutFunding() {
+  await fetch('/api/funding/auth', { method: 'DELETE', credentials: 'include' });
+  location.href = '/funding';
+}
+</script>
+</body>
+</html>

@@ -11,6 +11,7 @@ Playable Vite/React/Three.js front door for [twistedstacks.com](https://twisteds
 | Info-only project page | [twistedstacks.com/laga.html](https://www.twistedstacks.com/laga.html) | `public/laga.html` on the main showroom site |
 | Runnable demo/app | [anslag.twistedstacks.com](https://anslag.twistedstacks.com) | Separate Vercel project: [wawawee/AnslagSITK](https://github.com/wawawee/AnslagSITK) |
 | Client site | [silversmeden.twistedstacks.com](https://silversmeden.twistedstacks.com) | Separate Vercel project |
+| **Funding workbooks** (team only) | [twistedstacks.com/funding](https://www.twistedstacks.com/funding) | `funding-workbooks/` + `/api/funding/*` — Per, Joachim, Tony |
 
 DNS notes: [docs/namecheap-dns.md](./docs/namecheap-dns.md)
 
@@ -114,6 +115,25 @@ See [docs/suparays-local-dev.md](./docs/suparays-local-dev.md). Plain `npm run d
 Password-protected trading colab: wiki, team chat, and TRADE workspace (paper only).
 
 Local full stack: `npm run dev:ate` → http://localhost:3010/ate (`predev:ate` syncs wiki before start; use `npm run dev:ate:fresh` for an explicit re-sync).
+
+## Funding workbooks (`/funding`)
+
+Password-protected dossierer & finansieringsplaner (editable HTML). Sources live in `~/Documents/BIZ/00-MASTER/`; synced into `funding-workbooks/` via `npm run sync:funding`.
+
+| URL | Purpose |
+| --- | --- |
+| [twistedstacks.com/funding](https://www.twistedstacks.com/funding) | Login — **Per, Joachim, Tony** |
+
+Vercel env:
+
+```bash
+FUNDING_ROOM_PASSWORD=...   # team shared password (change from default!)
+# FUNDING_ROOM_SECRET=...   # optional HMAC override
+```
+
+Local: `npm run dev:funding` → http://localhost:3015/funding (default password `funding123`).
+
+HTML is served only through `/api/funding/doc?file=…` after session cookie — not public static files.
 
 ## Deploy (Vercel)
 

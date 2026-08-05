@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TwistedStacks — Finansierings- & investeringsarbetsbok</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a222d;
+      --surface2: #243040;
+      --border: #334155;
+      --text: #e8edf4;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent2: #a78bfa;
+      --investor: #34d399;
+      --grant: #fbbf24;
+      --warn: #fb7185;
+      --radius: 12px;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: 100vh;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 1.25rem 1rem 2rem;
+    }
+
+    nav h1 {
+      font-size: 1rem;
+      margin: 0 0 .25rem;
+      line-height: 1.3;
+    }
+
+    nav .sub {
+      font-size: .78rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    nav a {
+      display: block;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .88rem;
+      padding: .45rem .65rem;
+      border-radius: 8px;
+      margin-bottom: 2px;
+    }
+
+    nav a:hover, nav a.active { background: var(--surface2); color: var(--text); }
+
+    nav .group {
+      font-size: .7rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      margin: 1rem 0 .35rem .65rem;
+    }
+
+    main {
+      padding: 1.5rem 2rem 4rem;
+      max-width: 980px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin-bottom: 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: linear-gradient(var(--bg) 70%, transparent);
+      padding: .75rem 0 1rem;
+    }
+
+    button, .btn {
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      border-radius: 8px;
+      padding: .5rem .85rem;
+      font-size: .85rem;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    button:hover { border-color: var(--accent); color: var(--accent); }
+    button.primary { background: #0ea5e9; border-color: #0ea5e9; color: #041018; font-weight: 600; }
+    button.primary:hover { background: #38bdf8; }
+
+    .status {
+      margin-left: auto;
+      font-size: .8rem;
+      color: var(--muted);
+      align-self: center;
+    }
+
+    section {
+      margin-bottom: 2.5rem;
+      scroll-margin-top: 4rem;
+    }
+
+    section > h2 {
+      font-size: 1.45rem;
+      margin: 0 0 .5rem;
+      padding-bottom: .5rem;
+      border-bottom: 2px solid var(--surface2);
+    }
+
+    section > .lead {
+      color: var(--muted);
+      margin: 0 0 1.25rem;
+      font-size: .95rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.15rem;
+      margin-bottom: 1rem;
+    }
+
+    .card h3 {
+      margin: 0 0 .5rem;
+      font-size: 1rem;
+    }
+
+    .hint {
+      font-size: .82rem;
+      color: var(--muted);
+      background: var(--surface2);
+      border-left: 3px solid var(--accent);
+      padding: .65rem .85rem;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: .75rem;
+    }
+
+    .hint.investor { border-left-color: var(--investor); }
+    .hint.grant { border-left-color: var(--grant); }
+    .hint.warn { border-left-color: var(--warn); }
+
+    .editable {
+      min-height: 3rem;
+      outline: none;
+      border: 1px dashed transparent;
+      border-radius: 8px;
+      padding: .65rem .75rem;
+      transition: border-color .15s, background .15s;
+    }
+
+    .editable:hover { border-color: #475569; background: rgba(56, 189, 248, .04); }
+    .editable:focus { border-color: var(--accent); background: rgba(56, 189, 248, .07); }
+
+    .editable[data-placeholder]:empty::before {
+      content: attr(data-placeholder);
+      color: #64748b;
+      pointer-events: none;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .88rem;
+      margin: .75rem 0;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: .5rem .6rem;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th { background: var(--surface2); font-weight: 600; }
+
+    td.editable { min-height: 2rem; }
+
+    .tag {
+      display: inline-block;
+      font-size: .72rem;
+      padding: .15rem .45rem;
+      border-radius: 999px;
+      font-weight: 600;
+      margin-right: .35rem;
+    }
+
+    .tag.p0 { background: #7f1d1d; color: #fecaca; }
+    .tag.p1 { background: #78350f; color: #fde68a; }
+    .tag.p2 { background: #1e3a5f; color: #bae6fd; }
+    .tag.inv { background: #064e3b; color: #a7f3d0; }
+    .tag.grt { background: #713f12; color: #fde68a; }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { position: relative; height: auto; }
+      main { padding: 1rem; }
+      .grid2 { grid-template-columns: 1fr; }
+      .status { margin-left: 0; width: 100%; }
+    }
+
+    @media print {
+      nav, .toolbar { display: none !important; }
+      body { background: #fff; color: #111; }
+      .card { break-inside: avoid; border-color: #ccc; }
+      .editable { border: none !important; padding: 0; }
+      .hint { background: #f5f5f5; color: #333; }
+    }
+
+    .collab-steps {
+      counter-reset: step;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .collab-steps li {
+      counter-increment: step;
+      padding: .65rem 0 .65rem 2.5rem;
+      position: relative;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .collab-steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: .65rem;
+      width: 1.6rem;
+      height: 1.6rem;
+      background: var(--accent2);
+      color: #120a1f;
+      border-radius: 50%;
+      font-size: .75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    code, .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: .85em;
+      background: var(--surface2);
+      padding: .1rem .35rem;
+      border-radius: 4px;
+    }
+
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <nav>
+      <h1>TwistedStacks</h1>
+      <div class="sub">Finansierings- & investeringsarbetsbok · redigerbar</div>
+
+      <div class="group">Start</div>
+      <a href="#start">Så samarbetar vi</a>
+      <a href="#overview">Översikt</a>
+
+      <div class="group">Pitch & vinkel</div>
+      <a href="#investors">Investerare</a>
+      <a href="#grants">Bidrag & stöd</a>
+      <a href="#compare">Jämförelse</a>
+
+      <div class="group">Innehåll</div>
+      <a href="#profile">Bolagsprofil</a>
+      <a href="#portfolio">Portfölj</a>
+      <a href="#funding-list">Finansieringslista</a>
+      <a href="#blockers">Blockers</a>
+
+      <div class="group">Verktyg</div>
+      <a href="#anslagsitk">AnslagSITK</a>
+      <a href="#notes">Gemensamma anteckningar</a>
+      <a href="#checklist">Checklista</a>
+    </nav>
+
+    <main>
+      <div class="toolbar">
+        <button class="primary" type="button" onclick="saveNow()">💾 Spara lokalt</button>
+        <button type="button" onclick="exportJson()">⬇ Exportera fil</button>
+        <button type="button" onclick="importJson()">⬆ Importera fil</button>
+        <button type="button" onclick="window.print()">🖨 Skriv ut / PDF</button>
+        <button type="button" onclick="resetDefaults()">↺ Återställ mall</button>
+        <span class="status" id="saveStatus">Autosparar i webbläsaren</span>
+      </div>
+
+      <!-- START -->
+      <section id="start">
+        <h2>Så samarbetar vi (ingen tech-kunskap krävs)</h2>
+        <p class="lead">Dubbelklicka denna fil i webbläsaren. Allt med streckad ram går att redigera — klicka och skriv som i Word.</p>
+        <div class="card">
+          <ol class="collab-steps">
+            <li><strong>Per</strong> fyller i fakta och siffror. <strong>Du</strong> skärper språk, berättelse och vad som ska framhävas.</li>
+            <li>Klicka <strong>Spara lokalt</strong> — eller vänta, den sparar automatiskt efter några sekunder.</li>
+            <li>För att dela med varandra: klicka <strong>Exportera fil</strong> → skicka JSON-filen (t.ex. i Messenger/mail) → den andra klickar <strong>Importera fil</strong>.</li>
+            <li>Innan ansökan skickas: gå igenom <a href="#checklist">checklistan</a> och verifiera deadlines på officiella sidor.</li>
+            <li>Live discovery av utlysningar: <a href="https://anslag.twistedstacks.com" target="_blank">anslag.twistedstacks.com</a> (AnslagSITK).</li>
+          </ol>
+        </div>
+        <div class="hint warn">
+          <strong>Blocker just nu:</strong> TWISTEDSTACKS AB verkar inte registrerat än (2026-07-25). Många bidrag kräver AB — se avsnitt Blockers. Sök som <strong>Per Brinell</strong> endast där utlysningen tillåter privatperson.
+        </div>
+      </section>
+
+      <!-- OVERVIEW -->
+      <section id="overview">
+        <h2>Översikt — vad är TwistedStacks?</h2>
+        <p class="lead">En mening + elevator pitch. Redigera fritt.</p>
+
+        <div class="card">
+          <h3>En mening</h3>
+          <div class="editable" data-key="overview_one_liner" data-placeholder="Skriv en mening här…">TwistedStacks är en AI-driven produktstudio i Sandviken/Gävleborg som bygger flera vertikala B2B-verktyg (skatt, juridik, AR/tillgänglighet, fintech) på gemensam teknisk plattform — och finansierar dem med icke-utspädande kapital per produkt.</div>
+        </div>
+
+        <div class="card">
+          <h3>Elevator pitch (30 sek)</h3>
+          <div class="editable" data-key="overview_pitch" data-placeholder="30-sekunders pitch…">Vi löser att svenska SME och rådgivare drunknar i regelverk och fragmenterad data. TwistedStacks bygger specialiserad mjukvara med spårbar AI och människa-i-loopen — först SkatteRevision i drift, plus LAGA, SUPARAYS och fler. Showroom och kod finns live. Strategin: en delad plattform, separata ansökningar per vertikal, regional förankring via Movexum/Gävleborg, skala till Vinnova och selektivt investerarkapital när en produkt bevisat betalningsvilja.</div>
+        </div>
+
+        <div class="card">
+          <h3>Studio-tesen (ekonomi)</h3>
+          <div class="editable" data-key="overview_thesis" data-placeholder="Varför portfölj + plattform…">Kostnaden för att bygga (backend, brand, showroom, grant-mallar) är i stort sett fix — marginalkostnaden för produkt nr 2–4 är låg. Varje produkt kan söka egna Vinnova/Almi/Regionala medel. Det ger runway utan tidig utspädning — om vi håller fokus och inte sprider oss för tunt.</div>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <h3>Kontakt & plats</h3>
+            <div class="editable" data-key="overview_contact" data-placeholder="Kontaktuppgifter…">TWISTEDSTACKS AB (under bildande) · Sandviken, Gävleborg<br>Per Brinell · +46 76 0606 934 · dev@twistedstacks.com<br>Showroom: twistedstacks.com</div>
+          </div>
+          <div class="card">
+            <h3>Prioritet nu (Q3–Q4 2026)</h3>
+            <div class="editable" data-key="overview_priority" data-placeholder="Vad gör vi först…">1) Registrera/bekräfta AB · 2) Movexum Boost Chamber (SkatteRevision, start 2026-09-08) · 3) Almi verifiering · 4) Vinnova Innovativa Startups (öppnar 2026-10-12) · 5) Parallellt: SUPARAYS regionalt + CymWave Test&Demo-deadline 2026-09-08</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- INVESTORS -->
+      <section id="investors">
+        <h2>Investerare — vad ska framhävas?</h2>
+        <p class="lead">Fokus: avkastning, skalbarhet, team, defensibilitet, tydlig go-to-market. Undvik grant-språk ("vi söker bidrag för att…").</p>
+
+        <div class="hint investor"><strong>Investerare bryr sig om:</strong> marknad, traction, unit economics, moat, cap table, varför NU, exit/logik — inte vilka myndigheter ni kan söka.</div>
+
+        <div class="card">
+          <h3>Kärnbudskap till investerare</h3>
+          <div class="editable" data-key="inv_core" data-placeholder="3–5 punkter…"><ul>
+<li><strong>Portfolio studio med live bevis:</strong> twistedstacks.com + produkter i repo, inte bara slides.</li>
+<li><strong>Plattformseffekt:</strong> delad infra sänker burn ~30–40% vs fyra separata startups (modell — ange antaganden).</li>
+<li><strong>Första intäkts-/pilotspår:</strong> SkatteRevision mot rådgivare (fast pris, decision-support — inte skatterådgivning).</li>
+<li><strong>Deeptech-optioner:</strong> SUPARAYS (multi-sensor AR, tillgänglighet), ATE (agentic trading infra — paper-only ärlighet).</li>
+<li><strong>Clean cap table:</strong> non-dilutive stack först; priced round när en vertikal visar betalningsvilja.</li>
+</ul></div>
+        </div>
+
+        <div class="card">
+          <h3>Metrics & bevis (fyll i / uppdatera)</h3>
+          <div class="editable" data-key="inv_metrics" data-placeholder="Siffror investerare vill se…"><table>
+<tr><th>Metric</th><th>Status / värde</th><th>Kommentar</th></tr>
+<tr><td>Live produkter</td><td>Showroom + SkatteRevision motor</td><td>Länka demo</td></tr>
+<tr><td>MRR / piloter</td><td>TBD — fyll i</td><td>Ärlighet viktigare än hype</td></tr>
+<tr><td>Team</td><td>Per Brinell + nätverk</td><td>Regional + remote augment</td></tr>
+<tr><td>Ask (om relevant)</td><td>TBD SEK / användning</td><td>Koppla till 18–24 mån milestone</td></tr>
+<tr><td>Comparable / moat</td><td>Öppen myndighetsdata + domän + HITL</td><td>Jämför med generiska legal AI</td></tr>
+</table></div>
+        </div>
+
+        <div class="card">
+          <h3>Investerartyper & vinkel</h3>
+          <div class="editable" data-key="inv_types" data-placeholder="Angel, VC, corporate…"><table>
+<tr><th>Typ</th><th>Passar oss?</th><th>Vinkel</th></tr>
+<tr><td>Angel / syndikat</td><td>Ja, tidigt</td><td>Regional deeptech + B2B SaaS, bevisbar kod</td></tr>
+<tr><td>Propel / Sting</td><td>Medel (4/5)</td><td>AI + samhällsnytta; kräver Stockholm-närvaro delvis</td></tr>
+<tr><td>EIC Fund (EU)</td><td>Senare (TRL 5–8)</td><td>Välj EN mogen vertikal (legal eller trading)</td></tr>
+<tr><td>Strateg (bank/redovisning)</td><td>SkatteRevision</td><td>Decision-support, compliance-säker positionering</td></tr>
+<tr><td>Impact / accessibility</td><td>SUPARAYS</td><td>HRF/Arvsfonden-spår separat från VC-pitch</td></tr>
+</table></div>
+        </div>
+
+        <div class="card">
+          <h3>Investerare — undvik / röda flaggor</h3>
+          <div class="editable" data-key="inv_avoid" data-placeholder="Vad vi INTE ska säga…"><ul>
+<li>Success-fee / procent av skatteåterbäring (SkatteRevision) — revisoroberoende</li>
+<li>"Vi är en plattform utan produkt" — visa alltid en pilotvertikal</li>
+<li>Overclaim medicinsk effekt (CymWave) eller skatterådgivning</li>
+<li>Trading live utan licens — ATE är paper/research tills annat bevisas</li>
+</ul></div>
+        </div>
+      </section>
+
+      <!-- GRANTS -->
+      <section id="grants">
+        <h2>Bidrag & offentligt stöd — vad ska framhävas?</h2>
+        <p class="lead">Fokus: innovation, samhällsnytta, regional nytta, SME-digitalisering, verifierbar metod, budget i detalj.</p>
+
+        <div class="hint grant"><strong>Grant-givare bryr sig om:</strong> tydligt problem, innovationshöjd, genomförbarhet, budgetpost för post, spridning, hållbarhet — inte exit-multipel.</div>
+
+        <div class="card">
+          <h3>Kärnbudskap till bidragsgivare</h3>
+          <div class="editable" data-key="grant_core" data-placeholder="3–5 punkter…"><ul>
+<li><strong>Regional förankring Gävleborg:</strong> Sandviken, Movexum, SME-digitalisering.</li>
+<li><strong>Öppen data & myndighetsintegration:</strong> SCB, Bolagsverket, rättskällor — spårbar AI.</li>
+<li><strong>En vertikal per ansökan:</strong> t.ex. SkatteRevision ELLER LAGA — plattform som "underliggande infrastruktur".</li>
+<li><strong>Samhällsnytta:</strong> rätt skatt betald, tillgänglighet (SUPARAYS), defensiv cybersäkerhet (Recon).</li>
+<li><strong>Genomförbarhet:</strong> TRL, pilotpartners, tidsplan 9–24 mån, redovisningsbar budget.</li>
+</ul></div>
+        </div>
+
+        <div class="card">
+          <h3>Sökande — hårda regler</h3>
+          <div class="editable" data-key="grant_entity_rules" data-placeholder="Vem söker som vem…"><table>
+<tr><th>Stödtyp</th><th>Sökande</th><th>Exempel</th></tr>
+<tr><td>Vinnova, Almi företag, Region företag, EU SME</td><td><strong>TWISTEDSTACKS AB</strong></td><td>Innovativa Startups, verifiering</td></tr>
+<tr><td>Personstipendium, vissa stiftelser</td><td><strong>Per Brinell</strong></td><td>Privata fonder, kultur/studie</td></tr>
+<tr><td>Under bildande</td><td>Endast om utlysning tillåter</td><td>Skriv tydligt "AB under bildande"</td></tr>
+</table>
+<strong>Aldrig blanda:</strong> sök inte Vinnova IS som privatperson.</div>
+        </div>
+
+        <div class="card">
+          <h3>Rankad topplista (redigera / lägg till)</h3>
+          <div class="editable" data-key="grant_toplist" data-placeholder="Finansieringskällor…"><table>
+<tr><th>#</th><th>Källa</th><th>Belopp</th><th>Deadline</th><th>Fit</th><th>Vertikal / vinkel</th></tr>
+<tr><td>1</td><td>Movexum Inkubator + GSAI</td><td>Program + kopplade stöd</td><td>Löpande</td><td>5/5</td><td>Plattformsbolag, regional AI-studio</td></tr>
+<tr><td>2</td><td>Almi Verifiering</td><td>upp till 100k</td><td>Löpande 2026</td><td>4/5</td><td>En vertikal i taget</td></tr>
+<tr><td>3</td><td>Vinnova Innovativa Startups</td><td>500k</td><td>Öppnar 2026-10-12 → stänger 2027-01-12</td><td>5/5</td><td>Plattform + pilot (legal/skatt)</td></tr>
+<tr><td>4</td><td>Vinnova Test & Demo</td><td>varierar</td><td><strong>2026-09-08</strong></td><td>4/5</td><td>CymWave — kräver extern testmiljö</td></tr>
+<tr><td>5</td><td>Region Gävleborg ERUF</td><td>TBD</td><td>2026-09-22 (VERIFY)</td><td>3/5</td><td>SkatteRevision efter AB</td></tr>
+<tr><td>6</td><td>Sting + Propel</td><td>300k + 600k</td><td>2026 TBC</td><td>4/5</td><td>Deeptech/AI — Stockholm</td></tr>
+<tr><td>7</td><td>AI Sweden Connect</td><td>Nätverk</td><td>Löpande</td><td>4/5</td><td>Plattform + AI-kärnverksamhet</td></tr>
+<tr><td>8</td><td>Internetstiftelsen / NLnet</td><td>varierar</td><td>Utlysningsspecifik</td><td>3/5</td><td>SPACEinSPACE, Recon, OSS</td></tr>
+</table></div>
+        </div>
+      </section>
+
+      <!-- COMPARE -->
+      <section id="compare">
+        <h2>Jämförelse — samma bolag, olika publik</h2>
+        <p class="lead">Använd denna tabell när ni skriver om samma projekt till olika mottagare.</p>
+        <div class="card">
+          <div class="editable" data-key="compare_table" data-placeholder="Jämförelsetabell…"><table>
+<tr><th>Aspekt</th><th><span class="tag inv">Investerare</span></th><th><span class="tag grt">Bidrag / stöd</span></th></tr>
+<tr><td>Problem</td><td>Stor marknad, betalningsvilja, pain i SEK</td><td>Samhälls-/regional nytta, SME, digitalisering</td></tr>
+<tr><td>Lösning</td><td>Skalbar SaaS, moat, retention</td><td>Innovationshöjd, metod, TRL, pilot</td></tr>
+<tr><td>Team</td><td>Execution, domän, tidigare exits</td><td>Kompetens för projektplan + rapportering</td></tr>
+<tr><td>Ekonomi</td><td>Unit economics, runway, ask</td><td>Budget per post, medfinansiering, de minimis</td></tr>
+<tr><td>Risk</td><td>Marknad, konkurrens, fokus</td><td>Genomförbarhet, etik, compliance</td></tr>
+<tr><td>Framtid</td><td>Skalning, serie A, exit</td><td>Spridning, hållbarhet, öppen data</td></tr>
+</table></div>
+        </div>
+      </section>
+
+      <!-- PROFILE -->
+      <section id="profile">
+        <h2>Bolagsprofil (AnslagSITK-mall: twistedstacks)</h2>
+        <p class="lead">Denna text matas in i AnslagSITK vid ansökningsskrivning. Synka med vänner här först.</p>
+        <div class="card">
+          <h3>Beskrivning</h3>
+          <div class="editable" data-key="profile_desc" data-placeholder="Bolagsbeskrivning…">TwistedStacks är en AI-driven produktstudio som utvecklar specialiserad mjukvara för små och medelstora företag, rådgivare och regional utveckling. Vi bygger en portfölj av vertikala verktyg på gemensam teknisk grund — öppen myndighetsdata, spårbar AI-analys och människa-i-loopen. Första produkten i drift är SkatteRevision. Övriga projekt: AnslagSITK, LAGA, EnergiRevision, SUPARAYS/VR-SuperPowers, ATE, m.fl. Verksamhet i Gävleborg; TWISTEDSTACKS AB under bildande.</div>
+        </div>
+        <div class="card">
+          <h3>Fokusområden</h3>
+          <div class="editable" data-key="profile_focus" data-placeholder="Lista fokus…">AI-driven mjukvara · SME-digitalisering · Skatte-/redovisningstech · Legaltech · Energi/klimat · Regional utveckling · Öppen data · Deeptech/AR/IoT · Agentic AI med HITL · Tillgänglighet</div>
+        </div>
+        <div class="card">
+          <h3>Styrkor</h3>
+          <div class="editable" data-key="profile_strengths" data-placeholder="Styrkor…">Portfölj på gemensam agentplattform · Domänkunskap skatt/juridik/finans · iXBRL/SCB/Bolagsverket · Multi-agent-arkitektur · Lokal AI-infra · Multi-sensor AR · Live showroom · Snabb prototyp→prod · B2B mot rådgivare</div>
+        </div>
+        <div class="card">
+          <h3>Partnerskap (nu + mål)</h3>
+          <div class="editable" data-key="profile_partners" data-placeholder="Partners…">Sandvikens IT-Kår · Redovisnings-/skattekonsulter (pilot) · Movexum (Boost Chamber 2026-09-08, Inkubator, GSAI) · Högskolan i Gävle SPARK · HRF (accessibility/SUPARAYS)</div>
+        </div>
+      </section>
+
+      <!-- PORTFOLIO -->
+      <section id="portfolio">
+        <h2>Portfölj — per projekt</h2>
+        <p class="lead">En rad per produkt: problem, status, sökande, bästa finansieringsvinkel. Detaljer i BIZ: <code>projects/&lt;slug&gt;/dossier.md</code></p>
+
+        <div class="card">
+          <div class="editable" data-key="portfolio_table" data-placeholder="Projekt…"><table>
+<tr><th>Projekt</th><th>Prio</th><th>Status</th><th>Sökande</th><th>Investerarvinkel</th><th>Bidragvinkel</th></tr>
+<tr><td><strong>TwistedStacks site</strong></td><td><span class="tag p0">P0</span></td><td>Live showroom</td><td>AB</td><td>Venture studio, platform infra</td><td>Regional AI-lab, digitalisering</td></tr>
+<tr><td><strong>SkatteRevision</strong></td><td><span class="tag p2">P2</span></td><td>Produktiv motor</td><td>AB</td><td>B2B SaaS, rådgivare, fast pris</td><td>SME skatt, öppen data, Movexum</td></tr>
+<tr><td><strong>LAGA</strong></td><td><span class="tag p2">P2</span></td><td>Legal AI, TRL 6–7</td><td>AB</td><td>Legaltech moat, RAG+tal</td><td>Vinnova IS legal innovation</td></tr>
+<tr><td><strong>SUPARAYS / VR-SuperPowers</strong></td><td><span class="tag p0">P0</span></td><td>iOS AR live</td><td>AB</td><td>Deeptech AR, accessibility</td><td>Regional + Energimyndigheten</td></tr>
+<tr><td><strong>ATE</strong></td><td><span class="tag p0">P0</span></td><td>Paper-only</td><td>AB</td><td>Agentic fintech infra</td><td>AI Sweden, ej overclaim live</td></tr>
+<tr><td><strong>CymWave</strong></td><td><span class="tag p1">P1</span></td><td>Early concept</td><td>AB</td><td>Wellness hardware</td><td>Test&Demo 2026-09-08</td></tr>
+<tr><td><strong>DROPHELP</strong></td><td><span class="tag p1">P1</span></td><td>Phase 0 E2E</td><td>AB</td><td>Social AI wiki</td><td>Ideell omsorg, Gävleborg</td></tr>
+<tr><td><strong>Recon</strong></td><td><span class="tag p1">P1</span></td><td>Beta v2</td><td>AB</td><td>Defensiv cyber SaaS</td><td>Internetstiftelsen, Almi</td></tr>
+<tr><td><strong>SPACEinSPACE</strong></td><td><span class="tag p2">P2</span></td><td>OSS stack</td><td>AB/Per</td><td>Multi-agent substrate</td><td>NLnet, forskning</td></tr>
+<tr><td><strong>GameDev MCP Hub</strong></td><td><span class="tag p2">P2 lab</span></td><td>Lab</td><td>AB</td><td>Creative tools</td><td>Idé-funding, hold sälj</td></tr>
+</table></div>
+        </div>
+
+        <div class="card">
+          <h3>Projekt vi skriver om just nu (fritext)</h3>
+          <div class="editable" data-key="portfolio_focus_now" data-placeholder="Vilka 1–2 projekt är i fokus för nästa ansökan…">Primärt: SkatteRevision + bolagsregistrering. Sekundärt: Movexum Boost Chamber-paket. Parallellt förbereda Vinnova IS för LAGA eller plattform+pilot.</div>
+        </div>
+      </section>
+
+      <!-- FUNDING LIST editable rows -->
+      <section id="funding-list">
+        <h2>Finansieringslista — nästa steg</h2>
+        <p class="lead">Er egen action-lista. Uppdatera fit, deadline och vem som gör vad.</p>
+        <div class="card">
+          <div class="editable" data-key="funding_actions" data-placeholder="Actionlista…"><table>
+<tr><th>#</th><th>Handling</th><th>Ansvarig</th><th>Deadline</th><th>Status</th></tr>
+<tr><td>1</td><td>Bekräfta/registrera TWISTEDSTACKS AB</td><td>Per</td><td>ASAP</td><td>⬜ Blocker</td></tr>
+<tr><td>2</td><td>Ansök Movexum Boost Chamber (SkatteRevision)</td><td>Per + vän (text)</td><td>Före 2026-09-08</td><td>⬜</td></tr>
+<tr><td>3</td><td>Almi verifiering — välj vertikal</td><td>Per</td><td>Löpande</td><td>⬜</td></tr>
+<tr><td>4</td><td>Reconciliera SkatteRevision KONCEPT (ej success-fee)</td><td>Per</td><td>Före grant</td><td>⬜ Blocker</td></tr>
+<tr><td>5</td><td>Vinnova IS utkast (LAGA eller SkatteRevision)</td><td>Per + vän</td><td>Efter 2026-10-12</td><td>⬜</td></tr>
+<tr><td>6</td><td>CymWave Test&Demo — extern testmiljö?</td><td>Per</td><td>2026-09-08</td><td>⬜</td></tr>
+</table></div>
+        </div>
+      </section>
+
+      <!-- BLOCKERS -->
+      <section id="blockers">
+        <h2>Blockers — stoppa inte här</h2>
+        <p class="lead">Fixa dessa innan någon ansökan skickas. Redigera status när klart.</p>
+        <div class="card">
+          <div class="editable" data-key="blockers_list" data-placeholder="Blockers…"><ul>
+<li><strong>AB ej registrerat</strong> — "TWISTEDSTACKS AB" hittades inte i register 2026-07-25. Påverkar alla företagsbidrag.</li>
+<li><strong>SkatteRevision KONCEPT.md</strong> — success-fee kvarstår i docs; strider mot revisoroberoende. Använd fixed-price decision-support i ansökningar.</li>
+<li><strong>Deadlines VERIFY LIVE</strong> — alltid dubbelkolla på vinnova.se, region.se, almi.se innan submit.</li>
+<li><strong>Almi privat ~25k</strong> — kan sökas som Per Brinell tills AB finns (aktiekapital).</li>
+</ul></div>
+        </div>
+      </section>
+
+      <!-- ANSLAGSITK -->
+      <section id="anslagsitk">
+        <h2>AnslagSITK — verktyget bakom arbetet</h2>
+        <p class="lead">React-app + API idag — denna HTML-fil är för mänskligt samarbete. AnslagSITK för live-sökning och AI-utkast.</p>
+
+        <div class="grid2">
+          <div class="card">
+            <h3>Länkar</h3>
+            <ul style="margin:0;padding-left:1.2rem;font-size:.9rem;">
+              <li>Live: <a href="https://anslag.twistedstacks.com" target="_blank">anslag.twistedstacks.com</a></li>
+              <li>GitHub: <a href="https://github.com/wawawee/AnslagSITK" target="_blank">wawawee/AnslagSITK</a></li>
+              <li>Aktiv dev: <code>~/TwistedStacks/AnslagSITK</code></li>
+              <li>BIZ OS: <code>~/Documents/BIZ/00-MASTER/</code></li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Vad det gör</h3>
+            <ul style="margin:0;padding-left:1.2rem;font-size:.9rem;">
+              <li><strong>Discovery</strong> — hitta utlysningar (Exa + officiella källor)</li>
+              <li><strong>Ansökningsskrivning</strong> — org-profil + projekt → utkast</li>
+              <li><strong>Snapshots</strong> — spara grant-listor</li>
+              <li><strong>Stiftelseregister</strong> — lokal cache (~8000 stiftelser)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>API:er & datakällor (teknisk översikt)</h3>
+          <div class="editable" data-key="anslagsitk_apis" data-placeholder="API-lista…"><table>
+<tr><th>Källa</th><th>Env / setup</th><th>Användning</th></tr>
+<tr><td><strong>OpenRouter</strong></td><td>OPENROUTER_API_KEY</td><td>LLM för discovery + ansökningar</td></tr>
+<tr><td><strong>Exa</strong></td><td>EXA_API_KEY</td><td>Live webbsökning (Tillväxtverket, EU, Almi…)</td></tr>
+<tr><td><strong>GDP Hub</strong></td><td>GDP_API_KEY_VINNOVA m.fl.</td><td>Vinnova, Formas, Forte, VR utlysningar</td></tr>
+<tr><td><strong>Swecris</strong></td><td>SWECRIS_API_KEY</td><td>Historiska projekt → rätt finansiär</td></tr>
+<tr><td><strong>Stiftelseregister</strong></td><td>npm run sync:stiftelser</td><td>Lokal JSON-cache, sök ändamål</td></tr>
+<tr><td><strong>Qdrant</strong> (valfritt)</td><td>QDRANT_URL</td><td>Agentminne — ej krav för grants</td></tr>
+</table>
+<p><strong>Sökläge:</strong> quick (snabb) · standard · broad (fler källor + stiftelser)</p>
+<p><strong>Profil-mall:</strong> <code>twistedstacks</code> i <code>src/data/profilePresets.ts</code> — synka med avsnitt Bolagsprofil ovan.</p></div>
+        </div>
+
+        <div class="hint">Workflow: 1) Redigera story här i HTML → 2) Kopiera bolagsprofil till AnslagSITK → 3) Kör discovery → 4) Generera utkast → 5) Finpolish här eller i Word → 6) Checklista → submit.</div>
+      </section>
+
+      <!-- NOTES -->
+      <section id="notes">
+        <h2>Gemensamma anteckningar</h2>
+        <p class="lead">Fri yta för er att diskutera formuleringar, frågor till handläggare, eller versioner av intro-text.</p>
+        <div class="card">
+          <div class="editable" data-key="collab_notes" data-placeholder="Skriv anteckningar här…" style="min-height:12rem;"></div>
+        </div>
+        <div class="card">
+          <h3>Version / vem gjorde vad</h3>
+          <div class="editable" data-key="collab_changelog" data-placeholder="t.ex. 2026-08-05 — Anna skärpte investerar-pitch…"><ul>
+<li>2026-08-05 — Första version av arbetsboken skapad från BIZ + AnslagSITK-profil</li>
+</ul></div>
+        </div>
+      </section>
+
+      <!-- CHECKLIST -->
+      <section id="checklist">
+        <h2>Checklista innan inlämning</h2>
+        <p class="lead">Bocka av mentalt — eller skriv ✅ i tabellen nedan.</p>
+        <div class="card">
+          <div class="editable" data-key="checklist" data-placeholder="Checklista…"><table>
+<tr><th>☐</th><th>Punkt</th><th>Klar?</th></tr>
+<tr><td>☐</td><td>Deadline & maxbelopp verifierade på officiell webb</td><td></td></tr>
+<tr><td>☐</td><td>Rätt sökande (AB vs Per) enligt utlysning</td><td></td></tr>
+<tr><td>☐</td><td>Budget = stödberättigande kostnader (ej fluff)</td><td></td></tr>
+<tr><td>☐</td><td>Inga overclaims vs faktisk kodstatus / TRL</td><td></td></tr>
+<tr><td>☐</td><td>SkatteRevision: ingen success-fee / skatteråd-språk</td><td></td></tr>
+<tr><td>☐</td><td>En tydlig vertikal som huvudprojekt (inte bara "plattform")</td><td></td></tr>
+<tr><td>☐</td><td bilagor, signaturer, org.nr ifyllda</td><td></td></tr>
+<tr><td>☐</td><td>Vän har läst igenom språk & story</td><td></td></tr>
+</table></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <input type="file" id="importFile" accept="application/json,.json" hidden />
+
+  <script>
+    const STORAGE_KEY = 'twistedstacks_funding_workbook_v1';
+    let saveTimer = null;
+
+    function collectData() {
+      const data = { version: 1, savedAt: new Date().toISOString(), fields: {} };
+      document.querySelectorAll('.editable[data-key]').forEach(el => {
+        data.fields[el.dataset.key] = el.innerHTML;
+      });
+      return data;
+    }
+
+    function applyData(data) {
+      if (!data || !data.fields) return;
+      document.querySelectorAll('.editable[data-key]').forEach(el => {
+        const key = el.dataset.key;
+        if (data.fields[key] !== undefined) el.innerHTML = data.fields[key];
+      });
+    }
+
+    function saveNow() {
+      const data = collectData();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      document.getElementById('saveStatus').textContent =
+        'Sparat ' + new Date().toLocaleString('sv-SE');
+    }
+
+    function scheduleSave() {
+      clearTimeout(saveTimer);
+      document.getElementById('saveStatus').textContent = 'Sparar…';
+      saveTimer = setTimeout(saveNow, 800);
+    }
+
+    function exportJson() {
+      saveNow();
+      const data = collectData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'twistedstacks-funding-workbook-' +
+        new Date().toISOString().slice(0, 10) + '.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function importJson() {
+      document.getElementById('importFile').click();
+    }
+
+    function resetDefaults() {
+      if (!confirm('Återställa allt till ursprungsmallen? Lokala ändringar försvinner.')) return;
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
+    }
+
+    document.getElementById('importFile').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          applyData(JSON.parse(reader.result));
+          saveNow();
+          alert('Importerat! Innehållet är sparat lokalt.');
+        } catch (err) {
+          alert('Kunde inte läsa filen. Kontrollera att det är en exporterad JSON.');
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    });
+
+    document.querySelectorAll('.editable[data-key]').forEach(el => {
+      el.addEventListener('input', scheduleSave);
+    });
+
+    // Load saved
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        applyData(JSON.parse(saved));
+        const t = JSON.parse(saved).savedAt;
+        if (t) {
+          document.getElementById('saveStatus').textContent =
+            'Laddat sparad version · ' + new Date(t).toLocaleString('sv-SE');
+        }
+      }
+    } catch (_) {}
+
+    // Nav highlight on scroll
+    const sections = [...document.querySelectorAll('section[id]')];
+    const links = [...document.querySelectorAll('nav a')];
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + entry.target.id));
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach(s => obs.observe(s));
+  </script>
+
+<div id="funding-toolbar" style="position:fixed;bottom:12px;right:12px;z-index:9999;display:flex;gap:8px;font-family:system-ui,sans-serif;font-size:13px;">
+  <a href="/api/funding/doc?file=index.html" style="background:#1a222d;color:#38bdf8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Alla projekt</a>
+  <a href="/funding" style="background:#1a222d;color:#94a3b8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Inlogg</a>
+  <button type="button" onclick="logoutFunding()" style="background:#1a222d;color:#fb7185;border:1px solid #334155;padding:6px 12px;border-radius:8px;cursor:pointer;">Logga ut</button>
+</div>
+<script>
+async function logoutFunding() {
+  await fetch('/api/funding/auth', { method: 'DELETE', credentials: 'include' });
+  location.href = '/funding';
+}
+</script>
+</body>
+</html>

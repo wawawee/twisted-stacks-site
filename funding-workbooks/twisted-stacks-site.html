@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TwistedStacks Site — Projektunderlag</title>
+  <style>
+    :root {
+      --bg: #0f1419; --surface: #1a222d; --surface2: #243040; --border: #334155;
+      --text: #e8edf4; --muted: #94a3b8; --accent: #38bdf8; --investor: #34d399;
+      --grant: #fbbf24; --warn: #fb7185; --radius: 12px;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.55; }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+    .topbar { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; position: sticky; top: 0; z-index: 5;
+      background: linear-gradient(var(--bg) 75%, transparent); padding: .5rem 0 1rem; }
+    button { border: 1px solid var(--border); background: var(--surface2); color: var(--text); border-radius: 8px;
+      padding: .45rem .8rem; font-size: .85rem; cursor: pointer; font-family: inherit; }
+    button:hover { border-color: var(--accent); }
+    button.primary { background: #0ea5e9; border-color: #0ea5e9; color: #041018; font-weight: 600; }
+    .status { margin-left: auto; font-size: .78rem; color: var(--muted); align-self: center; }
+    h1 { font-size: 1.55rem; margin: 0 0 .25rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.25rem; font-size: .82rem; }
+    .badge { background: var(--surface2); border: 1px solid var(--border); padding: .2rem .55rem; border-radius: 999px; }
+    .badge.p0 { border-color: #7f1d1d; color: #fecaca; }
+    .badge.p1 { border-color: #78350f; color: #fde68a; }
+    .badge.p2 { border-color: #1e3a5f; color: #bae6fd; }
+    nav.jump { display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: 1.5rem; }
+    nav.jump a { color: var(--muted); text-decoration: none; font-size: .82rem; padding: .3rem .55rem;
+      border: 1px solid var(--border); border-radius: 8px; }
+    nav.jump a:hover { color: var(--accent); border-color: var(--accent); }
+    section { margin-bottom: 2rem; scroll-margin-top: 5rem; }
+    section > h2 { font-size: 1.2rem; margin: 0 0 .75rem; padding-bottom: .4rem; border-bottom: 2px solid var(--surface2); }
+    .hint { font-size: .82rem; color: var(--muted); background: var(--surface2); border-left: 3px solid var(--accent);
+      padding: .6rem .85rem; border-radius: 0 8px 8px 0; margin-bottom: .75rem; }
+    .hint.inv { border-left-color: var(--investor); }
+    .hint.grt { border-left-color: var(--grant); }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; }
+    .editable { min-height: 2rem; outline: none; border: 1px dashed transparent; border-radius: 8px; padding: .5rem .65rem;
+      transition: border-color .15s, background .15s; }
+    .editable:hover { border-color: #475569; background: rgba(56,189,248,.04); }
+    .editable:focus { border-color: var(--accent); background: rgba(56,189,248,.07); }
+    .editable[data-placeholder]:empty::before { content: attr(data-placeholder); color: #64748b; }
+    .md-content h1,.md-content h2,.md-content h3,.md-content h4 { margin-top: 1rem; }
+    .md-content table { width: 100%; border-collapse: collapse; font-size: .85rem; margin: .75rem 0; }
+    .md-content th,.md-content td { border: 1px solid var(--border); padding: .45rem .55rem; vertical-align: top; }
+    .md-content th { background: var(--surface2); }
+    .md-content blockquote { margin: .5rem 0; padding-left: .75rem; border-left: 3px solid var(--border); color: var(--muted); }
+    .md-content code { font-family: ui-monospace, monospace; font-size: .85em; background: var(--surface2); padding: .1rem .3rem; border-radius: 4px; }
+    .md-content a { color: var(--accent); }
+    .back { font-size: .85rem; margin-bottom: 1rem; }
+    .back a { color: var(--accent); }
+    @media print { .topbar, nav.jump, .back { display: none !important; } body { background: #fff; color: #111; }
+      .card { break-inside: avoid; } .editable { border: none !important; padding: 0; } }
+    @media (max-width: 600px) { .status { margin-left: 0; width: 100%; } }
+  </style>
+</head>
+<body data-slug="twisted-stacks-site">
+  <div class="wrap">
+    <p class="back"><a href="/api/funding/doc?file=index.html">← Alla projekt</a> · <a href="/api/funding/doc?file=studio-workbook.html">Studio-arbetsbok</a></p>
+
+    <h1>TwistedStacks Site</h1>
+    <div class="meta">
+      <span class="badge p0">P0</span>
+      
+      
+      
+    </div>
+
+    <div class="topbar">
+      <button class="primary" type="button" onclick="saveNow()">💾 Spara</button>
+      <button type="button" onclick="exportJson()">⬇ Exportera</button>
+      <button type="button" onclick="importJson()">⬆ Importera</button>
+      <button type="button" onclick="window.print()">🖨 PDF / Skriv ut</button>
+      <span class="status" id="saveStatus">Redigera genom att klicka i texterna</span>
+    </div>
+
+    <nav class="jump">
+      <a href="#investor">Investerare</a>
+      <a href="#grant">Bidrag</a>
+      <a href="#dossier">Dossier</a>
+      <a href="#funding">Finansieringsplan</a>
+      <a href="#notes">Anteckningar</a>
+    </nav>
+
+    <section id="investor">
+      <h2>Investerare — vad framhäva</h2>
+      <div class="hint inv">Fokus: marknad, traction, unit economics, moat — inte bidragsspråk.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="investor_pitch" data-placeholder="Skriv investerarpitch för detta projekt…">
+          <p><em>Fyll i: problem → lösning → traction → ask → varför nu. Se dossier §1–3 nedan som källa.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="grant">
+      <h2>Bidrag & stöd — vad framhäva</h2>
+      <div class="hint grt">Fokus: innovation, samhällsnytta, regional nytta, budget, TRL — en vertikal i taget.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="grant_pitch" data-placeholder="Skriv grant-vinkel för detta projekt…">
+          <p><em>Fyll i: innovationshöjd, samhällsnytta Gävleborg, budgetposter, sökande (AB vs Per). Se finansieringsplan nedan.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="dossier">
+      <h2>Dossier (från dossier.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="dossier"><h1>TwistedStacks — Studio Dossier: Narrative &amp; Economics</h1>
+<p><strong>Entity:</strong> TWISTEDSTACKS AB (Sandviken, Gävleborg) · <strong>Prepared:</strong> 2026-07-25 · <strong>Author:</strong> Atlas</p>
+<p><strong>What this is:</strong> the studio-level economic case — how a <strong>non-dilutive grant stack + shared platform</strong> compounds across the portfolio, an <strong>illustrative 24-month studio cost model</strong>, <strong>portfolio ROI logic</strong> (per-product grant capture × N products) at <strong>three funding levels</strong>, and an <strong>honest focus-risk</strong> treatment.</p>
+<blockquote>⚠️ <strong>All figures below are modelled illustrations, not forecasts or commitments.</strong> Verified grant <em>ceilings/deadlines</em> come from official sources (<code>funding-plan.md</code>); how many are <em>won</em> and <em>when</em> is assumed. See <code>sources.md</code> assumptions 5–7.</blockquote>
+<hr>
+<h2>1. Studio narrative in one paragraph</h2>
+<p>TwistedStacks runs a <strong>portfolio of AI-native vertical products</strong> (SUPARAYS, ATE, SkatteRevision, CymWave) on <strong>one shared platform</strong> — a single backend/infra, one brand + showroom (twistedstacks.com), one GTM/contact pipeline, and one <strong>grant-and-delivery motion</strong>. The studio's economic edge is that the <strong>cost of building and funding</strong> is largely fixed and shared, while <strong>non-dilutive capital is captured per product</strong>. Each product is a separately-eligible Swedish AB that can draw Vinnova, Region Gävleborg, and Almi support; the platform amortises the eng, design, and paperwork across all of them. The cap table stays clean until one vertical earns the right to scale.</p>
+<hr>
+<h2>2. How the compounding works (mechanics)</h2>
+<h3>2.1 Shared platform = fixed cost spread over N products</h3>
+<p>Third-party studio analyses put shared-service savings at <strong>30–40% lower burn per company</strong> and <strong>~40% less capital to reach milestones</strong> (M Accelerator; La Boétie). The mechanism, applied to TwistedStacks:</p>
+<table>
+<tr><th>Shared layer</th><th>Built once</th><th>Reused by</th><th>Marginal cost of +1 product</th></tr>
+<tr><td>Backend / infra (Supabase, auth, data)</td><td>✔ (in repo)</td><td>all products &amp; rooms</td><td>near-zero</td></tr>
+<tr><td>Brand + showroom (site, subdomains, PONGG proof layer)</td><td>✔ (in repo)</td><td>all products</td><td>low (a page + subdomain)</td></tr>
+<tr><td>GTM / contact pipeline (<code>/api/contact</code>, Resend, CTAs)</td><td>✔ (in repo)</td><td>all products</td><td>near-zero</td></tr>
+<tr><td>Grant-writing &amp; reporting templates</td><td>to build</td><td>all products</td><td><strong>declining</strong> (template reuse)</td></tr>
+<tr><td>Core engineering / design team</td><td>ongoing</td><td>flagship + spillover</td><td>the real constraint (§5)</td></tr>
+</table>
+<p><strong>Key point:</strong> the first three layers already exist in the codebase. The fourth (grant motion) is the compounding lever — the <strong>10th application is far cheaper than the 1st</strong>.</p>
+<h3>2.2 Non-dilutive stack = capital without cap-table cost</h3>
+<p>Per product, per cycle, the <strong>verified</strong> ceilings (<code>funding-plan.md</code>):</p>
+<ul>
+<li><strong>Vinnova Innovativa Startups:</strong> ≤ <strong>500 000 SEK</strong> (grant). <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Almi Innovationslån:</strong> <strong>50k–500k SEK</strong> (debt, ~50% co-fund). <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Region Gävleborg innovationsstöd</strong> (w/ Almi + Movexum) + mikro/konsultstöd (≤60k / ≤70k). <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Vinnova Applied-AI (consortium):</strong> <strong>2–10 MSEK @ ≤50%</strong> — for SUPARAYS (edge) / ATE (decision support). <code>[VERIFIED:2026-07-25]</code></li>
+</ul>
+<p>Stacked across the portfolio, this funds a lean shared team <strong>without a priced round</strong> — the essence of the thesis.</p>
+<hr>
+<h2>3. Illustrative 24-month studio-level cost model</h2>
+<p>Assumes a <strong>small studio</strong>: 2 founders + 2–3 shared hires (eng/design), remote-augmented, Gävleborg cost base. SEK.</p>
+<table>
+<tr><th>Cost line</th><th>Basis</th><th>24-mo total (SEK)</th></tr>
+<tr><td>Core team (2 founders lean + 2.5 FTE avg blended ~55k/mo loaded)</td><td>shared across products</td><td><strong>3,300,000</strong></td></tr>
+<tr><td>Cloud / infra / tooling (Supabase, Vercel, LLM API, domains)</td><td>shared</td><td><strong>240,000</strong></td></tr>
+<tr><td>Brand / showroom / design upkeep</td><td>shared</td><td><strong>180,000</strong></td></tr>
+<tr><td>Grant admin + accounting/legal (studio + per-product ABs)</td><td>shared, scales slowly</td><td><strong>360,000</strong></td></tr>
+<tr><td>Per-product prototype/GTM spend (4 products × ~150k)</td><td>per product</td><td><strong>600,000</strong></td></tr>
+<tr><td>Contingency (~10%)</td><td>—</td><td><strong>470,000</strong></td></tr>
+<tr><td><strong>Total 24-mo studio cost</strong></td><td></td><td><strong>≈ 5,150,000 SEK</strong></td></tr>
+</table>
+<p>This is the number the non-dilutive stack must cover to keep the studio equity-free.</p>
+<hr>
+<h2>4. Portfolio ROI logic — three funding levels</h2>
+<p><strong>Method:</strong> per-product grant capture × N products, minus co-financing, with a <strong>win-rate haircut</strong> (grants are competitive). Debt (Almi) is capital-in but must be repaid, so it is shown separately as <em>bridge</em>, not <em>return</em>.</p>
+<p><strong>Building blocks (per product, verified ceilings):</strong></p>
+<ul>
+<li>Vinnova IS grant: 500k · Region innovationsstöd: ~150k (modelled) · Almi debt bridge: up to 500k · Vinnova Applied-AI: 2–10 MSEK @ 50% (consortium only).</li>
+</ul>
+<h3>Level 1 — Conservative (&quot;grant-lean,&quot; ~40% win rate, no big consortium)</h3>
+<table>
+<tr><th>Item</th><th>Assumption</th><th>Non-dilutive captured (SEK)</th></tr>
+<tr><td>Vinnova IS</td><td>4 products × 500k × 40% win</td><td>800,000</td></tr>
+<tr><td>Region innovationsstöd/mikro/konsult</td><td>~2 awards × ~120k</td><td>240,000</td></tr>
+<tr><td>Almi Innovationslån (debt bridge)</td><td>2 × 300k</td><td>600,000 (repayable)</td></tr>
+<tr><td><strong>Non-dilutive grants (excl. debt)</strong></td><td></td><td><strong>≈ 1,040,000</strong></td></tr>
+<tr><td><strong>+ debt bridge</strong></td><td></td><td><strong>≈ 600,000</strong></td></tr>
+<tr><td><strong>Cost coverage</strong></td><td>vs 5.15M cost</td><td><strong>~20% grant-covered; runway extended, gap = equity/revenue</strong></td></tr>
+</table>
+<p><strong>Read:</strong> grants alone don't cover a 4-product studio at low win rates → <strong>must narrow focus</strong> or raise a small round. Validates sequencing.</p>
+<h3>Level 2 — Base (&quot;one flagship consortium wins,&quot; ~50% win rate)</h3>
+<table>
+<tr><th>Item</th><th>Assumption</th><th>Non-dilutive captured (SEK)</th></tr>
+<tr><td>Vinnova IS</td><td>4 × 500k × 50%</td><td>1,000,000</td></tr>
+<tr><td>Region innovationsstöd</td><td>~3 × 150k</td><td>450,000</td></tr>
+<tr><td><strong>Vinnova Applied-AI (flagship, e.g. SUPARAYS edge)</strong></td><td>1 project 4 MSEK @ 50% grant</td><td>2,000,000</td></tr>
+<tr><td>Almi debt bridge</td><td>3 × 350k</td><td>1,050,000 (repayable)</td></tr>
+<tr><td><strong>Non-dilutive grants (excl. debt)</strong></td><td></td><td><strong>≈ 3,450,000</strong></td></tr>
+<tr><td><strong>+ debt bridge</strong></td><td></td><td><strong>≈ 1,050,000</strong></td></tr>
+<tr><td><strong>Cost coverage</strong></td><td>vs 5.15M cost</td><td><strong>~67% grant-covered; ~87% incl. debt → near cash-neutral</strong></td></tr>
+</table>
+<p><strong>Read:</strong> the flagship consortium grant (Applied-AI 2–10M @ 50%) is the swing factor. <strong>One</strong> such win moves the studio from &quot;gap&quot; to &quot;near-covered.&quot; This is the target case.</p>
+<h3>Level 3 — Ambitious (&quot;multi-win + EU,&quot; ~60% win rate, Year-2 EU)</h3>
+<table>
+<tr><th>Item</th><th>Assumption</th><th>Non-dilutive captured (SEK)</th></tr>
+<tr><td>Vinnova IS</td><td>4 × 500k × 60%</td><td>1,200,000</td></tr>
+<tr><td>Region innovationsstöd</td><td>~3 × 150k</td><td>450,000</td></tr>
+<tr><td><strong>Vinnova Applied-AI ×1–2</strong></td><td>1×4M + 1×3M @ 50% grant</td><td>3,500,000</td></tr>
+<tr><td><strong>Eurostars (flagship, national grant)</strong></td><td>modelled ~2–3 MSEK Swedish share</td><td>~2,500,000</td></tr>
+<tr><td>Almi debt bridge</td><td>4 × 400k</td><td>1,600,000 (repayable)</td></tr>
+<tr><td><strong>Non-dilutive grants (excl. debt)</strong></td><td></td><td><strong>≈ 7,650,000</strong></td></tr>
+<tr><td><strong>+ debt bridge</strong></td><td></td><td><strong>≈ 1,600,000</strong></td></tr>
+<tr><td><strong>Cost coverage</strong></td><td>vs 5.15M cost</td><td><strong>&gt;100% grant-covered → self-funded search + reinvestment</strong></td></tr>
+</table>
+<p><strong>Read:</strong> upside case fully self-funds the studio <em>and</em> the flagship's push toward TRL 6+ / EIC. Requires strong win rates, a consortium, and an international partner — <strong>optimistic</strong>, not a plan of record. (EIC Accelerator, grant &lt;€2.5M + equity, sits beyond this window and is <strong>dilutive</strong> — excluded from &quot;non-dilutive&quot; totals.)</p>
+<h3>Summary</h3>
+<table>
+<tr><th>Level</th><th>Win rate</th><th>Non-dilutive grants</th><th>Debt bridge</th><th>Cost coverage</th></tr>
+<tr><td><strong>1 Conservative</strong></td><td>~40%</td><td>~1.0 MSEK</td><td>~0.6 MSEK</td><td>~20% (+debt ~32%)</td></tr>
+<tr><td><strong>2 Base</strong></td><td>~50%</td><td>~3.5 MSEK</td><td>~1.1 MSEK</td><td>~67% (+debt ~87%)</td></tr>
+<tr><td><strong>3 Ambitious</strong></td><td>~60%</td><td>~7.7 MSEK</td><td>~1.6 MSEK</td><td>&gt;100%</td></tr>
+</table>
+<p><strong>The ROI logic in one line:</strong> non-dilutive return scales with <strong>(win rate) × (N products) × (whether a consortium Applied-AI grant lands)</strong> — and the platform makes each additional application cheap, so the marginal ROI of one more well-targeted application is high. But coverage below Level 2 forces a focus decision.</p>
+<hr>
+<h2>5. Focus &amp; execution risk — the honest section</h2>
+<p><strong>This is the studio's dominant risk, and the model above quietly assumes it away by &quot;capturing&quot; grants across 4 products. In reality:</strong></p>
+<ol>
+<li><strong>A small team cannot ship 4 verticals well.</strong> Hexa needed <strong>~30 specialists</strong> to run many verticals; a 4–5 person studio attempting SUPARAYS <em>and</em> ATE <em>and</em> SkatteRevision <em>and</em> CymWave risks <strong>four half-products</strong>. The grant stack can <em>fund</em> four searches; it cannot <em>staff</em> four builds.</li>
+<li><strong>Grant-chasing can distort the roadmap.</strong> Optimising for what's fundable (edge AI because Vinnova has a call) rather than what customers pay for is a real failure mode. Grants should <strong>follow</strong> conviction, not create it.</li>
+<li><strong>Application + reporting overhead multiplies.</strong> N products = N sets of eligibility checks, budgets, and progress reports. This is the <em>cost side</em> of &quot;stack per-product grants&quot; and it lands on the same tiny team.</li>
+<li><strong>Shared-GTM synergy is weak.</strong> Sensor-mesh buyers, trading-infra buyers, tax-audit buyers, and wellness-hardware buyers <strong>do not overlap</strong>. The platform saves on build and brand, <strong>not on selling</strong>. Do not model cross-sell.</li>
+<li><strong>Cash-flow timing.</strong> Grants pay <strong>in arrears</strong> with co-financing (50% Applied-AI, 40% ERUF). Without Almi debt as a bridge, a &quot;won&quot; grant can still cause a liquidity crunch.</li>
+</ol>
+<p><strong>Mitigations (the plan of record):</strong></p>
+<ul>
+<li><strong>Sequence hard.</strong> One flagship (likely <strong>SUPARAYS</strong> — cleanest Vinnova edge-AI fit — or <strong>ATE</strong>) gets the majority of eng cycles. The other three stay in <strong>grant-funded validation</strong> (Vinnova IS + Movexum) until the flagship throws off cash or is acquired.</li>
+<li><strong>Grant-as-follower.</strong> Only pursue a call when it maps to a product the studio would build anyway.</li>
+<li><strong>Debt-bridge discipline.</strong> Keep Almi Innovationslån available specifically to cover arrears; never fund a <em>new</em> product on debt.</li>
+<li><strong>Kill criteria.</strong> Pre-commit to pausing any non-flagship product that fails its validation milestone, freeing the team.</li>
+</ul>
+<hr>
+<h2>6. Bottom line</h2>
+<p>The studio economics <strong>work at the Base level</strong> — one flagship consortium grant plus the per-product Vinnova/Region stack gets TwistedStacks to <strong>~87% cost coverage (incl. debt) without dilution</strong> over 24 months. The Conservative level exposes the truth that <strong>breadth without focus underfunds everything</strong>, and the Ambitious level is real but optimistic. The deciding variable is <strong>not</strong> the size of any single grant — it is whether the studio <strong>concentrates execution on one flagship</strong> while using the non-dilutive stack to keep the other bets alive cheaply. Studio structure is a <strong>funding and platform advantage</strong>; it is <strong>not</strong> a substitute for focus.</p>
+<p><em>See <code>market-research.md</code> (thesis + comparables), <code>competitors.md</code> (positioning), <code>funding-plan.md</code> (verified stack + calendar), <code>sources.md</code> (citations + numbered assumptions).</em></p></div>
+      </div>
+    </section>
+
+    <section id="funding">
+      <h2>Finansieringsplan (från funding-plan.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="funding"><h1>TwistedStacks AB — Studio Grant Stack &amp; Funding Plan</h1>
+<p><strong>Entity:</strong> TWISTEDSTACKS AB — Sandviken, Gävleborg, Sweden</p>
+<p><strong>Prepared:</strong> 2026-07-25 · <strong>Author:</strong> Atlas (venture-studio / vertical-SaaS strategy)</p>
+<p><strong>Framing:</strong> Non-dilutive first. A small regional AI studio does <strong>not</strong> win one big &quot;studio grant&quot; — it <strong>stacks per-product, per-project grants</strong> across the portfolio (SUPARAYS, ATE, SkatteRevision, CymWave, …) and layers debt + regional co-funding underneath. Each product is its own applicant/consortium party; the studio is the shared operating layer that industrialises the <em>application-and-delivery motion</em>.</p>
+<blockquote><strong>Verification legend</strong></blockquote>
+<blockquote><code>[VERIFIED:2026-07-25]</code> — confirmed against the official source via live crawl on 2026-07-25.</blockquote>
+<blockquote><code>[UNVERIFIED]</code> — plausible/typical, not confirmed on an official page today.</blockquote>
+<blockquote><code>[UNVERIFIED — källa 2026-07-25: &lt;value&gt;]</code> — the figure I could not confirm as stated; the official value found is given.</blockquote>
+<hr>
+<h2>0. How to read this stack</h2>
+<p>A Swedish studio's non-dilutive capital comes in <strong>four tiers</strong>, each with a different owner, cadence, and risk:</p>
+<table>
+<tr><th>Tier</th><th>Instrument type</th><th>Dilution</th><th>Who applies</th><th>Cadence</th></tr>
+<tr><td><strong>A. Soft / early validation</strong></td><td>Vinnova Innovativa Startups, Region Gävleborg innovationsstöd, Movexum incubation</td><td>None (bidrag)</td><td>Each product AB</td><td>1–2 windows/yr</td></tr>
+<tr><td><strong>B. Project R&amp;D grants</strong></td><td>Vinnova thematic calls (Avancerad digitalisering / Applied AI), Region konsultstöd</td><td>None (bidrag, 50% co-fund)</td><td>Product-led consortium</td><td>Themed windows</td></tr>
+<tr><td><strong>C. Risk debt</strong></td><td>Almi Innovationslån / Tillväxtlån / Företagslån</td><td>None (loan, interest)</td><td>Studio or product AB</td><td>Rolling</td></tr>
+<tr><td><strong>D. EU / scale</strong></td><td>Eurostars, EIC Accelerator</td><td>Grant (Eurostars) → grant+equity (EIC)</td><td>Lead product AB</td><td>Fixed cut-offs</td></tr>
+</table>
+<p><strong>Studio logic:</strong> the same grant-writing, budgeting, and reporting muscle is a <strong>shared platform cost</strong> amortised across N products. Write once, template many. See <code>dossier.md</code> for the ROI math.</p>
+<hr>
+<h2>1. Ranked stack (by fit for a Gävleborg AI studio, today)</h2>
+<h3>#1 — Vinnova · Innovativa Startups 2026 — <em>best per-product entry point</em></h3>
+<ul>
+<li><strong>Amount:</strong> Maximum <strong>500 000 SEK</strong> per company. <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Opens:</strong> <strong>12 October 2026</strong> (Vinnova moved the opening date to 12 Oct). <code>[VERIFIED:2026-07-25]</code> · <strong>reconfirmed K-DEADLINES 2026-07-25</strong> (closes <strong>2027-01-12 14:00</strong>). Master: <code>00-MASTER/INVENTORY/kimi-deadlines-2026-07.md</code>.</li>
+<li><strong>Eligibility:</strong> Swedish AB, <strong>≤10 years old, ≤10 employees, ≤10 MSEK</strong> net turnover or balance sheet, no profit distribution. <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Use:</strong> test customer need, business idea, willingness to pay (närma sig marknaden).</li>
+<li><strong>Diarienummer:</strong> 2025-04831. <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Studio play:</strong> each qualifying product AB (SUPARAYS, CymWave, SkatteRevision if &lt;10 yrs) files its <strong>own</strong> application. Four products × up to 500k = up to <strong>2.0 MSEK</strong> non-dilutive in one window. This is the single most repeatable brick in the stack.</li>
+<li><strong>Source:</strong> https://www.vinnova.se/e/innovativa-startups/innovativa-startups-2026</li>
+<li><strong>Caveat:</strong> Full call text (eligible costs, funding rate, assessment) publishes when the call opens; historically covered up to 100% of a short (~9-month) project. <code>[UNVERIFIED]</code></li>
+</ul>
+<h3>#2 — Region Gävleborg · Innovationsstöd — <em>regional, early-stage, local anchor</em></h3>
+<ul>
+<li><strong>Amount:</strong> Not published as a single headline figure; delivered <strong>jointly with Almi Norra Mellansverige + Movexum</strong> (the region's incubator). <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Eligibility:</strong> small newly-started company, <strong>≤5 years</strong> from registration, product/process/service <strong>not yet on market</strong> — support must precede market stage. <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Related regional instruments (same page):</strong></li>
+</ul>
+<p>  - <strong>Mikrostöd:</strong> costs max <strong>60 000 SEK</strong>. <code>[VERIFIED:2026-07-25]</code></p>
+<p>  - <strong>Medelstora hårda investeringar:</strong> stöd max <strong>3 MSEK</strong> (de minimis, over 3-year period). <code>[VERIFIED:2026-07-25]</code></p>
+<p>  - <strong>Stora investeringar:</strong> costs max <strong>25 MSEK</strong>; above 25 MSEK → go to Tillväxtverket; <strong>companies in Gävle kommun cannot apply</strong> for this type. <code>[VERIFIED:2026-07-25]</code></p>
+<p>  - <strong>Konsultstöd (cirkulär omställning):</strong> consultant costs max <strong>70 000 SEK</strong>, work ≤6 months, ~4-week handläggning. <code>[VERIFIED:2026-07-25]</code></p>
+<ul>
+<li><strong>Studio play:</strong> TwistedStacks is in <strong>Sandviken</strong> (not Gävle kommun) → the &quot;stora investeringar&quot; exclusion does <strong>not</strong> bind it, a genuine location advantage. Route new products through Movexum → Region innovationsstöd for the earliest non-dilutive kronor + local credibility.</li>
+<li><strong>Source:</strong> https://www.regiongavleborg.se/regional-utveckling/finansiering/foretagsstod/</li>
+</ul>
+<h3>#3 — Almi · Innovationslån — <em>bridge capital, no equity</em></h3>
+<ul>
+<li><strong>Amount:</strong> <strong>50 000–500 000 SEK</strong> (in many cases ~<strong>300 000 SEK</strong>). <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Co-financing:</strong> Almi funds up to <strong>50%</strong> of estimated project cost; for loans <strong>&gt;300 000 SEK</strong> at least half of the co-financing must be capital (equity/bank/external). <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Eligibility:</strong> company registered in Sweden, <strong>≤249 employees</strong>; new or established. Repayment <strong>3–5 years</strong>. <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Adjacent Almi products:</strong> <strong>Tillväxtlån</strong> (for scalable companies) and <strong>Företagslån</strong> (no fixed upper limit; Almi typically funds <strong>30–50%</strong> of capital need; repayment <strong>2–5 yrs</strong>; rates ~2–3 pp above banks). <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Studio play:</strong> use Innovationslån to bridge the gap <strong>between</strong> grant tranches (grants pay in arrears). Debt keeps the cap table clean — central to the non-dilutive thesis.</li>
+<li><strong>Source:</strong> https://www.almi.se/lan-finansiering/innovationslan/</li>
+</ul>
+<h3>#4 — Vinnova · Tillämpad AI för industrin (Avancerad digitalisering) — <em>high-fit for SUPARAYS / ATE, but consortium-gated</em></h3>
+<ul>
+<li><strong>Amount:</strong> <strong>2–10 MSEK per project</strong>, grant ≤ <strong>50%</strong> of eligible costs; project <strong>12–24 months</strong>; total call budget <strong>60 MSEK</strong>. <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Two tracks:</strong> <strong>Intelligent Edge — AI in the sensor chain</strong> (near-perfect fit for SUPARAYS AR sensor mesh; the call text explicitly frames edge AI + multi-agent decentralised intelligence) and <strong>AI-based decision support</strong> (fits ATE agentic trading infra). <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Eligibility:</strong> <strong>consortium of ≥2 parties, ≥1 Swedish company</strong>; needs-driven; behovsägare engaged. <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Status:</strong> the 2026 window <strong>closed 16 January 2026, 14:00</strong>. <code>[VERIFIED:2026-07-25]</code> → Track the next window under the Avancerad digitalisering programme (recurring). <code>[UNVERIFIED]</code></li>
+<li><strong>Studio play:</strong> this is where the studio structure pays off — TwistedStacks can be the <strong>industrial company party</strong> and bring a customer/behovsägare (e.g. a Sandviken/Gävleborg manufacturer or clinic) as second party. Requires the 50% co-fund, so pair with Almi debt or Region stöd.</li>
+<li><strong>Source:</strong> https://www.vinnova.se/e/avancerad-digitalisering-industriell-2024-04161/tillampad-ai-for-industrin-genom-2025-03809/</li>
+</ul>
+<h3>#5 — Tillväxtverket · &quot;Utveckla företags konkurrenskraft i Norra Mellansverige&quot; (ERUF) — <em>regional SME programme, Gävleborg-eligible</em></h3>
+<ul>
+<li><strong>Amount:</strong> project may receive <strong>≤60% EU co-funding</strong>; call budget <strong>33 MSEK</strong> (may change). Remaining 40% = public and/or private funds. <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Geography:</strong> <strong>Gävleborg, Dalarna, Värmland</strong>. <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Window:</strong> <strong>opens 20 August 2026, closes 22 September 2026</strong>; decision Dec 2026 / Jan 2027. <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Fit:</strong> funds förstudier/projects strengthening SME competitiveness + green transition, entrepreneurship in future industries, and the företagsfrämjande system — better suited to a <strong>collaborative studio-ecosystem project</strong> (e.g. with Movexum) than to a single product. <code>[UNVERIFIED]</code> fit-judgment.</li>
+<li><strong>Source:</strong> https://tillvaxtverket.se/tillvaxtverket/sokfinansiering/utlysningar/utlysningar/utvecklaforetagskonkurrenskraftinorramellansverige.12025.html</li>
+</ul>
+<h3>#6 — Tillväxtverket · Regionalt investeringsstöd — <em>hardware capex (SUPARAYS / CymWave)</em></h3>
+<ul>
+<li><strong>Amount:</strong> up to <strong>40%</strong> of the investment (materiella + immateriella tillgångar). <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Window:</strong> rolling via <em>Min ansökan</em>; call <strong>closes 31 December 2026</strong>; <strong>&gt;25 MSEK → Tillväxtverket</strong> (else the region). <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Caveat — support-area geography:</strong> the core stödområden (40% zones) are <strong>Norrbotten, Västerbotten, Västernorrland, Jämtland, Dalarn a</strong> plus listed municipalities; Gävleborg appears in the region list but <strong>specific Gävleborg municipality eligibility must be checked</strong> against the stödområde map / SCB DeSO lookup before relying on it. <code>[UNVERIFIED — källa 2026-07-25: Tillväxtverket lists Gävleborg among covered regions but eligibility is DeSO/stödområde-specific; verify Sandviken's DeSO before assuming 40%]</code></li>
+<li><strong>Source:</strong> https://tillvaxtverket.se/tillvaxtverket/sokfinansiering/utlysningar/utlysningar/regionaltinvesteringsstod.3519.html</li>
+</ul>
+<h3>#7 — Eurostars (Eureka) · Call 11 — <em>international R&amp;D, SME-led (later-stage optionality)</em></h3>
+<ul>
+<li><strong>Window:</strong> <strong>opens 9 July 2026, deadline 10 September 2026 (14:00 CET)</strong>. <code>[VERIFIED:2026-07-25]</code> <em>(Prior Call 10: 16 Jan → 19 Mar 2026. <code>[VERIFIED:2026-07-25]</code>)</em></li>
+<li><strong>Structure:</strong> SME-led international consortium — <strong>≥2 independent entities from ≥2 Eurostars countries</strong>; SME budget <strong>≥50%</strong> of total; no single party/country <strong>&gt;70%</strong>; project <strong>≤36 months</strong>; civil applications only. Funding is <strong>national</strong> (paid by Vinnova for the Swedish party). <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Note:</strong> one Eureka <em>resources</em> page also cited a &quot;<strong>deadline 21 July 2026</strong>&quot; for Call 11 — this conflicts with the official call page's 10 Sep 2026 and is treated as a stale secondary reference. <code>[UNVERIFIED — källa 2026-07-25: official Call 11 page states opens 9 Jul 2026 / deadline 10 Sep 2026 14:00 CET]</code></li>
+<li><strong>Studio play:</strong> only once a product (likely ATE or SUPARAYS) has a credible international partner. Do <strong>not</strong> front-load — Eurostars is a Year-2 move.</li>
+<li><strong>Source:</strong> https://www.eurekanetwork.org/programmes-and-calls/eurostars/eurostars-call-for-projects-september-2026/</li>
+</ul>
+<h3>#8 — EIC Accelerator — <em>deep-tech scale-up; grant + equity (last, not first)</em></h3>
+<ul>
+<li><strong>Structure:</strong> <strong>grant component &lt; €2.5M</strong> (TRL 6–8, ≤70% of eligible costs, lump sum) <strong>+ investment €1–10M</strong> (direct/quasi-equity, EIC Fund takes <strong>≤25% voting</strong>; STEP Scale-up allows €10–30M). <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>2026 short-proposal cut-offs (batched, 17:00 Brussels):</strong> <strong>7 Jan · 4 Mar · 6 May · 8 Jul · 2 Sep · 4 Nov 2026</strong>. <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Budget:</strong> EIC Accelerator 2026 total <strong>€634M</strong>. <code>[VERIFIED:2026-07-25]</code></li>
+<li><strong>Studio play:</strong> <strong>dilutive</strong> and highly competitive — reserve for the single break-out product with TRL ≥6 and market-creating claim. Flagged here for completeness of the stack, not as a near-term move.</li>
+<li><strong>Source:</strong> https://eic.ec.europa.eu/eic-funding-opportunities/eic-2026-work-programme_en · https://eic.ec.europa.eu/eic-funding-opportunities/eic-accelerator_en</li>
+</ul>
+<hr>
+<h2>2. Portfolio stacking view (illustrative, per product)</h2>
+<table>
+<tr><th>Product</th><th>#1 Vinnova IS (≤500k)</th><th>#2 Region innovationsstöd</th><th>#3 Almi Innovationslån (≤500k)</th><th>#4 Vinnova Applied-AI (2–10M, 50%)</th><th>#7/#8 EU (later)</th></tr>
+<tr><td><strong>SUPARAYS</strong> (AR sensor mesh)</td><td>✔ eligible</td><td>✔ (edge/sensor)</td><td>✔ bridge</td><td>✔✔ <strong>Intelligent Edge</strong> track</td><td>Eurostars → EIC</td></tr>
+<tr><td><strong>ATE</strong> (agentic trading infra)</td><td>✔ eligible</td><td>◐ (fintech risk)</td><td>✔ bridge</td><td>✔ <strong>AI decision support</strong></td><td>Eurostars</td></tr>
+<tr><td><strong>SkatteRevision</strong> (legal-fintech)</td><td>✔ if &lt;10 yrs</td><td>◐</td><td>✔ bridge</td><td>◐ (needs industrial angle)</td><td>—</td></tr>
+<tr><td><strong>CymWave</strong> (wellness hardware)</td><td>✔ eligible</td><td>✔ (hardware capex)</td><td>✔ bridge</td><td>◐</td><td>EIC (health)</td></tr>
+</table>
+<p>✔ strong fit · ◐ conditional · <strong>✔✔</strong> flagship fit. All amounts as verified above.</p>
+<hr>
+<h2>3. 24-month application calendar (sequenced)</h2>
+<table>
+<tr><th>When</th><th>Action</th><th>Instrument</th><th>Non-dilutive target</th></tr>
+<tr><td><strong>Aug–Sep 2026</strong></td><td>File ERUF SME/ecosystem project (w/ Movexum)</td><td>Tillväxtverket NMS (#5)</td><td>up to 60% of a shared project</td></tr>
+<tr><td><strong>Oct 2026</strong></td><td>File 2–4 product applications same window</td><td>Vinnova Innovativa Startups (#1)</td><td>up to 4 × 500k = <strong>2.0 MSEK</strong></td></tr>
+<tr><td><strong>Q4 2026</strong></td><td>Route earliest-stage product via Movexum</td><td>Region innovationsstöd (#2)</td><td>regional stöd + credibility</td></tr>
+<tr><td><strong>Q4 2026–Q1 2027</strong></td><td>Draw bridge debt against grant pipeline</td><td>Almi Innovationslån (#3)</td><td>up to 500k/product</td></tr>
+<tr><td><strong>Q1 2027</strong></td><td>Assemble consortium + behovsägare</td><td>next Vinnova Applied-AI window (#4)</td><td>2–10 MSEK @ 50%</td></tr>
+<tr><td><strong>Q3 2027</strong></td><td>If international partner ready</td><td>Eurostars Call (#7)</td><td>national grant, ≤36-mo project</td></tr>
+<tr><td><strong>2027–2028</strong></td><td>Only for the break-out product</td><td>EIC Accelerator (#8)</td><td>grant &lt;€2.5M (+equity if chosen)</td></tr>
+</table>
+<hr>
+<h2>4. Honest constraints</h2>
+<ol>
+<li><strong>Grants pay in arrears</strong> and demand co-financing (Vinnova Applied-AI 50%, ERUF 40% own funds). Cash-flow, not headline award, is the binding constraint → Almi debt is structurally necessary.</li>
+<li><strong>Consortium-gated calls (#4, #5, #7)</strong> need a <em>second party</em> and often a <em>behovsägare</em>. A solo studio must actively recruit customers/partners — this is real work, not a formality.</li>
+<li><strong>Regional geography is DeSO-specific.</strong> Do not assume the 40% Regionalt investeringsstöd rate applies to Sandviken without the SCB DeSO check (flagged UNVERIFIED above).</li>
+<li><strong>No &quot;studio-level&quot; mega-grant exists.</strong> The model is <em>N small per-product bricks</em>, which multiplies <strong>application + reporting overhead</strong> — the very focus risk detailed in <code>dossier.md</code>.</li>
+</ol>
+<p><em>All amounts/deadlines verified against vinnova.se, almi.se, regiongavleborg.se, tillvaxtverket.se, eurekanetwork.org, and eic.ec.europa.eu on 2026-07-25. See <code>sources.md</code>.</em></p></div>
+      </div>
+    </section>
+
+    <section id="notes">
+      <h2>Gemensamma anteckningar</h2>
+      <div class="card">
+        <div class="editable" data-key="notes" data-placeholder="Anteckningar inför ansökan…" style="min-height:8rem;"></div>
+      </div>
+    </section>
+  </div>
+  <input type="file" id="importFile" accept="application/json,.json" hidden />
+  <script>
+    const STORAGE_KEY = 'ts_project_twisted-stacks-site_v1';
+    let saveTimer = null;
+    function collectData() {
+      const data = { slug: 'twisted-stacks-site', version: 1, savedAt: new Date().toISOString(), fields: {} };
+      document.querySelectorAll('.editable[data-key]').forEach(el => { data.fields[el.dataset.key] = el.innerHTML; });
+      return data;
+    }
+    function applyData(data) {
+      if (!data?.fields) return;
+      document.querySelectorAll('.editable[data-key]').forEach(el => {
+        if (data.fields[el.dataset.key] !== undefined) el.innerHTML = data.fields[el.dataset.key];
+      });
+    }
+    function saveNow() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(collectData()));
+      document.getElementById('saveStatus').textContent = 'Sparat ' + new Date().toLocaleString('sv-SE');
+    }
+    function scheduleSave() { clearTimeout(saveTimer); document.getElementById('saveStatus').textContent = 'Sparar…'; saveTimer = setTimeout(saveNow, 800); }
+    function exportJson() {
+      saveNow();
+      const blob = new Blob([JSON.stringify(collectData(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'twisted-stacks-site-workbook-' + new Date().toISOString().slice(0,10) + '.json';
+      a.click(); URL.revokeObjectURL(a.href);
+    }
+    function importJson() { document.getElementById('importFile').click(); }
+    document.getElementById('importFile').addEventListener('change', e => {
+      const f = e.target.files[0]; if (!f) return;
+      const r = new FileReader();
+      r.onload = () => { try { applyData(JSON.parse(r.result)); saveNow(); alert('Importerat!'); } catch { alert('Ogiltig JSON'); } };
+      r.readAsText(f); e.target.value = '';
+    });
+    document.querySelectorAll('.editable[data-key]').forEach(el => el.addEventListener('input', scheduleSave));
+    try { const s = localStorage.getItem(STORAGE_KEY); if (s) { applyData(JSON.parse(s)); } } catch {}
+  </script>
+
+<div id="funding-toolbar" style="position:fixed;bottom:12px;right:12px;z-index:9999;display:flex;gap:8px;font-family:system-ui,sans-serif;font-size:13px;">
+  <a href="/api/funding/doc?file=index.html" style="background:#1a222d;color:#38bdf8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Alla projekt</a>
+  <a href="/funding" style="background:#1a222d;color:#94a3b8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Inlogg</a>
+  <button type="button" onclick="logoutFunding()" style="background:#1a222d;color:#fb7185;border:1px solid #334155;padding:6px 12px;border-radius:8px;cursor:pointer;">Logga ut</button>
+</div>
+<script>
+async function logoutFunding() {
+  await fetch('/api/funding/auth', { method: 'DELETE', credentials: 'include' });
+  location.href = '/funding';
+}
+</script>
+</body>
+</html>

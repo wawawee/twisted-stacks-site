@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SkatteRevision — Projektunderlag</title>
+  <style>
+    :root {
+      --bg: #0f1419; --surface: #1a222d; --surface2: #243040; --border: #334155;
+      --text: #e8edf4; --muted: #94a3b8; --accent: #38bdf8; --investor: #34d399;
+      --grant: #fbbf24; --warn: #fb7185; --radius: 12px;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.55; }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+    .topbar { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; position: sticky; top: 0; z-index: 5;
+      background: linear-gradient(var(--bg) 75%, transparent); padding: .5rem 0 1rem; }
+    button { border: 1px solid var(--border); background: var(--surface2); color: var(--text); border-radius: 8px;
+      padding: .45rem .8rem; font-size: .85rem; cursor: pointer; font-family: inherit; }
+    button:hover { border-color: var(--accent); }
+    button.primary { background: #0ea5e9; border-color: #0ea5e9; color: #041018; font-weight: 600; }
+    .status { margin-left: auto; font-size: .78rem; color: var(--muted); align-self: center; }
+    h1 { font-size: 1.55rem; margin: 0 0 .25rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.25rem; font-size: .82rem; }
+    .badge { background: var(--surface2); border: 1px solid var(--border); padding: .2rem .55rem; border-radius: 999px; }
+    .badge.p0 { border-color: #7f1d1d; color: #fecaca; }
+    .badge.p1 { border-color: #78350f; color: #fde68a; }
+    .badge.p2 { border-color: #1e3a5f; color: #bae6fd; }
+    nav.jump { display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: 1.5rem; }
+    nav.jump a { color: var(--muted); text-decoration: none; font-size: .82rem; padding: .3rem .55rem;
+      border: 1px solid var(--border); border-radius: 8px; }
+    nav.jump a:hover { color: var(--accent); border-color: var(--accent); }
+    section { margin-bottom: 2rem; scroll-margin-top: 5rem; }
+    section > h2 { font-size: 1.2rem; margin: 0 0 .75rem; padding-bottom: .4rem; border-bottom: 2px solid var(--surface2); }
+    .hint { font-size: .82rem; color: var(--muted); background: var(--surface2); border-left: 3px solid var(--accent);
+      padding: .6rem .85rem; border-radius: 0 8px 8px 0; margin-bottom: .75rem; }
+    .hint.inv { border-left-color: var(--investor); }
+    .hint.grt { border-left-color: var(--grant); }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; }
+    .editable { min-height: 2rem; outline: none; border: 1px dashed transparent; border-radius: 8px; padding: .5rem .65rem;
+      transition: border-color .15s, background .15s; }
+    .editable:hover { border-color: #475569; background: rgba(56,189,248,.04); }
+    .editable:focus { border-color: var(--accent); background: rgba(56,189,248,.07); }
+    .editable[data-placeholder]:empty::before { content: attr(data-placeholder); color: #64748b; }
+    .md-content h1,.md-content h2,.md-content h3,.md-content h4 { margin-top: 1rem; }
+    .md-content table { width: 100%; border-collapse: collapse; font-size: .85rem; margin: .75rem 0; }
+    .md-content th,.md-content td { border: 1px solid var(--border); padding: .45rem .55rem; vertical-align: top; }
+    .md-content th { background: var(--surface2); }
+    .md-content blockquote { margin: .5rem 0; padding-left: .75rem; border-left: 3px solid var(--border); color: var(--muted); }
+    .md-content code { font-family: ui-monospace, monospace; font-size: .85em; background: var(--surface2); padding: .1rem .3rem; border-radius: 4px; }
+    .md-content a { color: var(--accent); }
+    .back { font-size: .85rem; margin-bottom: 1rem; }
+    .back a { color: var(--accent); }
+    @media print { .topbar, nav.jump, .back { display: none !important; } body { background: #fff; color: #111; }
+      .card { break-inside: avoid; } .editable { border: none !important; padding: 0; } }
+    @media (max-width: 600px) { .status { margin-left: 0; width: 100%; } }
+  </style>
+</head>
+<body data-slug="skatterevision-reboot">
+  <div class="wrap">
+    <p class="back"><a href="/api/funding/doc?file=index.html">← Alla projekt</a> · <a href="/api/funding/doc?file=studio-workbook.html">Studio-arbetsbok</a></p>
+
+    <h1>SkatteRevision</h1>
+    <div class="meta">
+      <span class="badge p2">P2</span>
+      
+      
+      
+    </div>
+
+    <div class="topbar">
+      <button class="primary" type="button" onclick="saveNow()">💾 Spara</button>
+      <button type="button" onclick="exportJson()">⬇ Exportera</button>
+      <button type="button" onclick="importJson()">⬆ Importera</button>
+      <button type="button" onclick="window.print()">🖨 PDF / Skriv ut</button>
+      <span class="status" id="saveStatus">Redigera genom att klicka i texterna</span>
+    </div>
+
+    <nav class="jump">
+      <a href="#investor">Investerare</a>
+      <a href="#grant">Bidrag</a>
+      <a href="#dossier">Dossier</a>
+      <a href="#funding">Finansieringsplan</a>
+      <a href="#notes">Anteckningar</a>
+    </nav>
+
+    <section id="investor">
+      <h2>Investerare — vad framhäva</h2>
+      <div class="hint inv">Fokus: marknad, traction, unit economics, moat — inte bidragsspråk.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="investor_pitch" data-placeholder="Skriv investerarpitch för detta projekt…">
+          <p><em>Fyll i: problem → lösning → traction → ask → varför nu. Se dossier §1–3 nedan som källa.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="grant">
+      <h2>Bidrag & stöd — vad framhäva</h2>
+      <div class="hint grt">Fokus: innovation, samhällsnytta, regional nytta, budget, TRL — en vertikal i taget.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="grant_pitch" data-placeholder="Skriv grant-vinkel för detta projekt…">
+          <p><em>Fyll i: innovationshöjd, samhällsnytta Gävleborg, budgetposter, sökande (AB vs Per). Se finansieringsplan nedan.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="dossier">
+      <h2>Dossier (från dossier.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="dossier"><h1>ROI Model &amp; Investment Dossier — TWISTEDSTACKS AB / SkatteRevision</h1>
+<p><strong>Entity:</strong> TWISTEDSTACKS AB (Sandviken, Gävleborg) · <strong>Analyst:</strong> Fiskal · <strong>Date:</strong> 2026-07-25</p>
+<p><strong>Repo grounded:</strong> <code>wawawee/SKATTEREVISION-REBOOT</code> @ <code>90d594b</code>.</p>
+<blockquote><strong>POSITIONING GUARDRAIL.</strong> SkatteRevision is <strong>decision-support software</strong>, <strong>NOT tax advice (skatterådgivning)</strong> and <strong>NOT statutory audit (lagstadgad revision)</strong>. <strong>Revenue in every scenario below is software / per-dossier licensing — never a percentage of recovered tax.</strong> The recovered-tax figures a byrå may achieve are the <em>customer's</em> value, not SkatteRevision's revenue line.</blockquote>
+<hr>
+<h2>0. Entity status assumption (read first)</h2>
+<p>The repo's <code>docs/GRANTS_INVENTORY.md</code> (2026-06-12) states the applicant currently has <strong>&quot;inget registrerat bolag&quot;</strong> (no registered company yet) and treats <strong>TWISTEDSTACKS AB</strong> as the <em>target</em> legal carrier, with a &quot;privatperson → enskild firma → AB&quot; path. This brief models <strong>TWISTEDSTACKS AB as the operating entity</strong> per the mandate. <strong>Assumption A1:</strong> AB is registered (or will be) before any grant <em>disbursement</em> or revenue contract — consistent with Almi/Vinnova rules that the company need not exist at application but must exist before payout. All SEK figures are illustrative planning numbers, not audited projections.</p>
+<hr>
+<h2>1. Revenue model recap (the unit economics)</h2>
+<p>From <code>market-research.md</code>:</p>
+<ul>
+<li><strong>Primary:</strong> per-dossier licence — <strong>conservative 3,000 SEK</strong>, base 5,000–8,000 SEK.</li>
+<li><strong>Secondary/upsell:</strong> per-firm SaaS — 1,500–4,000 SEK/firm/mo.</li>
+<li><strong>Cost to serve a dossier</strong> is dominated by LLM inference + data compute. The repo routes across OpenRouter/Azure with a <strong><code>openrouter/free</code> last-resort fallback</strong> and cost-tiering, so <strong>marginal cost per dossier is modest</strong> (assume <strong>~150 SEK</strong> all-in incl. compute, QA overhead, support amortisation — <strong>Assumption A2</strong>). Gross margin per dossier at 3,000 SEK ≈ <strong>95 %</strong>.</li>
+</ul>
+<hr>
+<h2>2. Conservative pilot ROI (N byråer × dossiers/year × price)</h2>
+<p><strong>Deliberately conservative</strong> — small pilot cohort, low dossiers/byrå, floor price.</p>
+<p><strong>Pilot assumptions (Assumption A3):</strong></p>
+<ul>
+<li>N = <strong>10 pilot byråer</strong> (out of the 1,054 already in SkatteRevision's data).</li>
+<li>Dossiers per byrå per year = <strong>40</strong> (≈ a byrå running the tool on part of its client book; the repo's R3 work already produced ~20 lead profiles for a single partner).</li>
+<li>Price per dossier = <strong>3,000 SEK</strong> (floor).</li>
+<li>Marginal cost per dossier = <strong>150 SEK</strong>.</li>
+</ul>
+<table>
+<tr><th>Line</th><th>Calculation</th><th>Amount</th></tr>
+<tr><td>Dossiers / year</td><td>10 byråer × 40</td><td><strong>400</strong></td></tr>
+<tr><td>Gross pilot revenue</td><td>400 × 3,000 SEK</td><td><strong>1,200,000 SEK</strong></td></tr>
+<tr><td>Cost of delivery</td><td>400 × 150 SEK</td><td>60,000 SEK</td></tr>
+<tr><td><strong>Gross margin (pilot)</strong></td><td></td><td><strong>1,140,000 SEK (95 %)</strong></td></tr>
+</table>
+<p><strong>Customer-side value (context only, NOT SkatteRevision revenue):</strong> if just <strong>1 in 10</strong> dossiers surfaces a <em>credible</em> recoverable position and the byrå's client pursues it, at a conservative <strong>200,000 SEK</strong> recovered per successful case → 40 successful cases × 200k = <strong>8.0 MSEK</strong> recovered <em>for byrå clients</em>. Byråer pay SkatteRevision <strong>1.2 MSEK</strong> for software that helped surface <strong>~8 MSEK</strong> of client value — a <strong>~6.7×</strong> value-to-price ratio at the floor price. (The repo's own R3 pitch modelled ~20 MSEK aggregate net benefit across 20 leads — this pilot model is intentionally ~10× more conservative per case.)</p>
+<h3>Sensitivity (annual SkatteRevision revenue, per-dossier @ 3,000 SEK)</h3>
+<table>
+<tr><th>N byråer ↓ / dossiers per byrå →</th><th>25</th><th>40</th><th>75</th></tr>
+<tr><td><strong>10</strong></td><td>0.75 MSEK</td><td><strong>1.20 MSEK</strong></td><td>2.25 MSEK</td></tr>
+<tr><td><strong>25</strong></td><td>1.88 MSEK</td><td>3.00 MSEK</td><td>5.63 MSEK</td></tr>
+<tr><td><strong>50</strong></td><td>3.75 MSEK</td><td>6.00 MSEK</td><td>11.25 MSEK</td></tr>
+</table>
+<p>At <strong>50 byråer × 75 dossiers</strong> (still &lt;5 % of the reachable universe) revenue is <strong>~11 MSEK/yr</strong> at the floor price — and roughly double that at base pricing (5–6k). This is the scale case grants are meant to unlock.</p>
+<hr>
+<h2>3. 24-month build + go-to-market cost</h2>
+<p>The engine substantially <strong>exists</strong> (100 GB+ iXBRL parsed, 17 agents, enrichment DB, dossier PDF generation, R3 pitch delivered). The 24-month spend is therefore <strong>productisation, compliance-hardening, and GTM</strong>, not greenfield build. Team assumption: founders + a small hired core (Assumption A4).</p>
+<table>
+<tr><th>Cost category</th><th>Detail</th><th>24-mo cost (SEK)</th></tr>
+<tr><td>Core team (product/eng)</td><td>~2 FTE blended incl. founders' partial salary, ramping</td><td>2,600,000</td></tr>
+<tr><td>Domain / legal grounding</td><td>Tax-law expert time (energiskatt, FoU, moms), independence review, HFD corpus expansion</td><td>700,000</td></tr>
+<tr><td>GTM / sales</td><td>Part-time BD, byrå outreach, pilot success mgmt, pitch material</td><td>900,000</td></tr>
+<tr><td>Compliance &amp; data</td><td>GDPR/data-processing for iXBRL &amp; client data, security, Bolagsverket API, audit trail</td><td>450,000</td></tr>
+<tr><td>Infra / LLM / compute</td><td>Azure/OpenRouter inference, SQLite/Qdrant, hosting (cost-tiered)</td><td>500,000</td></tr>
+<tr><td>Legal / IP / admin</td><td>AB admin, contracts, DPA templates, accounting, insurance (E&amp;O)</td><td>400,000</td></tr>
+<tr><td>Buffer (~12 %)</td><td>Contingency</td><td>550,000</td></tr>
+<tr><td><strong>Total 24-mo cost</strong></td><td></td><td><strong>≈ 6,100,000 SEK</strong></td></tr>
+</table>
+<p><strong>Break-even orientation:</strong> at base pricing (~5,000 SEK/dossier, ~95 % margin) the venture covers a <strong>~250 kSEK/month</strong> run-rate at roughly <strong>~55 dossiers/month</strong> — i.e. <strong>~10–15 active byråer</strong> at moderate usage. That is the milestone the funding is designed to reach within 24 months.</p>
+<hr>
+<h2>4. Three funding levels</h2>
+<p>Sized to the pre-existing pipeline in <code>docs/GRANTS_INVENTORY.md</code> and verified instrument amounts in <code>funding-plan.md</code>.</p>
+<table>
+<tr><th></th><th><strong>Level 1 — Verify</strong></th><th><strong>Level 2 — Build &amp; pilot</strong></th><th><strong>Level 3 — Scale</strong></th></tr>
+<tr><td>Target raise</td><td><strong>≈ 0.3–0.5 MSEK</strong></td><td><strong>≈ 2–3 MSEK</strong></td><td><strong>≈ 6–10 MSEK</strong></td></tr>
+<tr><td>Instruments</td><td>Almi Verifieringsmedel (≤100k företag / ≤25k privat), Movexum incubator (coaching ~300k value; ≤20k/yr dev; ≤200k &quot;excellent&quot;), Gävle Science Park, competitions</td><td>+ Almi Innovationslån (50–500k, typ ~300k), Region Gävleborg konsultcheck (≤300k @50%), Tillväxtverket check, Vinnova Innovativa Startups steg 1 (≤500k) → steg 2 (≤900k)</td><td>+ ERUF (partner-led), Vinnova skalning/Tillämpad AI konsortium, Almi Tillväxtlån, EIC Accelerator (grant ≤€2.5M + equity €1–10M) once AB + traction + EU partners</td></tr>
+<tr><td>Milestone unlocked</td><td>3–5 documented byrå dialogues + ≥1 LOI/behovssignal; independence-safe pricing validated</td><td>10–25 pilot byråer live; per-dossier revenue proven; success-fee model retired; ~1.2–3.0 MSEK ARR</td><td>50+ byråer; ~6–11 MSEK ARR; second-country corpus started; EU narrative credible</td></tr>
+<tr><td>Dilution</td><td>None (grants/soft)</td><td>Mostly non-dilutive (grants + soft loan)</td><td>Loan + possible equity (EIC/Industrifonden)</td></tr>
+<tr><td>Gate</td><td>BankID / de minimis check</td><td><strong>AB registered</strong></td><td>AB + traction + partner/consortium</td></tr>
+</table>
+<p><strong>Financing philosophy (from repo pipeline):</strong> stay <strong>non-dilutive as long as possible</strong> — verification grants and soft loans first, equity only at Level 3. This matches <code>docs/GRANTS_PIPELINE_2026-06-12.md</code>: <em>&quot;use ERUF/Vinnova as scaling track, not as first proof.&quot;</em></p>
+<hr>
+<h2>5. Risks (honest, no hype)</h2>
+<table>
+<tr><th>Risk</th><th>Severity</th><th>Description</th><th>Mitigation</th></tr>
+<tr><td><strong>Legal boundary: advice vs support</strong></td><td><strong>High</strong></td><td>If output is treated as <em>skatterådgivning</em>, SkatteRevision attracts advisor liability; if bundled with a success fee to an auditing byrå, it triggers the <strong>auditor-independence prohibition</strong> (Revisorslag 2001:883; FAR EtikU 3 / EtikR 3 analysmodellen — see <code>market-research.md</code>)</td><td>Fixed-price <strong>decision-support</strong> framing on every dossier; retire KONCEPT.md success-fee model; ship independence note; lead with non-signing redovisningsbyråer</td></tr>
+<tr><td><strong>Liability / E&amp;O</strong></td><td>High</td><td>A materially wrong recovery figure could cause a byrå to mislead its client</td><td><code>source</code> field on every number; <code>INSUFFICIENT_DATA</code> gate; dual-critic (kritikern/verifikator) review; data-quality thresholds (repo: &lt;70 blocks → no PDF, &lt;50 → no customer output); professional E&amp;O insurance</td></tr>
+<tr><td><strong>Data access to iXBRL / annual reports</strong></td><td>Medium</td><td>Depends on Bolagsverket data/API availability and terms; GDPR when client data is processed</td><td>Bolagsverket + SCB are free/open EU-classed data (per KONCEPT.md); formal DPAs; the 2026→2027 iXBRL mandate <em>reduces</em> this risk over time</td></tr>
+<tr><td><strong>Accuracy / false positives</strong></td><td><strong>High</strong></td><td>False positives waste the byrå's credibility with <em>its</em> client and are more damaging than for forward-looking tools</td><td>Conservative scoring; human-in-the-loop; dual critic; ship <em>positions + missing data</em>, not verdicts; measure precision on pilot cohort</td></tr>
+<tr><td><strong>Byrå trust / adoption</strong></td><td>Medium-High</td><td>Byråer are conservative; a new external &quot;second opinion&quot; on their own past work can feel threatening</td><td>Frame as <em>complement</em> not <em>audit of the byrå</em> (repo PRODUCT_POSITION.md); white-label for a byrå's <em>own</em> clients (repo found 14/20 R3 leads were already R3 clients); land via warm intros/Odd Fellows network</td></tr>
+<tr><td><strong>Incumbent / Big 4 competition</strong></td><td>Medium</td><td>Fortnox/Visma/Wolters could bolt on a feature; Big 4 could move down-market</td><td>Depth of case-law reasoning + pre-built multi-year corpus; fixed-price productisation; byrå channel</td></tr>
+<tr><td><strong>Entity / financing timing</strong></td><td>Medium</td><td>No registered AB yet; grants need AB before payout; success-fee revenue is off the table</td><td>Register AB before Level-2 disbursement; non-dilutive-first sequencing</td></tr>
+<tr><td><strong>Key-person / small team</strong></td><td>Medium</td><td>Founder-dependent; deep domain + eng concentration</td><td>Document domain corpus; hire core with grant funding; codify agent protocols (already in repo)</td></tr>
+</table>
+<hr>
+<h2>6. Bottom line</h2>
+<ul>
+<li><strong>Engine largely built; the spend is productisation + compliance + GTM (~6.1 MSEK over 24 months).</strong></li>
+<li><strong>Conservative 10-byrå pilot → ~1.2 MSEK gross revenue at floor pricing, ~95 % margin, ~6.7× value-to-price for the byrå.</strong></li>
+<li><strong>Scale case (≤5 % of reachable byråer) → ~11 MSEK/yr at floor, ~2× at base pricing.</strong></li>
+<li><strong>The dominant risk is legal-boundary, and it is controllable by design:</strong> fixed-price decision-support, never a cut of recovered tax, retire the success-fee model.</li>
+</ul>
+<p><em>Assumptions A1–A4 and all instrument figures are documented in <code>sources.md</code> and <code>funding-plan.md</code>.</em></p>
+<hr>
+<h2>Från NotebookLM (mars 2026 — partiell)</h2>
+<blockquote>Source: NotebookLM ~tis 24 / ons 25 mars 2026. <strong>INCOMPLETE vs BAMBAM</strong> (saknar bl.a. 45 databaser, total elförbrukning/företag/månad). Full text: <code>research/notebooklm-mars-2026-anlagstavlan.md</code>. Origin/kritik-prompt (känsligt): <code>research/notebooklm-mars-2026-ORIGIN-STORY-PROMPT.md</code>. <strong>Reconcile</strong> mot BAMBAM + Hyper before treating as product truth.</blockquote>
+<h3>Agent architecture (bevara djup)</h3>
+<ul>
+<li><strong>Sanktionsexperten</strong> (&quot;Devil's Lawyer&quot;) — utredningsskyldighet / öppet yrkande; HFD 2024 ref. 52</li>
+<li><strong>Energirevision-Spearhead</strong> — HFD 2022 ref. 38; 0,6 vs ~43–45 öre/kWh</li>
+<li><strong>Fastighetsmomsaren</strong> — BRF omsättningsmetod vs ytmetod</li>
+<li><strong>Leasing-Auditör</strong> — moms på leasingövervärde</li>
+<li><strong>Heartbeat / ANLAGSTAVLAN</strong> — React Flow-telemetri; <strong>Daily Deep Research</strong> → <code>api_wishlist.md</code></li>
+<li><strong>Brains (M4)</strong> / <strong>Muscle (Tailscale/Intel)</strong> — lokal VLM vs tung Docker/OSINT</li>
+</ul>
+<h3>Verticals</h3>
+<ul>
+<li><strong>FoU:</strong> SNI 62010/62020; ruta 475; 15 %-regel; tak 3 MSEK/mån från 2024; 6-årsfönster</li>
+<li><strong>Energiskatt:</strong> HFD 2022 ref. 38; <strong>3-årsfönster</strong> (kritiskt vs 6 år moms/inkomst)</li>
+<li><strong>Skattetillägg:</strong> HFD 2024 ref. 52</li>
+<li><strong>BRF-moms / leasingmoms</strong></li>
+</ul>
+<h3>Local pilots</h3>
+<ul>
+<li><strong>Sandbacka Science Park</strong> — tre spjut: FoU / energi / leasing; Movexum/Almi/Region-nät</li>
+</ul>
+<h3>OSINT</h3>
+<ul>
+<li>Dorks, SCB, Allabolag, SerpAPI, lokal VLM, LiteLLM — kostnadstack vs Roaring (gratis först)</li>
+</ul>
+<h3>Conflicts to reconcile (critical)</h3>
+<table>
+<tr><th>Mars 2026 NotebookLM</th><th>Anslag / Hyper 2026-07</th></tr>
+<tr><td><strong>No-Cure-No-Pay / success fee</strong></td><td><code>BLOCKERS.md</code> + <code>PRODUCT_POSITION.md</code>: <strong>fixed price / decision-support</strong></td></tr>
+<tr><td>&quot;Intel to PwC&quot; / silver-platter till Big4</td><td>Byrå-kanal; FAR independence (EtikU 3 / EtikR 3; Revisorslag 2001:883)</td></tr>
+<tr><td><strong>Energirevision.com</strong> brand spearhead</td><td>OK som nisch-GTM att verifiera — blanda inte in success-fee</td></tr>
+<tr><td>TechInnovate PoC &quot;ONLINE&quot;</td><td><strong>CLAIMED — VERIFY</strong></td></tr>
+</table>
+<h3>Product data layer (BAMBAM — dual path)</h3>
+<table>
+<tr><th>Layer</th><th>Path</th><th>Role</th></tr>
+<tr><td><strong>Databases / long-running data</strong></td><td><code>/Volumes/BAMBAM/skatterevision</code></td><td>Likely the <strong>“45 databaser / elförbrukning”</strong> layer missing from mars NotebookLM: SQLite masters (~13 GB <code>data_index_master.sqlite</code>), enrichments, raw Bolagsverket year dumps + SCB, backups (~174 GB total). <strong>Pointer only — do not copy into Anslag.</strong></td></tr>
+<tr><td><strong>Repo / code</strong></td><td><code>/Volumes/BAMBAM/offload-from-macbook/a0/usr/projects/SKATTEREVISION-REBOOT</code></td><td>App, agents, docs; GitHub <code>wawawee/SKATTEREVISION-REBOOT</code> + funding package</td></tr>
+</table>
+<p><strong>Pointer:</strong> aktuell produktsanning = <strong>data path</strong> + <strong>REBOOT repo</strong> + Hyper funding (<code>PRODUCT_POSITION.md</code>, fixed price) — <strong>inte</strong> mars-dump ensam. See <a href="PATHS.md" target="_blank"><code>PATHS.md</code></a>.</p></div>
+      </div>
+    </section>
+
+    <section id="funding">
+      <h2>Finansieringsplan (från funding-plan.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="funding"><h1>Funding Plan — SkatteRevision / TWISTEDSTACKS AB</h1>
+<p><strong>Entity:</strong> TWISTEDSTACKS AB (Sandviken, Gävleborg) · <strong>Analyst:</strong> Fiskal · <strong>Date:</strong> 2026-07-25</p>
+<p><strong>Repo grounded:</strong> <code>wawawee/SKATTEREVISION-REBOOT</code> @ <code>90d594b</code> (extends existing <code>docs/GRANTS_INVENTORY.md</code>, <code>docs/GRANTS_PIPELINE_2026-06-12.md</code>).</p>
+<blockquote><strong>POSITIONING GUARDRAIL.</strong> SkatteRevision is <strong>decision-support</strong>, <strong>NOT tax advice</strong> and <strong>NOT statutory audit</strong>. Grant narratives must describe an <strong>innovation/AI/data product</strong>, not a tax-advisory service, and must <strong>not</strong> claim a success-fee business model.</blockquote>
+<p><strong>Verification convention (as instructed):</strong> every concrete deadline/amount carries a marker verified against the official source via Exa livecrawl on <strong>2026-07-25</strong>:</p>
+<ul>
+<li><code> [VERIFIED:2026-07-25]</code> — official page confirms the value.</li>
+<li><code> [UNVERIFIED]</code> — could not confirm on the official source.</li>
+<li><code> [UNVERIFIED — källa 2026-07-25: &lt;correct value&gt;]</code> — official source gives a <em>different</em> value than the repo/common claim; corrected value shown.</li>
+</ul>
+<p>Official sources checked: <strong>vinnova.se, almi.se, regiongavleborg.se, eic.ec.europa.eu</strong> (plus movexum.se for the incubator). Full citations in <code>sources.md</code>.</p>
+<hr>
+<h2>0. What already exists in the repo (patch, don't overwrite)</h2>
+<p>There is <strong>no <code>funding/</code> or <code>anslag/</code> directory</strong> at repo root. Funding intelligence <em>does</em> pre-exist as:</p>
+<ul>
+<li><code>docs/GRANTS_INVENTORY.md</code> — canonical masterlist with a <code>now / after_company / after_partner / archive_only</code> status model and an MVP funding path.</li>
+<li><code>docs/GRANTS_PIPELINE_2026-06-12.md</code> — sequencing strategy.</li>
+<li><code>docs/ANSOKNINGAR_GUIDE.md</code> — older (archived) TOP-15 guide.</li>
+<li><code>ansokningar/</code> — <strong>70+ draft applications</strong> (.docx/.pdf), of which ~18 are SkatteRevision-relevant; the rest are other TwistedStacks/Klätterträdet/IT-Kår/LAGA tracks that must <strong>not</strong> be co-mingled with SkatteRevision applications.</li>
+</ul>
+<p><strong>This plan extends that material with 2026-verified amounts/deadlines and a fit ranking. It adopts the inventory's non-dilutive-first sequencing and its warning to keep tracks separate.</strong></p>
+<hr>
+<h2>1. Verified instrument facts (2026-07-25)</h2>
+<h3>Almi — Verifieringsmedel (grant)</h3>
+<ul>
+<li>Up to <strong>100,000 SEK</strong> for companies; up to <strong>25,000 SEK</strong> for private individuals. <code> [VERIFIED:2026-07-25]</code></li>
+<li><strong>No co-financing</strong> normally required; <strong>de minimis</strong> (€300,000 rolling 3-yr ceiling). <code> [VERIFIED:2026-07-25]</code></li>
+<li>Eligible uses explicitly include <strong>market/competitor analysis, legal/regulatory studies, simple MVP</strong> — a near-perfect fit. Private individuals eligible with Swedish personnummer + bank + intent to start a company. <code> [VERIFIED:2026-07-25]</code></li>
+<li><strong>Rolling</strong> (contact an Almi advisor to open the e-service); no fixed deadline. <code> [VERIFIED:2026-07-25]</code></li>
+<li><em>Repo note:</em> inventory cites &quot;25 000 kr privat / 85 000 kr företag&quot;. Privat 25k confirmed; company figure per Almi is <strong>up to 100k</strong>, not 85k → <code> [UNVERIFIED — källa 2026-07-25: företag upp till 100 000 SEK]</code></li>
+</ul>
+<h3>Almi — Innovationslån (loan)</h3>
+<ul>
+<li><strong>50,000–500,000 SEK</strong>, typically <strong>~300,000 SEK</strong>. <code> [VERIFIED:2026-07-25]</code> <em>(Repo TOP-15 says &quot;750K&quot; — the official max is 500k → the 750k figure is</em> <code> [UNVERIFIED — källa 2026-07-25: max 500 000 SEK]</code><em>.)</em></li>
+<li>Requires <strong>co-financing</strong>; Almi funds up to <strong>50 %</strong> of project cost; loans &gt;300k need ≥half of co-financing in capital. <code> [VERIFIED:2026-07-25]</code></li>
+<li>Company must be registered in Sweden, ≤249 employees; <strong>need not exist at application but must exist before disbursement</strong>; repayment 3–5 yrs (max 96 mo). <code> [VERIFIED:2026-07-25]</code></li>
+<li><strong>Rolling</strong> (no fixed deadline); handling ~3–4 weeks. <code> [VERIFIED:2026-07-25]</code></li>
+</ul>
+<h3>Almi — Företagslån / Tillväxtlån (loan)</h3>
+<ul>
+<li>Marknadskompletterande loan; for capital needs <strong>up to 250,000 SEK Almi can lend the full amount</strong>, above that co-financing required; ~1/3 average financing share; rate ~2–3 % above bank. <code> [VERIFIED:2026-07-25]</code> <em>(A distinct named &quot;Tillväxtlån&quot; product amount is</em> <code> [UNVERIFIED]</code> <em>— Almi's public site frames growth financing under Företagslån; confirm exact product with advisor.)</em></li>
+</ul>
+<h3>Vinnova — Innovativa Startups 2026 (grant)</h3>
+<ul>
+<li><strong>Steg 1:</strong> up to <strong>500,000 SEK</strong>; <strong>call opens 2026-10-12</strong>; closes <strong>2027-01-12 14:00.</strong> <code> [VERIFIED:2026-07-25 K-DEADLINES]</code> <em>(korrigerar tidigare “1 Sep 2026”-öppning)</em></li>
+<li><strong>Eligibility:</strong> AB &amp;lt;10y, &amp;lt;10 emp, &amp;lt;10Mkr oms/balans, no dividend. <code> [VERIFIED:2026-07-25 K-DEADLINES]</code></li>
+<li><strong>Steg 2:</strong> up to <strong>900,000 SEK</strong>, requires ≥<strong>10 %</strong> own financing of eligible costs. <code> [VERIFIED:2026-07-25]</code> (Whether a steg-2 round is <em>open</em> in 2026 not confirmed → steg-2 <em>timing</em> <code> [UNVERIFIED]</code>.)</li>
+<li><em>Repo note:</em> older inventory said &quot;~sep 2026 opening&quot; — <strong>superseded</strong> by K-DEADLINES (Oct open). Call-based, not &quot;löpande&quot;.</li>
+</ul>
+<h3>Region Gävleborg — Regionala företagsstöd (grant/co-financing)</h3>
+<ul>
+<li><strong>Mikrostöd:</strong> costs 20,000–60,000 SEK, support up to <strong>50 %</strong>. <code> [VERIFIED:2026-07-25]</code></li>
+<li><strong>Konsultcheck (external consultant):</strong> up to <strong>300,000 SEK</strong>, support up to <strong>50 %</strong>. <code> [VERIFIED:2026-07-25]</code></li>
+<li><strong>Medelstora hårda investeringar:</strong> max <strong>3,000,000 SEK</strong> (hard costs). <code> [VERIFIED:2026-07-25]</code></li>
+<li><strong>Stora investeringar:</strong> up to <strong>25,000,000 SEK</strong> (above → Tillväxtverket). <code> [VERIFIED:2026-07-25]</code></li>
+<li><strong>de minimis</strong> ceiling 3,000,000 SEK / 3 yrs; <strong>needs-tested per application</strong>; requires other co-financing. <code> [VERIFIED:2026-07-25]</code></li>
+<li>⚠️ <strong>Geography:</strong> some investment supports <strong>exclude companies in Gävle kommun</strong>; <strong>Sandviken (TWISTEDSTACKS' base) is eligible.</strong> <code> [VERIFIED:2026-07-25]</code></li>
+<li><em>Repo note:</em> inventory's &quot;Region Gävleborg Företagsstöd 210K&quot; is <strong>not a named product</strong>; closest real instruments are the konsultcheck (≤300k) / consultant support. The &quot;210K&quot; figure is <code> [UNVERIFIED — källa 2026-07-25: no matching named amount; konsultcheck upp till 300 000 SEK @50%]</code>. For a software startup, the <strong>konsultcheck</strong> (buying external expertise) is the realistic fit; a pure software build is a weaker fit for the investment lines.</li>
+</ul>
+<h3>Tillväxtverket — Affärsutvecklingscheckar (grant, region-administered)</h3>
+<ul>
+<li>Business-development checks exist for SMEs (digitalisation / internationalisation), <strong>administered regionally</strong> (often via regions/Almi); typical range <strong>~50,000–250,000 SEK</strong> at <strong>40–50 %</strong> co-financing; eligibility roughly 2–49 employees, turnover 1–100 MSEK. <code> [VERIFIED:2026-07-25]</code> (general programme)</li>
+<li><strong>Gävleborg-specific 2026 round amount/deadline</strong> for TWISTEDSTACKS <code> [UNVERIFIED]</code> — confirm with Region Gävleborg / regional administrator; the repo &quot;175K&quot; figure is plausible but <code> [UNVERIFIED]</code>.</li>
+</ul>
+<h3>EIC Accelerator 2026 (grant + equity) — <em>later stage</em></h3>
+<ul>
+<li><strong>Grant up to €2.5M</strong> (TRL 6–8) + <strong>equity €1–10M</strong>. <code> [VERIFIED:2026-07-25]</code></li>
+<li><strong>2026 full-proposal cut-offs:</strong> <strong>7 Jan, 4 Mar, 6 May, 8 Jul, 2 Sep, 4 Nov 2026</strong>; short proposals <strong>any time.</strong> <code> [VERIFIED:2026-07-25]</code></li>
+<li>Needs AB + strong traction + (typically) EU dimension → the repo correctly marks it <strong>archive_only until AB + EU partners</strong> exist.</li>
+</ul>
+<h3>Movexum (Gävleborg incubator) — <em>not a grant, a platform</em></h3>
+<ul>
+<li>Incubator <strong>1,000 SEK/mo</strong>; coaching valued <strong>~300,000 SEK</strong>, total support valued <strong>&gt;500,000 SEK</strong>; up to <strong>20,000 SEK/yr</strong> development; up to <strong>200,000 SEK</strong> for &quot;excellent&quot; companies. <code> [VERIFIED:2026-07-25]</code></li>
+<li>Recently awarded <strong>17 MSEK for &quot;SPARK&quot;</strong> (startups + industry energy transition in Gävleborg) — directly relevant to SkatteRevision's energy-tax angle and regional legitimacy. <code> [VERIFIED:2026-07-25]</code></li>
+</ul>
+<hr>
+<h2>2. Top-5 ranked instruments (by fit)</h2>
+<p>Ranking weighs: <strong>fit to a decision-support/AI product</strong>, <strong>stage-appropriateness (pre-/early)</strong>, <strong>non-dilutive</strong>, <strong>regional eligibility (Sandviken)</strong>, and <strong>speed to money</strong>.</p>
+<h3>🥇 1. Almi Verifieringsmedel — <em>best first money</em></h3>
+<p><strong>Why #1:</strong> grant (non-dilutive), <strong>no co-financing</strong>, <strong>rolling</strong>, and its named eligible uses (<strong>market/competitor analysis, legal/regulatory studies, MVP</strong>) map <em>exactly</em> onto SkatteRevision's biggest open risks — including funding the <strong>independence/legal-boundary review</strong> that de-risks the whole model. Privatperson-eligible, so it works <strong>before</strong> the AB payout gate. Small (≤100k företag / ≤25k privat) but decisive for Level-1 &quot;Verify.&quot;</p>
+<p><strong>Fit rationale:</strong> de-risks the exact things a decision-support tax product must de-risk; matches repo's <code>now</code> MVP path.</p>
+<p><strong>Verified:</strong> amounts, de minimis, rolling — <code> [VERIFIED:2026-07-25]</code>. <strong>Action:</strong> book Almi advisor; prep 3–5 byrå dialogues + 1 LOI (repo §F checklist).</p>
+<h3>🥈 2. Vinnova Innovativa Startups 2026 (steg 1 → steg 2)</h3>
+<p><strong>Why #2:</strong> largest <strong>non-dilutive grant</strong> cleanly on-thesis for an <strong>AI/data innovation</strong> — <strong>500k steg 1</strong>, <strong>900k steg 2</strong> — with a <strong>known window: opens 2026-10-12 → closes 2027-01-12.</strong> Frames SkatteRevision as deep-tech, not tax advisory. Requires AB before payout; steg 2 needs ≥10 % co-fin.</p>
+<p><strong>Fit rationale:</strong> national innovation grant tailor-made for a novel software engine; timing lets TWISTEDSTACKS prepare the AB + evidence through Q3 2026.</p>
+<p><strong>Verified:</strong> steg-1 500k + <strong>2026-10-12</strong> opening / <strong>2027-01-12</strong> close — <code> [VERIFIED:2026-07-25 K-DEADLINES]</code>; steg-2 900k + 10 % — <code> [VERIFIED:2026-07-25]</code>. <strong>Action:</strong> register AB; assemble pilot signals; draft steg-1 for the October call (repo <code>01_Vinnova_InnovativaStartups_SkatteRevision.docx</code> as base).</p>
+<h3>🥉 3. Almi Innovationslån</h3>
+<p><strong>Why #3:</strong> bridges the gap between verification grants and larger raises with <strong>50–500k (typ ~300k)</strong>, <strong>rolling</strong>, fast (~3–4 wk), and it <em>tolerates</em> early-stage intangibles. Non-dilutive (debt), but needs <strong>50 % co-financing</strong> and repayment.</p>
+<p><strong>Fit rationale:</strong> funds the productisation/pilot phase (Level 2) once first evidence exists; complements Vinnova timing.</p>
+<p><strong>Verified:</strong> 50–500k, 50 % co-fin, rolling — <code> [VERIFIED:2026-07-25]</code> (repo &quot;750K&quot; corrected to <strong>max 500k</strong>). <strong>Action:</strong> after verification-go + AB; base = repo <code>03_Almi_Innovationslaan_SkatteRevision.docx</code>.</p>
+<h3>4. Region Gävleborg — Konsultcheck (regionala företagsstöd)</h3>
+<p><strong>Why #4:</strong> regional, <strong>Sandviken eligible</strong> (Gävle-kommun exclusion does <strong>not</strong> apply), up to <strong>300k @ 50 %</strong>, buys <strong>external expertise</strong> — ideal to fund the <strong>tax-law/independence specialist</strong> input SkatteRevision needs. Needs-tested + requires co-financing + de minimis.</p>
+<p><strong>Fit rationale:</strong> regional legitimacy + funds the exact external competence gaps; strong pairing with Movexum/Science Park local network.</p>
+<p><strong>Verified:</strong> konsultcheck ≤300k @50 %, Sandviken eligibility, de minimis 3M/3yr — <code> [VERIFIED:2026-07-25]</code> (repo &quot;210K&quot; is not a real product line). <strong>Action:</strong> engage Region Gävleborg näringsliv; scope a consultant deliverable (legal boundary / market validation).</p>
+<h3>5. Movexum incubator (+ Gävle Science Park) — <em>platform, not cash</em></h3>
+<p><strong>Why #5:</strong> near-free (<strong>1,000 kr/mo</strong>) access to <strong>~300k+ of coaching</strong>, small dev grants (≤20k/yr; ≤200k &quot;excellent&quot;), investor/soft-loan intros, and — via <strong>SPARK (17 MSEK)</strong> — a live regional programme aligned to SkatteRevision's <strong>energy-tax</strong> angle. Not a large cash instrument, but it <strong>manufactures the evidence, LOIs and warm intros</strong> every grant above depends on.</p>
+<p><strong>Fit rationale:</strong> the repo explicitly makes &quot;evidence / byrå dialogues&quot; the gating blocker for <em>all</em> funding; Movexum is the fastest way to generate it, plus regional credibility for Vinnova/ERUF later.</p>
+<p><strong>Verified:</strong> incubator cost, coaching value, dev grants, SPARK 17 MSEK — <code> [VERIFIED:2026-07-25]</code>. <strong>Action:</strong> apply now (repo <code>04_Movexum_Inkubator_SkatteRevision.docx</code>); book Gävle Science Park intro.</p>
+<hr>
+<h2>3. Sequenced roadmap (fit + gates)</h2>
+<table>
+<tr><th>Phase</th><th>Instrument(s)</th><th>Type</th><th>Amount (verified)</th><th>Gate</th></tr>
+<tr><td><strong>Now</strong></td><td>Almi Verifieringsmedel; Movexum; Gävle Science Park; competitions (Venture Cup / EWC)</td><td>Grant + platform</td><td>≤100k (≤25k privat); coaching ~300k+</td><td>Evidence pack: 3–5 byrå dialogues + ≥1 LOI; BankID; de minimis</td></tr>
+<tr><td><strong>Gate</strong></td><td>Register <strong>TWISTEDSTACKS AB</strong></td><td>—</td><td>—</td><td>Before any disbursement</td></tr>
+<tr><td><strong>After company</strong></td><td><strong>Vinnova Innovativa Startups steg 1</strong> (öppnar <strong>2026-10-12</strong>); Almi Innovationslån; Region Gävleborg konsultcheck; Tillväxtverket check</td><td>Grant + loan</td><td>500k / ≤500k / ≤300k @50 % / ~50–250k</td><td>AB + first pilot signals + co-financing</td></tr>
+<tr><td><strong>Scale</strong></td><td>Vinnova steg 2 (≤900k); ERUF (partner-led, autumn 2026 window per repo); Almi växtfinansiering; <strong>EIC Accelerator</strong></td><td>Grant + loan + equity</td><td>≤900k / regional / — / €2.5M grant + €1–10M equity</td><td>AB + traction + partner/consortium + EU dimension</td></tr>
+</table>
+<p><strong>ERUF note:</strong> repo cites an autumn-2026 window (&quot;utlysning öppnar 20 aug 2026&quot;, partner Propell/Sandbacka as project owner). ERUF calls are region/programme-specific → the <strong>20 Aug 2026 date is</strong> <code> [UNVERIFIED]</code> (confirm on regiongavleborg.se / Tillväxtverket ERUF pages nearer the date). ERUF requires a <strong>project-owning partner</strong> — keep it as a Level-3 track.</p>
+<hr>
+<h2>4. Guardrails for every application</h2>
+<ol>
+<li><strong>Describe an AI/data innovation</strong>, never &quot;tax advice&quot; or &quot;audit.&quot; SkatteRevision = <strong>decision-support</strong>.</li>
+<li><strong>No success-fee business model</strong> in any narrative (retire KONCEPT.md 20–35 %). Independence-safe fixed-price licensing only.</li>
+<li><strong>Keep tracks separate</strong> — do not co-file SkatteRevision with Klätterträdet / IT-Kår / LAGA (repo inventory warning).</li>
+<li><strong>De minimis accounting</strong> — Almi + Region Gävleborg + Movexum grants all count toward the <strong>€300k / 3M SEK</strong> ceilings; track cumulatively.</li>
+<li><strong>AB before payout</strong> — applications can precede registration; disbursement cannot.</li>
+<li><strong>Re-verify amounts/deadlines at submission</strong> — grant terms change; the markers above are a 2026-07-25 snapshot.</li>
+</ol>
+<p><em>All figures and their official sources are itemised in <code>sources.md</code>.</em></p>
+<hr>
+<h2>K-DEADLINES sync + deferred (2026-07-25)</h2>
+<ul>
+<li>Master deadlines: <code>00-MASTER/INVENTORY/kimi-deadlines-2026-07.md</code>.</li>
+<li>Innovativa Startups: öppnar <strong>2026-10-12</strong> (inte 1 sep) — <strong>VERIFIED</strong>.</li>
+<li>Almi Verifiering privat <strong>~25k</strong> → <strong>Per Brinell</strong> tills AB registrerat (AB-blocker kvar).</li>
+<li><strong>NotebookLM mars 2026:</strong> ingested as <strong>old/partial</strong> → <code>research/notebooklm-mars-2026-anlagstavlan.md</code> (+ origin/critique prompt separat). <strong>Do not</strong> adopt success-fee / &quot;intel to PwC&quot; from that dump — keep <strong>AB + decision-support / fixed-price</strong> framing.</li>
+<li><strong>Sandbacka / Gävleborg angle (from mars dump, funding-safe):</strong> local pilot narrative via Sandbacka Science Park tenants/partners (FoU / energiskatt / leasing spears) strengthens Region + Movexum + ERUF partner story — without personal origin details.</li>
+<li><strong>Still deferred:</strong> giant NotebookLM / portal deep-dive via MCP (full refresh) — user later; <strong>ej akut gap</strong>. Mars-ingest ≠ full refresh.</li>
+</ul></div>
+      </div>
+    </section>
+
+    <section id="notes">
+      <h2>Gemensamma anteckningar</h2>
+      <div class="card">
+        <div class="editable" data-key="notes" data-placeholder="Anteckningar inför ansökan…" style="min-height:8rem;"></div>
+      </div>
+    </section>
+  </div>
+  <input type="file" id="importFile" accept="application/json,.json" hidden />
+  <script>
+    const STORAGE_KEY = 'ts_project_skatterevision-reboot_v1';
+    let saveTimer = null;
+    function collectData() {
+      const data = { slug: 'skatterevision-reboot', version: 1, savedAt: new Date().toISOString(), fields: {} };
+      document.querySelectorAll('.editable[data-key]').forEach(el => { data.fields[el.dataset.key] = el.innerHTML; });
+      return data;
+    }
+    function applyData(data) {
+      if (!data?.fields) return;
+      document.querySelectorAll('.editable[data-key]').forEach(el => {
+        if (data.fields[el.dataset.key] !== undefined) el.innerHTML = data.fields[el.dataset.key];
+      });
+    }
+    function saveNow() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(collectData()));
+      document.getElementById('saveStatus').textContent = 'Sparat ' + new Date().toLocaleString('sv-SE');
+    }
+    function scheduleSave() { clearTimeout(saveTimer); document.getElementById('saveStatus').textContent = 'Sparar…'; saveTimer = setTimeout(saveNow, 800); }
+    function exportJson() {
+      saveNow();
+      const blob = new Blob([JSON.stringify(collectData(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'skatterevision-reboot-workbook-' + new Date().toISOString().slice(0,10) + '.json';
+      a.click(); URL.revokeObjectURL(a.href);
+    }
+    function importJson() { document.getElementById('importFile').click(); }
+    document.getElementById('importFile').addEventListener('change', e => {
+      const f = e.target.files[0]; if (!f) return;
+      const r = new FileReader();
+      r.onload = () => { try { applyData(JSON.parse(r.result)); saveNow(); alert('Importerat!'); } catch { alert('Ogiltig JSON'); } };
+      r.readAsText(f); e.target.value = '';
+    });
+    document.querySelectorAll('.editable[data-key]').forEach(el => el.addEventListener('input', scheduleSave));
+    try { const s = localStorage.getItem(STORAGE_KEY); if (s) { applyData(JSON.parse(s)); } } catch {}
+  </script>
+
+<div id="funding-toolbar" style="position:fixed;bottom:12px;right:12px;z-index:9999;display:flex;gap:8px;font-family:system-ui,sans-serif;font-size:13px;">
+  <a href="/api/funding/doc?file=index.html" style="background:#1a222d;color:#38bdf8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Alla projekt</a>
+  <a href="/funding" style="background:#1a222d;color:#94a3b8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Inlogg</a>
+  <button type="button" onclick="logoutFunding()" style="background:#1a222d;color:#fb7185;border:1px solid #334155;padding:6px 12px;border-radius:8px;cursor:pointer;">Logga ut</button>
+</div>
+<script>
+async function logoutFunding() {
+  await fetch('/api/funding/auth', { method: 'DELETE', credentials: 'include' });
+  location.href = '/funding';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CymWave — Projektunderlag</title>
+  <style>
+    :root {
+      --bg: #0f1419; --surface: #1a222d; --surface2: #243040; --border: #334155;
+      --text: #e8edf4; --muted: #94a3b8; --accent: #38bdf8; --investor: #34d399;
+      --grant: #fbbf24; --warn: #fb7185; --radius: 12px;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.55; }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+    .topbar { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; position: sticky; top: 0; z-index: 5;
+      background: linear-gradient(var(--bg) 75%, transparent); padding: .5rem 0 1rem; }
+    button { border: 1px solid var(--border); background: var(--surface2); color: var(--text); border-radius: 8px;
+      padding: .45rem .8rem; font-size: .85rem; cursor: pointer; font-family: inherit; }
+    button:hover { border-color: var(--accent); }
+    button.primary { background: #0ea5e9; border-color: #0ea5e9; color: #041018; font-weight: 600; }
+    .status { margin-left: auto; font-size: .78rem; color: var(--muted); align-self: center; }
+    h1 { font-size: 1.55rem; margin: 0 0 .25rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.25rem; font-size: .82rem; }
+    .badge { background: var(--surface2); border: 1px solid var(--border); padding: .2rem .55rem; border-radius: 999px; }
+    .badge.p0 { border-color: #7f1d1d; color: #fecaca; }
+    .badge.p1 { border-color: #78350f; color: #fde68a; }
+    .badge.p2 { border-color: #1e3a5f; color: #bae6fd; }
+    nav.jump { display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: 1.5rem; }
+    nav.jump a { color: var(--muted); text-decoration: none; font-size: .82rem; padding: .3rem .55rem;
+      border: 1px solid var(--border); border-radius: 8px; }
+    nav.jump a:hover { color: var(--accent); border-color: var(--accent); }
+    section { margin-bottom: 2rem; scroll-margin-top: 5rem; }
+    section > h2 { font-size: 1.2rem; margin: 0 0 .75rem; padding-bottom: .4rem; border-bottom: 2px solid var(--surface2); }
+    .hint { font-size: .82rem; color: var(--muted); background: var(--surface2); border-left: 3px solid var(--accent);
+      padding: .6rem .85rem; border-radius: 0 8px 8px 0; margin-bottom: .75rem; }
+    .hint.inv { border-left-color: var(--investor); }
+    .hint.grt { border-left-color: var(--grant); }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; }
+    .editable { min-height: 2rem; outline: none; border: 1px dashed transparent; border-radius: 8px; padding: .5rem .65rem;
+      transition: border-color .15s, background .15s; }
+    .editable:hover { border-color: #475569; background: rgba(56,189,248,.04); }
+    .editable:focus { border-color: var(--accent); background: rgba(56,189,248,.07); }
+    .editable[data-placeholder]:empty::before { content: attr(data-placeholder); color: #64748b; }
+    .md-content h1,.md-content h2,.md-content h3,.md-content h4 { margin-top: 1rem; }
+    .md-content table { width: 100%; border-collapse: collapse; font-size: .85rem; margin: .75rem 0; }
+    .md-content th,.md-content td { border: 1px solid var(--border); padding: .45rem .55rem; vertical-align: top; }
+    .md-content th { background: var(--surface2); }
+    .md-content blockquote { margin: .5rem 0; padding-left: .75rem; border-left: 3px solid var(--border); color: var(--muted); }
+    .md-content code { font-family: ui-monospace, monospace; font-size: .85em; background: var(--surface2); padding: .1rem .3rem; border-radius: 4px; }
+    .md-content a { color: var(--accent); }
+    .back { font-size: .85rem; margin-bottom: 1rem; }
+    .back a { color: var(--accent); }
+    @media print { .topbar, nav.jump, .back { display: none !important; } body { background: #fff; color: #111; }
+      .card { break-inside: avoid; } .editable { border: none !important; padding: 0; } }
+    @media (max-width: 600px) { .status { margin-left: 0; width: 100%; } }
+  </style>
+</head>
+<body data-slug="cymwave">
+  <div class="wrap">
+    <p class="back"><a href="/api/funding/doc?file=index.html">← Alla projekt</a> · <a href="/api/funding/doc?file=studio-workbook.html">Studio-arbetsbok</a></p>
+
+    <h1>CymWave</h1>
+    <div class="meta">
+      <span class="badge p1">P1</span>
+      
+      
+      
+    </div>
+
+    <div class="topbar">
+      <button class="primary" type="button" onclick="saveNow()">💾 Spara</button>
+      <button type="button" onclick="exportJson()">⬇ Exportera</button>
+      <button type="button" onclick="importJson()">⬆ Importera</button>
+      <button type="button" onclick="window.print()">🖨 PDF / Skriv ut</button>
+      <span class="status" id="saveStatus">Redigera genom att klicka i texterna</span>
+    </div>
+
+    <nav class="jump">
+      <a href="#investor">Investerare</a>
+      <a href="#grant">Bidrag</a>
+      <a href="#dossier">Dossier</a>
+      <a href="#funding">Finansieringsplan</a>
+      <a href="#notes">Anteckningar</a>
+    </nav>
+
+    <section id="investor">
+      <h2>Investerare — vad framhäva</h2>
+      <div class="hint inv">Fokus: marknad, traction, unit economics, moat — inte bidragsspråk.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="investor_pitch" data-placeholder="Skriv investerarpitch för detta projekt…">
+          <p><em>Fyll i: problem → lösning → traction → ask → varför nu. Se dossier §1–3 nedan som källa.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="grant">
+      <h2>Bidrag & stöd — vad framhäva</h2>
+      <div class="hint grt">Fokus: innovation, samhällsnytta, regional nytta, budget, TRL — en vertikal i taget.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="grant_pitch" data-placeholder="Skriv grant-vinkel för detta projekt…">
+          <p><em>Fyll i: innovationshöjd, samhällsnytta Gävleborg, budgetposter, sökande (AB vs Per). Se finansieringsplan nedan.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="dossier">
+      <h2>Dossier (från dossier.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="dossier"><h1>CymWave — Funding Dossier</h1>
+<p><strong>Prepared:</strong> 2026-07-25 · <strong>Analyst:</strong> Ripple</p>
+<p><strong>Product:</strong> Programmable immersive bath / float <em>experience</em> platform (water + vibroacoustic + sound + light &quot;journeys&quot;) for hotels, spas, retreats.</p>
+<p><strong>Applicant entity:</strong> <strong>TWISTEDSTACKS AB</strong> — <em>Sandviken, Gävleborg</em> — <strong>⚠️ FLAG TO CONFIRM (see §1).</strong></p>
+<p>Currency: SEK for the entity model; EUR/USD for market context (from <code>market-research.md</code>). FX assumptions in <code>sources.md</code> A1 (<strong>1 EUR ≈ 11.3 SEK</strong>, <strong>1 USD ≈ 10.4 SEK</strong>).</p>
+<hr>
+<h2>0. ⚠️ Compliance rule (read first — non-negotiable)</h2>
+<blockquote><strong>CymWave is a wellness / relaxation / sensory-experience / premium-hospitality product. It makes NO medical, therapeutic, diagnostic, preventive-medical, or curative claims — ever.</strong></blockquote>
+<p>&gt;</p>
+<blockquote>- <strong>Do not use:</strong> &quot;treats,&quot; &quot;cures,&quot; &quot;therapy,&quot; &quot;therapeutic,&quot; &quot;detox,&quot; &quot;heals,&quot; &quot;medical,&quot; &quot;clinical outcome,&quot; &quot;diagnoses,&quot; &quot;prevents [disease],&quot; &quot;improves circulation/immunity&quot; (as medical claims), &quot;trauma/anxiety/depression/insomnia treatment,&quot; &quot;neurological reset,&quot; &quot;guaranteed sleep.&quot;</blockquote>
+<blockquote>- <strong>Do use:</strong> relaxation, recovery ritual, immersive spa journey, perceived stress reduction, sleep preparation, guest wellbeing, sensory experience, premium amenity, &quot;designed for wellbeing and sensory relaxation, not diagnosis or treatment.&quot;</blockquote>
+<blockquote>- <strong>Why it matters:</strong> any medical/therapeutic claim risks triggering <strong>EU MDR (2017/745)</strong> classification, which imposes clinical-evidence and conformity burdens CymWave is not resourced for, and would sink a wellness-framed grant application. It also protects grant credibility (Vinnova explicitly wants wellbeing innovation, <em>not</em> unsupported &quot;healing&quot; claims — per repo <code>docs/GRANT_STRATEGY.md</code>).</blockquote>
+<blockquote>- <strong>Control:</strong> a <strong>claims-review checklist</strong> gates ALL outputs — grant text, pitch decks, operator scripts, brochures, website, PR. One stray word can reclassify the product. Owner sign-off required before anything ships. (See §7.)</blockquote>
+<hr>
+<h2>1. ⚠️ Entity flag — TWISTEDSTACKS AB (confirm before filing)</h2>
+<p><strong>Finding (2026-07-25):</strong> a targeted Swedish business-registry check (Bolagsfakta / Allabolag / Merinfo via Exa) returned <strong>no company registered under the exact name &quot;TWISTEDSTACKS AB.&quot;</strong> Similar names exist (e.g., <em>Twisted Keys Sweden AB</em>, <em>STACKAB AB</em>, <em>Sandviken Solutions AB</em>) but none matches. <strong>This must be resolved before any application</strong> — every instrument below requires a real Swedish legal entity with an organisationsnummer.</p>
+<p><strong>Action items (blocking):</strong></p>
+<ol>
+<li><strong>Confirm the legal name &amp; org-nr.</strong> Is the entity (a) already registered under a slightly different spelling, (b) newly formed and not yet indexed, or (c) still to be incorporated?</li>
+<li><strong>Confirm registered seat = Sandviken, Gävleborg</strong> — this drives <em>regional</em> eligibility (Region Gävleborg, Almi <strong>Norra Mellansverige</strong>, Movexum incubator).</li>
+<li><strong>Confirm company age &amp; size</strong> — several instruments cap age (Region Gävleborg innovationsstöd: <strong>&lt; 5 years</strong>; Vinnova Innovativa Startups: young AB) and size (SME ≤ 249 employees).</li>
+<li><strong>Confirm ownership/dividends history</strong> — Region Gävleborg takes a <em>restrictive</em> view of firms with large/recurring dividends; Vinnova startup calls restrict dividend history.</li>
+</ol>
+<blockquote>Until confirmed, treat &quot;TWISTEDSTACKS AB, Sandviken&quot; as an <strong>assumption</strong>. If the entity does not yet exist, incorporating a young Gävleborg-seated AB actually <em>improves</em> fit for the regional + startup instruments.</blockquote>
+<hr>
+<h2>2. Company &amp; product status (grounded in the repo)</h2>
+<p>From <code>wawawee/CymWave</code> (README + docs, last repo updates 2026-06-07):</p>
+<ul>
+<li><strong>Stage:</strong> early-stage / concept-recovery → proof-of-experience. Not yet a built prototype; no medical validation; single-founder profile.</li>
+<li><strong>Technical track:</strong> moving toward measured pressure/vibration design; an <strong>aviation vibration-testing specialist</strong> expected to support actuator/motor-side tuning.</li>
+<li><strong>Positioning (locked):</strong> <em>&quot;A programmable immersive hydro-wellness experience for deep relaxation and memorable spa journeys.&quot;</em> Explicitly avoids medical claims.</li>
+<li><strong>Assets in repo:</strong> research brief, product roadmap (Phase 0→4), grant strategy, IP/regulatory notes, Test&amp;Demo one-pager, AnslagSITK integration notes, sources.</li>
+<li><strong>Funding readiness:</strong> strong <em>narrative</em> readiness; needs (a) confirmed entity, (b) external test/demo environment + LOIs from venues, (c) FTO/patentability memo, (d) safety/CE concept.</li>
+</ul>
+<hr>
+<h2>3. Grant angles (three framings, ranked by fit)</h2>
+<p>CymWave can be framed three ways; <strong>use the framing that matches each funder</strong> (detailed instrument ranking in <code>funding-plan.md</code>).</p>
+<h3>Angle A — <strong>Test &amp; Demo / testbädd</strong> (SME de-risking before market) — <em>strongest immediate fit</em></h3>
+<ul>
+<li><strong>Story:</strong> &quot;A Swedish SME with an innovative wellness-experience solution needs to <strong>verify function, performance, safety and usability in a real test/demo environment</strong> (a partner hotel/spa + an external vibration/acoustics/water-safety test provider) before market introduction.&quot;</li>
+<li><strong>Fits:</strong> <strong>Vinnova Test &amp; Demo för SMF 2026</strong> (see <code>funding-plan.md</code>, VERIFIED). CymWave buys external test/demo services (vibration testing, water/electrical safety verification, UX testing) — exactly the eligible cost type.</li>
+<li><strong>Why it wins:</strong> frames spend as <em>innovation-risk reduction</em>, not product development or marketing; matches the aviation-vibration-testing track already in the repo.</li>
+</ul>
+<h3>Angle B — <strong>Tourism &amp; experience innovation</strong> (besöksnäring / visitor economy)</h3>
+<ul>
+<li><strong>Story:</strong> &quot;Exportable Swedish <strong>experience innovation</strong> that strengthens the competitiveness and non-room revenue of Nordic hospitality — a differentiating premium amenity for hotels, spas, and retreats.&quot;</li>
+<li><strong>Fits:</strong> Tillväxtverket visitor-economy/ERUF regional priorities, Region Gävleborg företagsstöd/innovationsstöd, Visit Sweden-adjacent tourism-innovation initiatives.</li>
+<li><strong>Why it fits Gävleborg:</strong> regional development strategy + smart-specialisation (RIS3); a local wellness-tourism flagship is politically and economically attractive.</li>
+</ul>
+<h3>Angle C — <strong>Preventive wellbeing with a public partner</strong> (region/kommun)</h3>
+<ul>
+<li><strong>Story:</strong> &quot;Public-private collaboration on <strong>preventive wellbeing / stress-recovery environments</strong> (workplace wellbeing, staff recovery, healthy-workplace pilots) with a <strong>region or kommun</strong> as partner — measurable <em>wellbeing</em> outcomes, explicitly non-medical.&quot;</li>
+<li><strong>Fits:</strong> Vinnova collaboration/&quot;healthy &amp; resilient societies&quot; calls (require a public + business actor); regional preventive-health initiatives.</li>
+<li><strong>⚠️ Claim discipline critical here:</strong> &quot;preventive wellbeing&quot; must stay experiential (perceived stress, sleep readiness, comfort) and <strong>never</strong> drift into rehab/medical treatment, or it triggers MDR and disqualifies the wellness framing. A public partner is required and hardest to line up quickly.</li>
+</ul>
+<p><strong>Recommended sequence:</strong> lead with <strong>Angle A (Test &amp; Demo)</strong> now; use <strong>Angle B</strong> for regional co-funding; pursue <strong>Angle C</strong> only once a public partner + tight non-medical protocol exist.</p>
+<hr>
+<h2>4. 24-month budget (SEK) &amp; conservative pilot revenue</h2>
+<h3>4.1 Cost model — 24 months (Phase 1 proof-of-experience → Phase 2 partner pilot)</h3>
+<table>
+<tr><th>Work package</th><th>Description</th><th>Cost (SEK)</th></tr>
+<tr><td>WP1 Market &amp; customer validation</td><td>10–15 hotel/spa/retreat interviews, willingness-to-pay, LOIs</td><td><strong>150,000</strong></td></tr>
+<tr><td>WP2 IP &amp; FTO</td><td>Patentability + freedom-to-operate memo (orchestration, audio-to-haptic mapping, retrofit architecture)</td><td><strong>120,000</strong></td></tr>
+<tr><td>WP3 Technical feasibility &amp; vibration/pressure testing</td><td>Aviation-vibration specialist; actuator/motor-side tuning; pressure/vibration/timing characterisation; external test provider</td><td><strong>450,000</strong></td></tr>
+<tr><td>WP4 Electrical &amp; water safety concept + CE pathway</td><td>LVD/EMC/Machinery scoping, IP-rating/wet-zone design review, Legionella/hygiene concept</td><td><strong>250,000</strong></td></tr>
+<tr><td>WP5 Proof-of-experience prototype</td><td>Certified off-the-shelf components, control system outside wet zone, e-stop, sanitation workflow</td><td><strong>500,000</strong></td></tr>
+<tr><td>WP6 UX &amp; journey design</td><td>Journey library (Calm Descent, Nordic Float, Deep Harbor, Dream Current, Celebration), operator dashboard v0</td><td><strong>200,000</strong></td></tr>
+<tr><td>WP7 Partner pilot (Phase 2)</td><td>30–100 sessions at 1 venue, A/B session pricing, surveys, operator checklist, maintenance log</td><td><strong>250,000</strong></td></tr>
+<tr><td>WP8 Evaluation &amp; compliance</td><td>Perceived-stress/comfort/WTP measurement, <strong>claims-review checklist</strong>, safety documentation</td><td><strong>120,000</strong></td></tr>
+<tr><td>WP9 Founder time / project management (24 mo, part- to full-time)</td><td>Coordination, grant management, partner relations</td><td><strong>900,000</strong></td></tr>
+<tr><td>WP10 Overheads, travel, contingency (~10%)</td><td></td><td><strong>310,000</strong></td></tr>
+<tr><td><strong>TOTAL 24-month programme cost</strong></td><td></td><td><strong>≈ 3,250,000 SEK</strong></td></tr>
+</table>
+<blockquote>This total <em>exceeds</em> any single early-stage instrument, so it must be <strong>assembled from a stack</strong> (grants + loan + own/medfinansiering) and phased — see funding levels §5 and <code>funding-plan.md</code>.</blockquote>
+<h3>4.2 Conservative pilot revenue (during the 24 months)</h3>
+<p>CymWave revenue in the grant window is <strong>pilot-scale</strong>, not commercial scale. Two conservative lines:</p>
+<p><strong>(i) Pilot-install / setup fees</strong> (Phase 2, from <code>docs/PRODUCT_ROADMAP.md</code> &quot;setup fee + monthly licence&quot; model):</p>
+<table>
+<tr><th>Item</th><th>Assumption</th><th>Value (SEK)</th></tr>
+<tr><td>Paid/sponsored pilot installs in 24 mo</td><td><strong>1–2</strong> venues</td><td>—</td></tr>
+<tr><td>Setup/integration fee per pilot (discounted vs €45k list)</td><td><strong>~200,000 SEK</strong> each</td><td>200k–400k</td></tr>
+<tr><td>Content/software licence during pilot</td><td>~<strong>8,000 SEK/mo</strong> × ~6–12 mo × 1–2</td><td>~50k–150k</td></tr>
+<tr><td><strong>Conservative pilot revenue (24 mo)</strong></td><td></td><td><strong>≈ 250,000 – 550,000 SEK</strong></td></tr>
+</table>
+<p><strong>(ii) Unit-economics sanity check at commercial price</strong> (from <code>market-research.md</code>): list <strong>€45,000 ≈ 508,000 SEK</strong> per install; blended margin on hardware+integration assumed <strong>~35–45%</strong>, plus recurring content licence <strong>€8,000/yr ≈ 90,000 SEK/yr</strong> at high software margin. This is the <em>post-grant</em> revenue engine, not grant-window revenue.</p>
+<blockquote><strong>Honesty flag:</strong> during the grant period CymWave is <strong>cash-flow negative</strong> and dependent on grant + loan + medfinansiering. Pilot revenue offsets a <em>fraction</em> of programme cost. This is normal for pre-commercial hardware and is stated plainly for grant credibility.</blockquote>
+<hr>
+<h2>5. Three funding levels &amp; break-even logic</h2>
+<p>Mapped to the repo's suggested tracks (100k / 500k / 1M / 2M) and consolidated into three actionable levels. Instrument details, deadlines, and VERIFIED/UNVERIFIED status in <code>funding-plan.md</code>.</p>
+<h3>Level 1 — <strong>Lean validation</strong> (~100,000–600,000 SEK)</h3>
+<ul>
+<li><strong>Instruments:</strong> Almi <strong>Verifieringsmedel</strong> (up to 100k SEK, no co-finance) + Region Gävleborg <strong>företagsstöd/innovationsstöd</strong> (via Almi/Movexum) + own medfinansiering.</li>
+<li><strong>Covers:</strong> WP1 (validation), WP2 (FTO memo), start of WP4 (safety scoping), claims checklist.</li>
+<li><strong>Goal:</strong> de-risk the idea, produce FTO + WTP evidence + LOIs → <em>makes the Vinnova application fundable.</em></li>
+<li><strong>Break-even:</strong> not expected; this is pre-revenue de-risking. Output = a credible larger application.</li>
+</ul>
+<h3>Level 2 — <strong>Test &amp; Demo prototype</strong> (~1,000,000–1,400,000 SEK Vinnova + co-finance)</h3>
+<ul>
+<li><strong>Instruments:</strong> <strong>Vinnova Test &amp; Demo för SMF 2026</strong> (max <strong>1M SEK</strong>, up to <strong>70%</strong> of eligible costs → implies <strong>≥ ~430k SEK</strong> own/other medfinansiering to reach ~1.43M eligible) <strong>+</strong> Almi <strong>Innovationslån</strong> (50k–500k SEK) for the co-finance/prototype gap.</li>
+<li><strong>Covers:</strong> WP3 (vibration testing), WP4/WP5 (safety + proof-of-experience prototype), WP6 (journey UX).</li>
+<li><strong>Goal:</strong> a safe, tested proof-of-experience unit + verified safety/performance data → ready for a real pilot.</li>
+<li><strong>Break-even:</strong> still pre-commercial; sets up Phase 2 pilot.</li>
+</ul>
+<h3>Level 3 — <strong>Pilot + path to market</strong> (~2,000,000+ SEK, blended)</h3>
+<ul>
+<li><strong>Instruments:</strong> Vinnova collaboration/&quot;healthy &amp; resilient societies&quot; (up to 2M SEK, needs public + business partner — Angle C) <em>or</em> Tillväxtverket/ERUF regional (as a pilot company inside a larger project) <strong>+</strong> first pilot-install revenue + Almi loan.</li>
+<li><strong>Covers:</strong> WP7 (partner pilot), WP8 (evaluation/compliance), scale-up prep, EU-application groundwork (Eurostars/EIC later).</li>
+<li><strong>Break-even logic (post-grant commercial):</strong></li>
+</ul>
+<p>  - Contribution per commercial install ≈ <strong>€45k × ~40% ≈ €18,000 ≈ 200,000 SEK</strong> (hardware+integration) <strong>+</strong> content ARR ~90,000 SEK/yr/unit.</p>
+<p>  - Assume a small fixed commercial cost base (2–3 people, support, insurance, ongoing certification) of <strong>~2.0–2.5M SEK/yr</strong>.</p>
+<p>  - <strong>Break-even ≈ ~10–13 commercial installs/year</strong> (200k×~12 ≈ 2.4M SEK contribution) plus growing content ARR — i.e., roughly the <strong>top of the 3-yr SOM (10–40 installs)</strong> from <code>market-research.md</code>. Recurring content licences pull break-even <em>earlier</em> each year as the installed base compounds.</p>
+<blockquote>The <strong>operator-side</strong> payback (~15 months per install, <code>market-research.md</code> §4) is the sales argument; the <strong>CymWave-side</strong> break-even (~10–13 installs/yr) is the investor/grant argument. Both must be told, honestly, side by side.</blockquote>
+<hr>
+<h2>6. Risk register (honest)</h2>
+<table>
+<tr><th>Risk</th><th>Severity</th><th>Likelihood</th><th>Mitigation</th></tr>
+<tr><td><strong>Hospitality CapEx sales cycle is long</strong> (6–18+ months; committee/GM/owner approvals; seasonal budgets)</td><td>High</td><td>High</td><td>Lead with operator ROI (<code>market-research.md</code>); pilot-with-a-partner before selling; setup-fee + licence model lowers upfront barrier; target boutique owner-operators (faster decisions)</td></tr>
+<tr><td><strong>Install / BOM complexity &amp; cost</strong> (wet-zone electrics, actuators, plumbing, hygiene)</td><td>High</td><td>High</td><td>Retrofit/off-the-shelf-first architecture (repo roadmap); control system outside wet zone; modular kit; certified components</td></tr>
+<tr><td><strong>Certification cost &amp; timeline</strong> (CE: LVD/EMC/Machinery, IP rating, Legionella, safety) — material low-hundreds-of-thousands SEK, gating</td><td>High</td><td>High</td><td>Budgeted in WP4; scope early with a test/demo provider (Vinnova-eligible); phase certification with prototype</td></tr>
+<tr><td><strong>MDR / medical-claim slip</strong> reclassifies product</td><td>High</td><td>Medium</td><td><strong>Claims-review checklist</strong> (§7), owner sign-off, strict vocabulary; wellness-only positioning locked</td></tr>
+<tr><td><strong>IP / FTO</strong> — &quot;sound+vibration in a bath&quot; not novel (Kohler, US9504625B2, US7029452)</td><td>Medium</td><td>Medium</td><td>FTO memo (WP2); anchor novelty in orchestration/mapping/service, not the tub; keep mechanisms private pre-review</td></tr>
+<tr><td><strong>Single-founder / key-person risk</strong></td><td>High</td><td>High</td><td>Bring in the aviation-vibration specialist + advisors formally; use Movexum incubator; document everything; grant framing should show a credible extended team/partners</td></tr>
+<tr><td><strong>Entity uncertainty</strong> (TWISTEDSTACKS AB not found)</td><td>High</td><td>—</td><td>Resolve §1 before filing anything</td></tr>
+<tr><td><strong>Grant timing/medfinansiering gap</strong></td><td>Medium</td><td>Medium</td><td>Stack Almi (fast) → Vinnova (larger); secure medfinansiering (own cash/loan) before Vinnova apply</td></tr>
+<tr><td><strong>Demand &lt; assumed</strong> (novel wet+programmed experience)</td><td>Medium</td><td>Medium</td><td>WP1 validation + Phase-2 pilot A/B before scaling; conservative utilisation (35%) in ROI</td></tr>
+</table>
+<hr>
+<h2>7. Compliance operating procedure (claims-review checklist)</h2>
+<p>Gate every external artefact through this before it ships:</p>
+<ol>
+<li><strong>No</strong> disease/condition named as something CymWave affects.</li>
+<li><strong>No</strong> verbs: treat, cure, heal, diagnose, prevent (medical), remedy, therapy/therapeutic.</li>
+<li>Wellbeing claims are <strong>experiential &amp; subjective</strong> (perceived stress, comfort, sleep <em>readiness</em>, relaxation) and, where possible, tied to <em>measured user-experience</em> outcomes — not clinical outcomes.</li>
+<li>Include the standing disclaimer: <em>&quot;CymWave is designed for wellbeing, recovery ritual, and sensory relaxation — not diagnosis, treatment, or cure of any medical condition.&quot;</em></li>
+<li>Owner/founder sign-off recorded.</li>
+<li>Applies to: grant applications, pitch decks, website, brochures, PR, operator training scripts, in-venue signage, guest onboarding.</li>
+</ol>
+<hr>
+<h2>8. Immediate next steps (blocking → enabling)</h2>
+<ol>
+<li><strong>Resolve the entity</strong> (§1) — name, org-nr, seat, age, size, dividends.</li>
+<li><strong>Talk to Almi (Norra Mellansverige) + Movexum</strong> — the mandated first contact for Region Gävleborg innovationsstöd, and the route to Verifieringsmedel.</li>
+<li><strong>Secure 2–3 LOIs</strong> from hotel/spa/retreat test environments (needed for Vinnova Test &amp; Demo credibility).</li>
+<li><strong>Commission the FTO memo</strong> (Almi Verifieringsmedel-eligible).</li>
+<li><strong>File Vinnova Test &amp; Demo för SMF 2026 before 2026-09-08 14:00</strong> (VERIFIED — see <code>funding-plan.md</code>), with medfinansiering lined up.</li>
+<li><strong>Stand up the claims-review checklist</strong> now, so all grant text is compliant from day one.</li>
+</ol></div>
+      </div>
+    </section>
+
+    <section id="funding">
+      <h2>Finansieringsplan (från funding-plan.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="funding"><h1>CymWave — Funding Plan &amp; Instrument Ranking</h1>
+<p><strong>Prepared:</strong> 2026-07-25 · <strong>Analyst:</strong> Ripple</p>
+<p><strong>Applicant:</strong> TWISTEDSTACKS AB, Sandviken, Gävleborg — <strong>⚠️ confirm entity (see <code>dossier.md</code> §1).</strong></p>
+<h2>Verification legend</h2>
+<p>Every concrete <strong>deadline</strong> and <strong>amount</strong> below is tagged after checking the official source via Exa livecrawl on <strong>2026-07-25</strong>:</p>
+<ul>
+<li><strong>[VERIFIED:2026-07-25]</strong> — confirmed on the official site (vinnova.se / almi.se / tillvaxtverket.se / regiongavleborg.se).</li>
+<li><strong>[UNVERIFIED]</strong> — could not confirm a <em>specific current</em> figure/deadline from the official source today (program exists, but the exact number/date is not officially confirmed for CymWave's situation).</li>
+<li><strong>[UNVERIFIED — källa 2026-07-25: &lt;value&gt;]</strong> — the repo/earlier draft figure did not match; the corrected official value from today is given.</li>
+</ul>
+<blockquote>Regional instruments (Region Gävleborg, Tillväxtverket affärsutvecklingscheckar) are <strong>behovsprövade / rolling / advisor-gated</strong>, so they often have <strong>no single public deadline or fixed amount</strong> — these are legitimately <strong>[UNVERIFIED]</strong> on specifics even though the program is real. Always confirm the live figure in the e-service before filing.</blockquote>
+<hr>
+<h2>Ranked top 5 (by fit for CymWave <em>right now</em>)</h2>
+<table>
+<tr><th>Rank</th><th>Instrument</th><th>Amount</th><th>Deadline</th><th>Fit rationale</th></tr>
+<tr><td><strong>1</strong></td><td><strong>Vinnova — Test och demo för SMF 2026</strong></td><td><strong>max 1,000,000 SEK/project; ≤70% eligible; ≤€220k/3yr (GBER 28.4)</strong> [VERIFIED:2026-07-25]</td><td><strong>Closes 2026-09-08 14:00</strong> [VERIFIED:2026-07-25]</td><td>Exact match to CymWave's stage &amp; need: an SME buying <strong>external test/demo services</strong> to verify <strong>function, performance, safety, usability</strong> before market. Maps to WP3–WP6.</td></tr>
+<tr><td><strong>2</strong></td><td><strong>Almi — Verifieringsmedel</strong></td><td><strong>up to 100,000 SEK (företag); normally NO co-finance; de minimis ≤€300k/3yr</strong> [VERIFIED:2026-07-25]</td><td><strong>Rolling / via advisor</strong> (no fixed date) [VERIFIED:2026-07-25 that it is rolling]</td><td>Fast bridge to fund FTO memo, customer/market validation, regulatory scoping — <em>makes the Vinnova bid fundable.</em> First contact = Almi advisor.</td></tr>
+<tr><td><strong>3</strong></td><td><strong>Almi — Innovationslån</strong></td><td><strong>50,000–500,000 SEK (often ~300k); Almi ≤50% of project cost; requires medfinansiering</strong> [VERIFIED:2026-07-25]</td><td><strong>Rolling</strong> [VERIFIED:2026-07-25]</td><td>Practical way to fund the <strong>medfinansiering/prototype gap</strong> left by Vinnova's 70% cap. Loan (repayable), Swedish co. ≤249 employees.</td></tr>
+<tr><td><strong>4</strong></td><td><strong>Region Gävleborg — Företagsstöd / Innovationsstöd</strong> (konsultcheck + innovationsstöd)</td><td><strong>Amount behovsprövat; no fixed public sum</strong> [UNVERIFIED — no fixed amount published; confirm with advisor]</td><td><strong>Rolling / behovsprövad; contact first</strong> [UNVERIFIED — no fixed deadline]</td><td>Local anchor. Innovationsstöd targets <strong>companies &lt; 5 yrs</strong>, product <strong>not yet on market</strong>; <strong>first contact via Almi Norra Mellansverige or Movexum incubator</strong> [VERIFIED:2026-07-25]. Reinforces the Sandviken/Gävleborg tourism-innovation angle.</td></tr>
+<tr><td><strong>5</strong></td><td><strong>Vinnova — Samverkan &quot;Healthy &amp; Resilient Societies&quot; / preventive-wellbeing collaboration</strong></td><td><strong>repo cites max 2,000,000 SEK, 18–24 mo</strong> [UNVERIFIED — 2026 call not confirmed on vinnova.se today]</td><td>repo cites <strong>closes 2026-09-01 14:00</strong> [UNVERIFIED — not confirmed on official call page today]</td><td>Bigger ticket, but <strong>requires a public + business partner</strong> (Angle C). Higher effort, slower to assemble; pursue once a region/kommun partner + strict non-medical protocol exist.</td></tr>
+</table>
+<hr>
+<h2>Full instrument detail</h2>
+<h3>1. Vinnova — Test och demo för Små och Medelstora företag 2026 ⭐ (primary target)</h3>
+<p>Official: <code>vinnova.se/e/utlysning-2026-01600/test-och-demo-for-sma-och-medelstora-foretag-2026</code></p>
+<ul>
+<li><strong>Amount:</strong> max <strong>1,000,000 SEK per project</strong>, up to <strong>70%</strong> of total eligible costs, provided total ≤ <strong>€220,000 over 3 years</strong> (GBER art. 28.4). <strong>[VERIFIED:2026-07-25]</strong></li>
+<li><strong>Deadline:</strong> <strong>Closes 8 September 2026 at 14:00.</strong> <strong>[VERIFIED:2026-07-25]</strong></li>
+<li><strong>Project window:</strong> must start <strong>no earlier than 2026-11-10</strong>, <strong>no later than 2026-11-24</strong>, and <strong>end no later than 2027-12-15.</strong> <strong>[VERIFIED:2026-07-25]</strong></li>
+<li><strong>Eligibility/structure:</strong> SME that develops an innovative solution and needs to test/verify it in a real test &amp; demo environment before market. <strong>Company is sole participant and buys test/demo services externally.</strong> <strong>[VERIFIED:2026-07-25]</strong></li>
+<li><strong>Co-financing:</strong> remaining ~30% must be the same cost type (own cash / other funding). <strong>[VERIFIED:2026-07-25]</strong></li>
+<li><strong>CymWave application shape:</strong> external providers = vibration/acoustics test lab (aviation-vibration specialist), water/electrical-safety verification, UX testing at a partner venue. Frame as <strong>risk reduction</strong>, not product development or marketing.</li>
+<li><strong>Context:</strong> Vinnova has earmarked <strong>321M SEK</strong> for test/demo across five 2026 calls (≥28M SEK for research-infrastructure use by industry). <strong>[VERIFIED:2026-07-25]</strong></li>
+</ul>
+<h3>2. Almi — Verifieringsmedel (fast de-risking bridge)</h3>
+<p>Official: <code>almi.se/lan-finansiering/verifieringsmedel/</code></p>
+<ul>
+<li><strong>Amount:</strong> in many cases <strong>up to 100,000 SEK</strong> for companies (up to 25,000 SEK for individuals); <strong>varies by region &amp; advisor assessment.</strong> <strong>[VERIFIED:2026-07-25]</strong></li>
+<li><strong>Co-financing:</strong> <strong>normally none required.</strong> <strong>[VERIFIED:2026-07-25]</strong></li>
+<li><strong>State-aid form:</strong> de minimis; total ≤ <strong>€300,000 / rolling 3 years.</strong> <strong>[VERIFIED:2026-07-25]</strong></li>
+<li><strong>Deadline:</strong> <strong>rolling — you must first contact an Almi advisor</strong>, then get access to the e-service. <strong>[VERIFIED:2026-07-25]</strong></li>
+<li><strong>Eligible use:</strong> customer-need/market/technology/business-model verification, novelty/FTO assessment, legal/regulatory assessment. <strong>Not</strong> for marketing, travel, patent <em>applications</em>, production, or investments creating lasting value.</li>
+<li><strong>CymWave use:</strong> WP1 (validation) + WP2 (FTO/patentability memo) + WP4 start (regulatory/safety scoping).</li>
+</ul>
+<h3>3. Almi — Innovationslån (co-finance / prototype gap)</h3>
+<p>Official: <code>almi.se/lan-finansiering/innovationslan/</code></p>
+<ul>
+<li><strong>Amount:</strong> <strong>50,000–500,000 SEK</strong> (often around <strong>~300,000 SEK</strong>; exact sum after assessment). <strong>[VERIFIED:2026-07-25]</strong></li>
+<li><strong>Almi share:</strong> up to <strong>50%</strong> of estimated project cost; <strong>requires medfinansiering</strong> (for loans &gt; 300k SEK, ≥ half the co-finance must be capital — own/bank/other external). <strong>[VERIFIED:2026-07-25]</strong></li>
+<li><strong>Eligibility:</strong> Swedish-registered company, <strong>≤ 249 employees</strong>; new or established. <strong>[VERIFIED:2026-07-25]</strong></li>
+<li><strong>Deadline:</strong> <strong>rolling.</strong> <strong>[VERIFIED:2026-07-25]</strong></li>
+<li><strong>CymWave use:</strong> fund the ~30% Vinnova co-finance and/or prototype hardware (WP5). Note: it's a <strong>loan</strong> — repayment logic required (see <code>dossier.md</code> risks).</li>
+</ul>
+<h3>4. Region Gävleborg — Företagsstöd / Innovationsstöd (regional anchor)</h3>
+<p>Official: <code>regiongavleborg.se/regional-utveckling/finansiering/foretagsstod/</code></p>
+<ul>
+<li><strong>Instruments:</strong> <strong>konsultcheck</strong> (external consultant for a defined project) and <strong>Innovationsstöd</strong> (early-stage new product/process/service). <strong>[VERIFIED:2026-07-25 that these exist]</strong></li>
+<li><strong>Innovationsstöd eligibility:</strong> <strong>small, newly started company, not older than 5 years</strong> (from registration), product/service/process <strong>not yet on the market</strong>; support must be pre-market. <strong>First contact always via Almi (Norra Mellansverige) or Movexum</strong> (the region's incubator), who then bring in the Region. <strong>[VERIFIED:2026-07-25]</strong></li>
+<li><strong>Amount:</strong> <strong>no fixed public sum — behovsprövat</strong> per application; partly EU (ERUF) money with extra reporting. <strong>[UNVERIFIED — exact amount not published; confirm with advisor]</strong></li>
+<li><strong>Deadline:</strong> <strong>rolling / needs-assessed; no single public deadline.</strong> <strong>[UNVERIFIED — confirm current window with advisor]</strong></li>
+<li><strong>Conditions:</strong> restrictive view on firms with large/recurring dividends; firms judged able to self-finance are ineligible. <strong>[VERIFIED:2026-07-25]</strong></li>
+<li><strong>CymWave use:</strong> consultant check for safety/UX/IP work; innovationsstöd for pre-market development — <em>if</em> entity is &lt; 5 yrs and Sandviken-seated (see entity flag).</li>
+</ul>
+<h3>5. Vinnova — Samverkansprojekt &quot;Healthy &amp; Resilient Societies&quot; (preventive-wellbeing, Angle C)</h3>
+<p>Official basis: repo <code>docs/GRANT_STRATEGY.md</code>; 2026 call <strong>not confirmed on vinnova.se today</strong>.</p>
+<ul>
+<li><strong>Amount:</strong> repo cites <strong>max 2,000,000 SEK for 18–24-month projects.</strong> <strong>[UNVERIFIED — 2026 call/amount not confirmed on official page 2026-07-25]</strong></li>
+<li><strong>Deadline:</strong> repo cites <strong>closes 2026-09-01 14:00.</strong> <strong>[UNVERIFIED — not confirmed on the official call page today; verify before relying on it]</strong></li>
+<li><strong>Requirement:</strong> consortium <strong>must include a public actor + a business actor</strong>; careful non-medical claim discipline. <strong>[VERIFIED:2026-07-25 as a general design principle of these calls]</strong></li>
+<li><strong>CymWave use:</strong> only viable with a region/kommun partner + strict wellbeing (non-medical) protocol; slower to assemble than Test &amp; Demo.</li>
+</ul>
+<hr>
+<h2>Other instruments (watchlist, not top-5 now)</h2>
+<table>
+<tr><th>Instrument</th><th>Amount</th><th>Deadline</th><th>Status / note</th></tr>
+<tr><td><strong>Vinnova — Innovativa Startups 2026</strong></td><td><strong>max 500,000 SEK</strong> [VERIFIED:2026-07-25 K-DEADLINES]</td><td>opens <strong>2026-10-12</strong>, closes <strong>2027-01-12 14:00</strong> [VERIFIED:2026-07-25 K-DEADLINES]</td><td>Good fit <em>if</em> held in a young AB (&amp;lt;10y/&amp;lt;10 emp/&amp;lt;10Mkr, no dividend). Was wrongly dated Sep open — corrected.</td></tr>
+<tr><td><strong>Tillväxtverket — affärsutvecklingscheckar / ERUF regional</strong></td><td>ERUF <strong>förstudier: max 40% &amp; 400,000 SEK EU-stöd</strong> (Skåne-Blekinge plan example) [VERIFIED:2026-07-25 for that regional plan]; national besöksnäring check amount <strong>[UNVERIFIED]</strong></td><td>Regional windows vary (e.g., a Skåne-Blekinge omgång <strong>opens 2026-08-20</strong>) [VERIFIED:2026-07-25 for that region]</td><td><strong>Checks are regionally administered</strong> — Gävleborg's specific check amount/deadline <strong>[UNVERIFIED — confirm regionally]</strong>. Often better as a <em>pilot company inside</em> a larger ERUF project than as a solo applicant.</td></tr>
+<tr><td><strong>Tillväxtverket / Visit Sweden — tourism innovation (strategic foresight)</strong></td><td>N/A (program/tooling, not a cash grant to a single startup) [VERIFIED:2026-07-25]</td><td>N/A</td><td>Useful for <em>positioning/partners</em> in besöksnäring, not direct funding.</td></tr>
+<tr><td><strong>Eurostars — Sept 2026 call</strong></td><td>repo: up to <strong>~5,000,000 SEK</strong> Swedish funding [UNVERIFIED — 2026 Swedish ceiling not confirmed today]</td><td>repo: opens <strong>2026-07-09</strong>, closes <strong>2026-09-10 14:00 CEST</strong> [UNVERIFIED — verify on eurostars/vinnova before relying]</td><td>Later stage (TRL 5–7), needs international consortium. Likely <strong>2027+</strong> for CymWave.</td></tr>
+<tr><td><strong>EIC Accelerator / Transition</strong></td><td>Large (grant+equity) [UNVERIFIED — not CymWave-relevant near-term]</td><td>Cut-offs vary [UNVERIFIED]</td><td>Only if deep-tech/IP defensibility + traction become strong. Wellness-hospitality alone likely too soft.</td></tr>
+<tr><td><strong>Almi — regional grants / advisory</strong></td><td>Varies [UNVERIFIED]</td><td>Rolling</td><td>Bundle with Verifieringsmedel/Innovationslån via the same advisor.</td></tr>
+</table>
+<hr>
+<h2>Recommended stacking &amp; sequence (fit-optimised)</h2>
+<ol>
+<li><strong>NOW → 4 weeks:</strong> Contact <strong>Almi (Norra Mellansverige) + Movexum</strong>; open <strong>Verifieringsmedel</strong> (Rank 2) for FTO + validation; this also unlocks the Region Gävleborg route (Rank 4). <em>Resolve the entity first (<code>dossier.md</code> §1).</em></li>
+<li><strong>NOW → 2026-09-08:</strong> Prepare and <strong>file Vinnova Test &amp; Demo för SMF 2026</strong> (Rank 1) — the single highest-value, best-fit, time-critical action. Secure <strong>medfinansiering</strong> (own cash + <strong>Almi Innovationslån</strong>, Rank 3) to cover the 30% gap.</li>
+<li><strong>In parallel:</strong> line up <strong>2–3 venue LOIs</strong> and an <strong>external test/demo provider</strong> (required for Rank 1 credibility).</li>
+<li><strong>Q4 2026 →:</strong> if a <strong>public partner</strong> materialises, assemble <strong>Vinnova Healthy &amp; Resilient Societies</strong> (Rank 5, Angle C) and/or slot into a <strong>Tillväxtverket/ERUF</strong> project.</li>
+<li><strong>2027+:</strong> <strong>Eurostars/EIC</strong> once TRL and IP justify an international consortium.</li>
+</ol>
+<p><strong>Verification tally (this document):</strong></p>
+<ul>
+<li><strong>[VERIFIED:2026-07-25]:</strong> 20 discrete figures/dates (Vinnova Test &amp; Demo amount, %, GBER cap, close date, project-window dates, 321M context; Almi Verifieringsmedel amount, no-co-finance, de minimis cap, rolling; Almi Innovationslån range, 50% share, employee cap, rolling; Region Gävleborg instrument existence, &lt;5yr rule, Almi/Movexum route, dividend rule; Tillväxtverket ERUF förstudie 40%/400k + Skåne-Blekinge open date).</li>
+<li><strong>[UNVERIFIED]</strong> or <strong>[UNVERIFIED — källa …]:</strong> ~8 items (Region Gävleborg exact amount &amp; deadline; Vinnova Samverkan 2026 amount &amp; date; Gävleborg-specific check amount/deadline; Eurostars 2026 Swedish ceiling &amp; dates; EIC specifics). Innovativa Startups open/close <strong>uppdaterat VERIFIED via K-DEADLINES</strong>.</li>
+</ul>
+<blockquote><strong>Bottom line:</strong> the <strong>one instrument that is both best-fit and fully verified with a hard, imminent deadline is Vinnova Test &amp; Demo för SMF 2026 — max 1M SEK, closes 2026-09-08 14:00.</strong> Build the plan around hitting that date.</blockquote>
+<hr>
+<h2>TODO (light) — Vinnova Test &amp; Demo mall / Gantt</h2>
+<ul>
+<li>[ ] Hämta officiell <strong>Projektbeskrivningsmall Test och Demo 2026</strong> från Vinnova (cv + art.28-intyg finns på utlysningssidan).</li>
+<li>[ ] Skissa enkel <strong>Gantt</strong> WP3–WP6 inom fönster <strong>2026-11-10 → ≤2027-12-15</strong> (start tidigast 10 nov).</li>
+<li>[ ] <em>Ej</em> skriva full template här — endast när det behövs för draft.</li>
+</ul>
+<p><strong>Källa deadlines:</strong> <code>00-MASTER/INVENTORY/kimi-deadlines-2026-07.md</code>.</p></div>
+      </div>
+    </section>
+
+    <section id="notes">
+      <h2>Gemensamma anteckningar</h2>
+      <div class="card">
+        <div class="editable" data-key="notes" data-placeholder="Anteckningar inför ansökan…" style="min-height:8rem;"></div>
+      </div>
+    </section>
+  </div>
+  <input type="file" id="importFile" accept="application/json,.json" hidden />
+  <script>
+    const STORAGE_KEY = 'ts_project_cymwave_v1';
+    let saveTimer = null;
+    function collectData() {
+      const data = { slug: 'cymwave', version: 1, savedAt: new Date().toISOString(), fields: {} };
+      document.querySelectorAll('.editable[data-key]').forEach(el => { data.fields[el.dataset.key] = el.innerHTML; });
+      return data;
+    }
+    function applyData(data) {
+      if (!data?.fields) return;
+      document.querySelectorAll('.editable[data-key]').forEach(el => {
+        if (data.fields[el.dataset.key] !== undefined) el.innerHTML = data.fields[el.dataset.key];
+      });
+    }
+    function saveNow() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(collectData()));
+      document.getElementById('saveStatus').textContent = 'Sparat ' + new Date().toLocaleString('sv-SE');
+    }
+    function scheduleSave() { clearTimeout(saveTimer); document.getElementById('saveStatus').textContent = 'Sparar…'; saveTimer = setTimeout(saveNow, 800); }
+    function exportJson() {
+      saveNow();
+      const blob = new Blob([JSON.stringify(collectData(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'cymwave-workbook-' + new Date().toISOString().slice(0,10) + '.json';
+      a.click(); URL.revokeObjectURL(a.href);
+    }
+    function importJson() { document.getElementById('importFile').click(); }
+    document.getElementById('importFile').addEventListener('change', e => {
+      const f = e.target.files[0]; if (!f) return;
+      const r = new FileReader();
+      r.onload = () => { try { applyData(JSON.parse(r.result)); saveNow(); alert('Importerat!'); } catch { alert('Ogiltig JSON'); } };
+      r.readAsText(f); e.target.value = '';
+    });
+    document.querySelectorAll('.editable[data-key]').forEach(el => el.addEventListener('input', scheduleSave));
+    try { const s = localStorage.getItem(STORAGE_KEY); if (s) { applyData(JSON.parse(s)); } } catch {}
+  </script>
+
+<div id="funding-toolbar" style="position:fixed;bottom:12px;right:12px;z-index:9999;display:flex;gap:8px;font-family:system-ui,sans-serif;font-size:13px;">
+  <a href="/api/funding/doc?file=index.html" style="background:#1a222d;color:#38bdf8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Alla projekt</a>
+  <a href="/funding" style="background:#1a222d;color:#94a3b8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Inlogg</a>
+  <button type="button" onclick="logoutFunding()" style="background:#1a222d;color:#fb7185;border:1px solid #334155;padding:6px 12px;border-radius:8px;cursor:pointer;">Logga ut</button>
+</div>
+<script>
+async function logoutFunding() {
+  await fetch('/api/funding/auth', { method: 'DELETE', credentials: 'include' });
+  location.href = '/funding';
+}
+</script>
+</body>
+</html>

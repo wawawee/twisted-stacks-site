@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TwistedStacks — Alla projekt</title>
+  <style>
+    :root { --bg:#0f1419; --surface:#1a222d; --border:#334155; --text:#e8edf4; --muted:#94a3b8; --accent:#38bdf8; }
+    body { margin:0; font-family: system-ui,sans-serif; background:var(--bg); color:var(--text); padding:2rem 1.5rem 4rem; max-width:1100px; margin-inline:auto; }
+    h1 { margin:0 0 .35rem; }
+    .lead { color:var(--muted); margin-bottom:1.5rem; }
+    .links { margin-bottom:2rem; font-size:.9rem; }
+    .links a { color:var(--accent); margin-right:1rem; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap:1rem; }
+    .project-card { display:block; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1rem 1.1rem; text-decoration:none; color:inherit; transition:border .15s; }
+    .project-card:hover { border-color:var(--accent); }
+    .project-card h2 { margin:.5rem 0 .35rem; font-size:1.05rem; }
+    .project-card p { margin:0; font-size:.85rem; color:var(--muted); }
+    .updated { margin-top:.35rem !important; font-size:.78rem !important; }
+    .badge { display:inline-block; font-size:.72rem; padding:.15rem .45rem; border-radius:999px; border:1px solid var(--border); }
+    .badge.p0 { border-color:#7f1d1d; color:#fecaca; }
+    .badge.p1 { border-color:#78350f; color:#fde68a; }
+    .badge.p2 { border-color:#1e3a5f; color:#bae6fd; }
+    .help { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1rem; margin-bottom:2rem; font-size:.9rem; }
+    .help ol { margin:.5rem 0 0; padding-left:1.2rem; }
+  </style>
+</head>
+<body>
+  <h1>TwistedStacks — Projektunderlag</h1>
+  <p class="lead">11 redigerbara HTML-filer · dubbelklicka ett projekt · spara lokalt eller exportera JSON · skriv ut som PDF</p>
+  <div class="links">
+    <a href="/api/funding/doc?file=studio-workbook.html">Studio-arbetsbok (översikt)</a>
+    <a href="https://anslag.twistedstacks.com" target="_blank">AnslagSITK (live)</a>
+  </div>
+  <div class="help">
+    <strong>Så gör ni:</strong>
+    <ol>
+      <li>Öppna ett projekt → redigera texter (klicka och skriv)</li>
+      <li><strong>Spara</strong> sparar i webbläsaren · <strong>Exportera</strong> skickar fil till kompis</li>
+      <li><strong>PDF:</strong> öppna projekt → Skriv ut → "Spara som PDF"</li>
+      <li>Uppdatera från markdown: kör <code>node 00-MASTER/scripts/generate-project-html.mjs</code> (skriver om mall, ej lokala sparade ändringar i localStorage)</li>
+    </ol>
+  </div>
+  <div class="grid"><a class="project-card" href="/api/funding/doc?file=twisted-stacks-site.html">
+      <span class="badge p0">P0</span>
+      <h2>TwistedStacks Site</h2>
+      <p>TWISTEDSTACKS AB</p>
+      <p class="updated"></p>
+    </a>
+<a class="project-card" href="/api/funding/doc?file=ate.html">
+      <span class="badge p0">P0</span>
+      <h2>ATE — Agentic Trading Engine</h2>
+      <p>TWISTEDSTACKS AB</p>
+      <p class="updated"></p>
+    </a>
+<a class="project-card" href="/api/funding/doc?file=vr-superpowers.html">
+      <span class="badge p0">P0</span>
+      <h2>SUPARAYS / VR-SuperPowers</h2>
+      <p>TWISTEDSTACKS AB</p>
+      <p class="updated"></p>
+    </a>
+<a class="project-card" href="/api/funding/doc?file=cymwave.html">
+      <span class="badge p1">P1</span>
+      <h2>CymWave</h2>
+      <p>TWISTEDSTACKS AB</p>
+      <p class="updated"></p>
+    </a>
+<a class="project-card" href="/api/funding/doc?file=drophelp.html">
+      <span class="badge p1">P1</span>
+      <h2>DROPHELP / TANGLE</h2>
+      <p>TWISTEDSTACKS AB</p>
+      <p class="updated"></p>
+    </a>
+<a class="project-card" href="/api/funding/doc?file=recon-search-assistant.html">
+      <span class="badge p1">P1</span>
+      <h2>Recon Search Assistant</h2>
+      <p>TWISTEDSTACKS AB</p>
+      <p class="updated"></p>
+    </a>
+<a class="project-card" href="/api/funding/doc?file=laga.html">
+      <span class="badge p2">P2</span>
+      <h2>LAGA — Legal AI Gateway</h2>
+      <p>TWISTEDSTACKS AB</p>
+      <p class="updated">Uppdaterad 2026-07-25</p>
+    </a>
+<a class="project-card" href="/api/funding/doc?file=skatterevision-reboot.html">
+      <span class="badge p2">P2</span>
+      <h2>SkatteRevision</h2>
+      <p>TWISTEDSTACKS AB</p>
+      <p class="updated"></p>
+    </a>
+<a class="project-card" href="/api/funding/doc?file=spaceinspace.html">
+      <span class="badge p2">P2</span>
+      <h2>SPACEinSPACE</h2>
+      <p>TWISTEDSTACKS AB för OSS-infrastruktur; Per Brinell för forskningsstipendier</p>
+      <p class="updated">Uppdaterad 2026-07-26</p>
+    </a>
+<a class="project-card" href="/api/funding/doc?file=gamedev-mcp-hub.html">
+      <span class="badge p2">P2 lab</span>
+      <h2>GameDev MCP Hub</h2>
+      <p>TWISTEDSTACKS AB</p>
+      <p class="updated"></p>
+    </a>
+<a class="project-card" href="/api/funding/doc?file=tin-study.html">
+      <span class="badge p2">P2</span>
+      <h2>TIN-STUDY</h2>
+      <p>TWISTEDSTACKS AB</p>
+      <p class="updated">Uppdaterad 2026-07-25 (uppdaterad till COMPLETE)</p>
+    </a></div>
+
+<div id="funding-toolbar" style="position:fixed;bottom:12px;right:12px;z-index:9999;display:flex;gap:8px;font-family:system-ui,sans-serif;font-size:13px;">
+  <a href="/api/funding/doc?file=index.html" style="background:#1a222d;color:#38bdf8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Alla projekt</a>
+  <a href="/funding" style="background:#1a222d;color:#94a3b8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Inlogg</a>
+  <button type="button" onclick="logoutFunding()" style="background:#1a222d;color:#fb7185;border:1px solid #334155;padding:6px 12px;border-radius:8px;cursor:pointer;">Logga ut</button>
+</div>
+<script>
+async function logoutFunding() {
+  await fetch('/api/funding/auth', { method: 'DELETE', credentials: 'include' });
+  location.href = '/funding';
+}
+</script>
+</body>
+</html>

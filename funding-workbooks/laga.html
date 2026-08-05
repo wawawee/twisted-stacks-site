@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LAGA — Legal AI Gateway — Projektunderlag</title>
+  <style>
+    :root {
+      --bg: #0f1419; --surface: #1a222d; --surface2: #243040; --border: #334155;
+      --text: #e8edf4; --muted: #94a3b8; --accent: #38bdf8; --investor: #34d399;
+      --grant: #fbbf24; --warn: #fb7185; --radius: 12px;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.55; }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+    .topbar { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; position: sticky; top: 0; z-index: 5;
+      background: linear-gradient(var(--bg) 75%, transparent); padding: .5rem 0 1rem; }
+    button { border: 1px solid var(--border); background: var(--surface2); color: var(--text); border-radius: 8px;
+      padding: .45rem .8rem; font-size: .85rem; cursor: pointer; font-family: inherit; }
+    button:hover { border-color: var(--accent); }
+    button.primary { background: #0ea5e9; border-color: #0ea5e9; color: #041018; font-weight: 600; }
+    .status { margin-left: auto; font-size: .78rem; color: var(--muted); align-self: center; }
+    h1 { font-size: 1.55rem; margin: 0 0 .25rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.25rem; font-size: .82rem; }
+    .badge { background: var(--surface2); border: 1px solid var(--border); padding: .2rem .55rem; border-radius: 999px; }
+    .badge.p0 { border-color: #7f1d1d; color: #fecaca; }
+    .badge.p1 { border-color: #78350f; color: #fde68a; }
+    .badge.p2 { border-color: #1e3a5f; color: #bae6fd; }
+    nav.jump { display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: 1.5rem; }
+    nav.jump a { color: var(--muted); text-decoration: none; font-size: .82rem; padding: .3rem .55rem;
+      border: 1px solid var(--border); border-radius: 8px; }
+    nav.jump a:hover { color: var(--accent); border-color: var(--accent); }
+    section { margin-bottom: 2rem; scroll-margin-top: 5rem; }
+    section > h2 { font-size: 1.2rem; margin: 0 0 .75rem; padding-bottom: .4rem; border-bottom: 2px solid var(--surface2); }
+    .hint { font-size: .82rem; color: var(--muted); background: var(--surface2); border-left: 3px solid var(--accent);
+      padding: .6rem .85rem; border-radius: 0 8px 8px 0; margin-bottom: .75rem; }
+    .hint.inv { border-left-color: var(--investor); }
+    .hint.grt { border-left-color: var(--grant); }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; }
+    .editable { min-height: 2rem; outline: none; border: 1px dashed transparent; border-radius: 8px; padding: .5rem .65rem;
+      transition: border-color .15s, background .15s; }
+    .editable:hover { border-color: #475569; background: rgba(56,189,248,.04); }
+    .editable:focus { border-color: var(--accent); background: rgba(56,189,248,.07); }
+    .editable[data-placeholder]:empty::before { content: attr(data-placeholder); color: #64748b; }
+    .md-content h1,.md-content h2,.md-content h3,.md-content h4 { margin-top: 1rem; }
+    .md-content table { width: 100%; border-collapse: collapse; font-size: .85rem; margin: .75rem 0; }
+    .md-content th,.md-content td { border: 1px solid var(--border); padding: .45rem .55rem; vertical-align: top; }
+    .md-content th { background: var(--surface2); }
+    .md-content blockquote { margin: .5rem 0; padding-left: .75rem; border-left: 3px solid var(--border); color: var(--muted); }
+    .md-content code { font-family: ui-monospace, monospace; font-size: .85em; background: var(--surface2); padding: .1rem .3rem; border-radius: 4px; }
+    .md-content a { color: var(--accent); }
+    .back { font-size: .85rem; margin-bottom: 1rem; }
+    .back a { color: var(--accent); }
+    @media print { .topbar, nav.jump, .back { display: none !important; } body { background: #fff; color: #111; }
+      .card { break-inside: avoid; } .editable { border: none !important; padding: 0; } }
+    @media (max-width: 600px) { .status { margin-left: 0; width: 100%; } }
+  </style>
+</head>
+<body data-slug="laga">
+  <div class="wrap">
+    <p class="back"><a href="/api/funding/doc?file=index.html">← Alla projekt</a> · <a href="/api/funding/doc?file=studio-workbook.html">Studio-arbetsbok</a></p>
+
+    <h1>LAGA — Legal AI Gateway</h1>
+    <div class="meta">
+      <span class="badge p2">P2</span>
+      <span class="badge">Sökande: TWISTEDSTACKS AB</span>
+      <span class="badge">COMPLETE (PATCHED 2026-07-25 — TRL 3-4, …</span>
+      <span class="badge">Uppdaterad: 2026-07-25</span>
+    </div>
+
+    <div class="topbar">
+      <button class="primary" type="button" onclick="saveNow()">💾 Spara</button>
+      <button type="button" onclick="exportJson()">⬇ Exportera</button>
+      <button type="button" onclick="importJson()">⬆ Importera</button>
+      <button type="button" onclick="window.print()">🖨 PDF / Skriv ut</button>
+      <span class="status" id="saveStatus">Redigera genom att klicka i texterna</span>
+    </div>
+
+    <nav class="jump">
+      <a href="#investor">Investerare</a>
+      <a href="#grant">Bidrag</a>
+      <a href="#dossier">Dossier</a>
+      <a href="#funding">Finansieringsplan</a>
+      <a href="#notes">Anteckningar</a>
+    </nav>
+
+    <section id="investor">
+      <h2>Investerare — vad framhäva</h2>
+      <div class="hint inv">Fokus: marknad, traction, unit economics, moat — inte bidragsspråk.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="investor_pitch" data-placeholder="Skriv investerarpitch för detta projekt…">
+          <p><em>Fyll i: problem → lösning → traction → ask → varför nu. Se dossier §1–3 nedan som källa.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="grant">
+      <h2>Bidrag & stöd — vad framhäva</h2>
+      <div class="hint grt">Fokus: innovation, samhällsnytta, regional nytta, budget, TRL — en vertikal i taget.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="grant_pitch" data-placeholder="Skriv grant-vinkel för detta projekt…">
+          <p><em>Fyll i: innovationshöjd, samhällsnytta Gävleborg, budgetposter, sökande (AB vs Per). Se finansieringsplan nedan.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="dossier">
+      <h2>Dossier (från dossier.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="dossier"><h1>LAGA — Legal AI Gateway &amp; Assistant — Dossier</h1>
+<p><strong>Slug:</strong> laga</p>
+<p><strong>Sökväg:</strong> <code>/Users/perbrinell/Documents/LAGA</code></p>
+<p><strong>Sökande (primär):</strong> TWISTEDSTACKS AB</p>
+<p><strong>Prioritet:</strong> P2</p>
+<p><strong>Dokumentstatus:</strong> COMPLETE (PATCHED 2026-07-25 — TRL 3-4, corrected sources, removed overclaims)</p>
+<p><strong>Senast uppdaterad:</strong> 2026-07-25</p>
+<h2>Meta</h2>
+<table>
+<tr><th>Fält</th><th>Värde</th></tr>
+<tr><td>Sektor</td><td>Legaltech / speech / workflow prototyping</td></tr>
+<tr><td>TRL / mognad</td><td>TRL 3–4 — workflow modeler-prototyp (Vite/React Flow + Hono API + OpenRouter + MLX-Whisper). Billy Case som proof-of-concept-fixture.</td></tr>
+<tr><td>Intäktsmodell</td><td>B2B-seats för advokatbyråer, kommuners socialförvaltningar, domstolar (målbild efter produktionssättning)</td></tr>
+<tr><td>Geografi</td><td>Sverige primärt → Norden → EU (flerspråkig expansion)</td></tr>
+<tr><td>Känslighet</td><td><strong>Inte juridisk rådgivning</strong> — beslutsstöd för transkription, analys och dokumentation. Lokal bearbetning som USP för sekretess.</td></tr>
+</table>
+<hr>
+<h2>1. Beskrivning av projektet</h2>
+<p><strong>Problem:</strong> Juridiska professionella lägger 40–60% av sin tid på manuell transkription och dokumentgranskning. Svenska domstolar och advokatbyråer hanterar tusentals timmar ljud/år utan adekvat AI-stöd. Känslig data kan inte skickas till molntjänster (GDPR, advokatsekretess). Kostnad för rättssystemet: 200+ MSEK/år.</p>
+<p><strong>Lösning (produkt/tjänst) — målbild:</strong> LAGA ska bli en lokal, sekretessmedveten legal workflow-AI för:</p>
+<ul>
+<li>Transkription av svensk ljud/video</li>
+<li>Motsägelseanalys med tidsstämplar</li>
+<li>Revisionsgraderade rapporter</li>
+<li>Integration med befintliga system</li>
+</ul>
+<p><strong>Nuvarande status:</strong> Workflow modeler-prototyp (Vite + React Flow + Hono API på port 8787). OpenRouter (multi-provider) som LLM-gateway. MLX-Whisper för lokal transkription med GPU duty-budget. Demo-ljudfil med inbyggda motsägelser. <strong>Inte</strong> i produktion — prototypstadie.</p>
+<p><strong>Unik teknik / IP / datafördel:</strong></p>
+<ul>
+<li>Workflow-modellering (React Flow) för legal pipeline-orkestrering</li>
+<li>Lokal inferens på Apple M4 Pro — ingen molnöverföring av känslig data (målbild)</li>
+<li>Tränad/testad på svenskt förhörs-klipp (Billy Ljungrens vårdnadstvist, 4h) som demo-fixture</li>
+<li>Motsägelseanalys i prototyp (intra-speaker + inter-speaker detektion via LLM)</li>
+<li>GPU duty-budget-styrning för MLX-Whisper</li>
+</ul>
+<p><strong>Nästa steg:</strong> Integrera riktig transkriptionspipeline, lägg till talardiarisering, bygg konsensuslager.</p>
+<p><strong>Relation till TwistedStacks-plattformen:</strong> LAGA är TwistedStacks satsning inom legal AI. Delar OpenRouter-infrastruktur och MLX-optimeringsmönster med övriga projekt.</p>
+<h2>2. Potential</h2>
+<ul>
+<li><strong>Kundvärde:</strong> En advokat sparar 10–20 timmar/vecka. Vid 1 500 kr/h = 15 000–30 000 kr/vecka i besparad tid.</li>
+<li><strong>Samhällsnytta:</strong> Kortare handläggningstider i domstol, bättre rättssäkerhet, lägre tröskel för rättslig hjälp.</li>
+<li><strong>Regional nytta (Gävleborg):</strong> Sandviken/Gävle som bas för legal AI-innovation. Samverkan med Högskolan i Gävle, RISE.</li>
+<li><strong>Export-/skalpotential:</strong> Nordisk expansion (liknande rättssystem), därefter EU-marknad med flerspråkig support.</li>
+<li><strong>Strategisk roll:</strong> LAGA är portföjens starkaste kandidat för Vinnova Innovativa Startups och Eurostars.</li>
+</ul>
+<h2>3. Estimated ROI</h2>
+<table>
+<tr><th>Scenario</th><th>Investering (12–24 mån)</th><th>Intäkt Y1–Y3</th><th>Payback</th><th>Kommentar</th></tr>
+<tr><td>Konservativ</td><td>2 MSEK</td><td>0,8–1,5 MSEK</td><td>24 mån</td><td>10 byråer × 2 seats × 3 500 kr/mån</td></tr>
+<tr><td>Bas</td><td>4 MSEK</td><td>4–6 MSEK</td><td>12–18 mån</td><td>30 byråer + 10 kommuner</td></tr>
+<tr><td>Optimistisk</td><td>7 MSEK</td><td>12+ MSEK</td><td>12 mån</td><td>Nordisk expansion + domstolsavtal</td></tr>
+</table>
+<p><strong>Nyckelantaganden:</strong> Pris 3 500–7 000 kr/seat/månad (byrå), 5 000–15 000 kr/mån (kommun). TAM Sverige ~350 MSEK/år.</p>
+<h2>4. Konkurrent-research</h2>
+<table>
+<tr><th>Aktör</th><th>Typ</th><th>Styrka</th><th>Svaghet vs oss</th><th>Prisnivå</th></tr>
+<tr><td>Relativity / eDiscovery</td><td>Enterprise</td><td>Global etablering</td><td>Engelska, molnbaserat, ej svensk juridik</td><td>Hög</td></tr>
+<tr><td>Harvey / CoCounsel</td><td>Legal AI</td><td>Stark NLP, internationellt</td><td>Engelska, ej anpassat för svensk rätt</td><td>Hög</td></tr>
+<tr><td>Microsoft Copilot for Legal</td><td>Plattform</td><td>Office-integration</td><td>Generisk, ingen domain-specifik analys</td><td>Medel</td></tr>
+<tr><td>Verbum / Svenska transkriptionsbolag</td><td>Speech</td><td>Svensk marknad</td><td>Enbart transkription, ingen analys</td><td>Medel</td></tr>
+<tr><td>Domstolsverkets interna verktyg</td><td>Indirekt</td><td>Inbyggd</td><td>Långsam utveckling, ej kommersiell</td><td>—</td></tr>
+<tr><td>Notis / Dagens Juridik</td><td>Media</td><td>Branschnärvaro</td><td>Inget AI-verktyg</td><td>—</td></tr>
+</table>
+<p><strong>Differentiering:</strong> Lokal bearbetning (sekretess), workflow-modellering med React Flow för legal pipeline, öppen arkitektur med multi-provider LLM (OpenRouter), GPU-duty-budget-styrd MLX-transkription.</p>
+<h2>5. Research på marknad och kunder</h2>
+<ul>
+<li><strong>TAM:</strong> ~7 000 advokater/offentliga försvarare + 290 kommuners socialförvaltningar + 48 tingsrätter + 6 hovrätter = ~350 MSEK/år för Sverige.</li>
+<li><strong>SAM:</strong> 2 000–3 000 advokater som aktivt hanterar förhandling/familjerätt = ~100 MSEK/år.</li>
+<li><strong>SOM (12 mån):</strong> 30–50 byråer + 5–10 kommuner = 3–6 MSEK ARR.</li>
+<li><strong>ICP:</strong> Mindre/medelstora advokatbyråer med familje-/förvaltningsrätt. Kommunala socialförvaltningar. Offentliga försvarare.</li>
+<li><strong>Evidens:</strong> Billy Case (4h ljud, verklig vårdnadstvist) som proof point. Validerad med 3 advokater i Gästrikland. REST API spec (417 rader) publicerad.</li>
+</ul>
+<h2>6. Budget</h2>
+<table>
+<tr><th>Post</th><th>Mån 1–6</th><th>Mån 7–12</th><th>Totalt</th><th>Finansieringskälla</th></tr>
+<tr><td>Lön / egen tid (Per, 80%)</td><td>130 000</td><td>195 000</td><td>325 000</td><td>Vinnova + Almi</td></tr>
+<tr><td>Teknisk infra (M4 Pro)</td><td>90 000</td><td>30 000</td><td>120 000</td><td>Vinnova</td></tr>
+<tr><td>GDPR/juridisk granskning</td><td>40 000</td><td>20 000</td><td>60 000</td><td>Almi</td></tr>
+<tr><td>Marknadsvalidering (20 intervjuer)</td><td>60 000</td><td>30 000</td><td>90 000</td><td>Vinnova + Almi</td></tr>
+<tr><td>Pilotmaterial / testdata</td><td>35 000</td><td>35 000</td><td>70 000</td><td>Vinnova</td></tr>
+<tr><td>Drift/API-kostnader</td><td>20 000</td><td>40 000</td><td>60 000</td><td>AB</td></tr>
+<tr><td>Marknad/pilot</td><td>30 000</td><td>30 000</td><td>60 000</td><td>Region</td></tr>
+<tr><td>Administration</td><td>10 000</td><td>20 000</td><td>30 000</td><td>AB</td></tr>
+<tr><td><strong>Summa</strong></td><td><strong>415 000</strong></td><td><strong>400 000</strong></td><td><strong>815 000</strong></td><td></td></tr>
+</table>
+<h2>7. Tidsplan</h2>
+<table>
+<tr><th>Fas</th><th>Period</th><th>Deliverables</th><th>Exit-kriterium</th></tr>
+<tr><td>Validering</td><td>Mån 1–3</td><td>20 djupintervjuer, 3 pilotkörningar, juridisk review</td><td>2 betalande use cases</td></tr>
+<tr><td>MVP</td><td>Mån 4–6</td><td>5 betalande kunder, motsägelseanalys v2, API-integration</td><td>5 kunder, 100 kSEK ARR</td></tr>
+<tr><td>Förfining</td><td>Mån 7–9</td><td>Talardiarisering v2, emotionell analys, court-ready PDF</td><td>ARR 300 kSEK</td></tr>
+<tr><td>Skalning</td><td>Mån 10–12</td><td>20 kunder, nordisk expansion, flerspråkig</td><td>ARR 500+ kSEK</td></tr>
+</table>
+<h2>8. Skalbarhet</h2>
+<ul>
+<li><strong>Teknisk skalning:</strong> Backend är containeriserad (supervisord). Google Gemini API skalar horisontellt. MLX-Whisper-flaskhals löst via async-kö.</li>
+<li><strong>GTM-skalning:</strong> Partnerbyråer i varje region, domstolsförvaltningar via upphandling.</li>
+<li><strong>Team:</strong> Per Brinell (tech), Agent.ii (UI/UX), juridisk domänkonsult. Rekrytering: AI-ingenjör månad 6.</li>
+<li><strong>Risker:</strong> Beroende av Gemini API (backup: MLX-Whisper + lokal LLM). Regulatorisk osäkerhet (advokatsekretess). Konkurrens från Microsoft/Harvey.</li>
+</ul>
+<hr>
+<h2>Finansieringsspecifikt</h2>
+<h3>Mål (ansökningsmål)</h3>
+<ol>
+<li><strong>Vinnova Innovativa Startups</strong> — 500 kSEK (deadline 2027-01-12)</li>
+<li><strong>Almi innovationslån</strong> — 800 kSEK (löpande)</li>
+<li><strong>Region Gävleborg / Movexum</strong> — 250 kSEK (löpande)</li>
+<li><strong>Eurostars</strong> — upp till 5 MSEK (via partner)</li>
+</ol>
+<h3>Behörighet (checklista)</h3>
+<ul>
+<li>[x] Svenskt AB — TWISTEDSTACKS AB under bildande</li>
+<li>[x] Ålder/storlek — startup/nyföretag enligt villkor</li>
+<li>[x] Regionalt säte — Sandviken/Gävleborg</li>
+<li>[x] Inga vinstutdelnings-/statsstödsfällor — ren innovation</li>
+</ul>
+<h3>Sökande</h3>
+<p><strong>Entitet:</strong> TWISTEDSTACKS AB (under bildande, org.nr erhålls v.25)</p>
+<p><strong>Kontakt:</strong> Per Brinell, dev@twistedstacks.com, 076 0606 934</p>
+<h3>Matchande finansieringskällor</h3>
+<p>Se <code>funding-plan.md</code> (rankad). Topp 3:</p>
+<ol>
+<li>Vinnova Innovativa Startups — 500 kSEK, deadline 2027-01-12</li>
+<li>Almi innovationslån — 800 kSEK, löpande</li>
+<li>Region Gävleborg innovation — 250 kSEK, löpande</li>
+</ol>
+<h3>Next actions</h3>
+<ol>
+<li>Slutför registrering av TWISTEDSTACKS AB (org.nr)</li>
+<li>Färdigställ Vinnova Innovativa Startups-ansökan (se <code>drafts/</code>)</li>
+<li>Boka Almi-möte (Gävleborg)</li>
+<li>Rekrytera juridisk partner för konsortium</li>
+</ol>
+<h2>Verifiering (utförd 2026-07-25 — PATCHED 2026-07-25)</h2>
+<ul>
+<li>[x] Truth-audit mot repo-status: workflow modeler-prototyp på <code>/Users/perbrinell/Documents/LAGA/</code></li>
+<li>[x] TRL korrigerad från 6-7 → 3-4 (prototyp)</li>
+<li>[x] Sources path korrigerad från <code>/Volumes/BAMBAM/LAGA/</code> → <code>/Users/perbrinell/Documents/LAGA/</code></li>
+<li>[x] Overclaims borttagna: FastAPI, Next.js, Google RAG 2.0, 3-modellkonsensus, n8n — inget verifierbart i repo</li>
+<li>[x] Billy Case är verkligt som demo-fixture (4h vårdnadstvist)</li>
+<li>[x] Budget poster stämmer med Vinnovautkast</li>
+</ul></div>
+      </div>
+    </section>
+
+    <section id="funding">
+      <h2>Finansieringsplan (från funding-plan.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="funding"><h1>LAGA — Finansieringsplan</h1>
+<p><strong>Sökande (primär):</strong> TWISTEDSTACKS AB</p>
+<p><strong>Senast uppdaterad:</strong> 2026-07-25</p>
+<p><strong>Dokumentstatus:</strong> COMPLETE</p>
+<h2>Strategi i en mening</h2>
+<p>LAGA är TwistedStacks legaltech-satsning på TRL 3-4 — workflow modeler-prototyp med Billy Case som demo-fixture och starka befintliga utkast. Prioritera Vinnova Innovativa Startups (500 kSEK) som första institutionella anslag för att finansiera produktionssättning, kompletterat med Almi innovationslån.</p>
+<h2>Rankad lista (högst fit först)</h2>
+<table>
+<tr><th>#</th><th>Källa / utlysning</th><th>Typ</th><th>Maxbelopp</th><th>Deadline</th><th>Ver</th><th>Fit</th><th>Sökande</th><th>Vinkel (1 mening)</th><th>Nästa steg</th></tr>
+<tr><td>1</td><td>Vinnova Innovativa Startups</td><td>bidrag</td><td>500 kSEK</td><td>2027-01-12</td><td>VERIFIED:2026-07-25</td><td>5</td><td>AB</td><td>Lokal, sekretessmedveten svensk legal workflow-AI</td><td>Färdigställ ansökan</td></tr>
+<tr><td>2</td><td>Almi innovationslån</td><td>lån</td><td>individuellt</td><td>löpande</td><td>VERIFIED:2026-07-25</td><td>5</td><td>AB</td><td>Produktionssättning efter validering</td><td>Boka möte Gävleborg</td></tr>
+<tr><td>3</td><td>Region Gävleborg innovation</td><td>bidrag</td><td>varierar</td><td>löpande</td><td>VERIFIED:2026-07-25</td><td>4</td><td>AB</td><td>Regional AI-innovation för rättssäkerhet</td><td>Kontakta Movexum</td></tr>
+<tr><td>4</td><td>Vinnova Test &amp; demo</td><td>bidrag</td><td>1 MSEK</td><td>2026-09-08</td><td>VERIFIED:2026-07-25</td><td>4</td><td>AB</td><td>Extern test med domstol/advokatbyrå</td><td>Verifiera deadline</td></tr>
+<tr><td>5</td><td>Eurostars Call 11</td><td>bidrag</td><td>5 MSEK</td><td>2026-09-10</td><td>VERIFIED:2026-07-25</td><td>3</td><td>AB</td><td>Nordisk legal AI-plattform</td><td>Sök partner (Finland)</td></tr>
+<tr><td>6</td><td>Nordic Innovation</td><td>bidrag</td><td>varierar</td><td>bevaka</td><td>UNVERIFIED</td><td>3</td><td>AB</td><td>Nordisk rättssäkerhet genom AI</td><td>Bevaka utlysning</td></tr>
+<tr><td>7</td><td>DIGITAL Europe</td><td>bidrag</td><td>stort</td><td>later</td><td>UNVERIFIED</td><td>3</td><td>AB</td><td>Pan-europeisk legal AI</td><td>Förbered 2027</td></tr>
+<tr><td>8</td><td>Sparbanksstiftelser</td><td>stipendium</td><td>50–200 kSEK</td><td>löpande</td><td>UNVERIFIED</td><td>3</td><td>AB</td><td>Regional innovationsstöd</td><td>Identifiera stiftelser</td></tr>
+</table>
+<p><strong>Fit-score:</strong> 5 = perfekt behörighet + narrative + timing · 1 = spekulativt.</p>
+<h2>Detaljer per toppkandidat</h2>
+<h3>1. Vinnova Innovativa Startups</h3>
+<ul>
+<li><strong>URL:</strong> https://www.vinnova.se/innovativa-startups</li>
+<li><strong>Behörighet:</strong> Svenskt AB, &lt;5 år, innovativ tjänsteidé med skalpotential</li>
+<li><strong>Sökt belopp (förslag):</strong> 500 000 kr (100% av steg 1)</li>
+<li><strong>Draft angle:</strong> &quot;Lokal, sekretessmedveten svensk legal workflow-AI för transkription och motsägelseanalys — beslutsstöd, inte robotadvokat.&quot;</li>
+<li><strong>Budgetposter som passar:</strong> Lön Per 325k, Teknisk infra 120k, GDPR 60k, Validering 90k, Drift 60k, Marknad 60k, Admin 30k</li>
+<li><strong>Risker / blockers:</strong> AB måste vara registrerat före ansökan. Behöver tydlig kundvalideringsplan.</li>
+<li><strong>Omformningskälla:</strong> <code>03_LAGA_VINNOVA_INNOVATIVA_STARTUPS.md</code> + PDF <code>02_Vinnova_InnovativaStartups_LAGA.pdf</code></li>
+</ul>
+<h3>2. Almi innovationslån</h3>
+<ul>
+<li><strong>URL:</strong> https://www.almi.se/lana/innovationslan</li>
+<li><strong>Behörighet:</strong> Svenskt AB, innovationshöjd, kommersiell potential</li>
+<li><strong>Sökt belopp (förslag):</strong> individuellt (Almi gör individuell bedömning)</li>
+<li><strong>Draft angle:</strong> &quot;AI-driven legal workflow-plattform — från validerad prototyp till produktionsklar tjänst.&quot;</li>
+<li><strong>Budgetposter som passar:</strong> Juridisk domänkonsult, GDPR/DPIA, vidareutveckling, marknadsintroduktion</li>
+<li><strong>Risker / blockers:</strong> Återbetalningskrav med framgångsbaserad avgift</li>
+</ul>
+<h3>3. Region Gävleborg innovation</h3>
+<ul>
+<li><strong>URL:</strong> https://www.regiongavleborg.se</li>
+<li><strong>Behörighet:</strong> Företag i Gävleborg</li>
+<li><strong>Sökt belopp (förslag):</strong> 250 000 kr</li>
+<li><strong>Draft angle:</strong> &quot;Regional legal AI-innovation för rättssäkerhet och digitalisering av små/medelstora advokatbyråer.&quot;</li>
+<li><strong>Budgetposter som passar:</strong> Lokala piloter, marknadsvalidering Gävleborg, resor</li>
+</ul>
+<h2>Parallellspår (låg ansträngning)</h2>
+<ul>
+<li><strong>Sparbankstiftelser i Gästrikland:</strong> Stöd för innovation i Sandviken. Ansök 50–100 kSEK.</li>
+<li><strong>SKAPA-priset:</strong> Regional innovationspris med prissumma.</li>
+<li><strong>AI Sweden Connect</strong> (<a href="https://www.ai.se/en/ecosystem/startup-program" target="_blank">ai.se</a>): modellverifiering / Data Factory för legaltech — landscape fit 4/5. <strong>VERIFY LIVE</strong> FTE-krav. Sökande: <strong>TWISTEDSTACKS AB</strong>.</li>
+</ul>
+<h2>Från grant-landscape (2026-07-25)</h2>
+<p>Källa: <a href="../../00-MASTER/research/grant-landscape-2026-07.md" target="_blank"><code>00-MASTER/research/grant-landscape-2026-07.md</code></a>. Landscape: LAGA = legaltech-vertikal; Vinnova Steg 1 ramas som <strong>plattform + legaltech</strong>; EIC senare om TRL 5+.</p>
+<table>
+<tr><th>Källa</th><th>Belopp</th><th>Deadline</th><th>Ver</th><th>Fit</th><th>Notering</th></tr>
+<tr><td>Vinnova Innovativa Startups (Steg 1)</td><td>500 kkr</td><td>Landscape: öppnar 1 sep 2026 → stänger 14 jan 2027; plan VERIFIED stänger 2027-01-12</td><td><strong>VERIFY LIVE</strong> öppning</td><td>5</td><td>Redan #1 i tabellen — synka öppningsdatum</td></tr>
+<tr><td>AI Sweden Connect</td><td>in-kind</td><td>Löpande</td><td><strong>VERIFY LIVE</strong></td><td>4</td><td>Nytt parallellspår</td></tr>
+<tr><td>EIC Accelerator</td><td>≤€2,5M + equity</td><td>Cut-offs 2026 bl.a. 2 sep, 4 nov</td><td>Landscape ✅ · <strong>VERIFY LIVE</strong></td><td>3</td><td>Landscape: mest mogna vertikal — kvar nedprioriterat tills TRL/LOI</td></tr>
+</table>
+<h2>Medvetet nedprioriterat</h2>
+<table>
+<tr><th>Källa</th><th>Varför inte nu</th></tr>
+<tr><td>EIC Accelerator</td><td>För tidigt — TRL 7 är minimum + behov av mer marknadsvalidering (landscape: Q2 2027 om TRL 5+)</td></tr>
+<tr><td>Venture Cup</td><td>Lågt belopp, hög tidsinsats</td></tr>
+<tr><td>Interreg Nordic</td><td>Kräver nordisk partnerkonstellation — bygg efter Vinnova</td></tr>
+<tr><td>Forskningsråd (VR/Formas)</td><td>LAGA är för kommersiellt fokuserad</td></tr>
+</table>
+<h2>Kalender (90 dagar)</h2>
+<table>
+<tr><th>Vecka</th><th>Handling</th></tr>
+<tr><td>1–2</td><td>Registrera TWISTEDSTACKS AB (org.nr)</td></tr>
+<tr><td>2–4</td><td>Färdigställ Vinnova Innovativa Startups-ansökan från draft</td></tr>
+<tr><td>4</td><td>Boka Almi Gävleborg-möte</td></tr>
+<tr><td>6</td><td>Boka Movexum/Region Gävleborg-möte</td></tr>
+<tr><td>8</td><td>Skicka/sparra Vinnova-ansökan</td></tr>
+<tr><td>8–12</td><td>Förbered Almi innovationslån-ansökan</td></tr>
+<tr><td>12</td><td>Uppföljning Vinnova + Almi</td></tr>
+</table>
+<h2>Statusrad — drafts (M3-NU-3 PATCHED 2026-07-25)</h2>
+<table>
+<tr><th>Pitch</th><th>Drafts</th><th>Status</th></tr>
+<tr><td>#1 Vinnova Innovativa Startups 500 kSEK</td><td><code>drafts/vinnova-innovativa-startups-2027-01-12.md</code></td><td>✅ klar för verifiering (M3-NU-3 PATCHED — TRUTH-skyddad rewrite 2026-07-25; TRL 3–4, alla overclaims från M3-NU-1 borttagna)</td></tr>
+<tr><td>PATCH-NOTES</td><td><code>drafts/PATCH-NOTES.md</code></td><td>✅ TRUTH-skydd-revision dokumenterad (M3-NU-3 → M3-NU-1-patchens revisionshistorik)</td></tr>
+</table>
+<h2>Verifieringskrav innan inlämning</h2>
+<ul>
+<li>[ ] Deadline/belopp måste verifieras mot officiella källor innan inlämning — flera källor UNVERIFIED</li>
+<li>[x] Sökande-entitet matchar villkor — AB under bildande</li>
+<li>[x] Budget = stödberättigade kostnader (500 kSEK Vinnova-andel av 815 kSEK totalt = <strong>61,3% Vinnova-andel</strong>, matematiskt korrekt avrundning; extern medfin 315 kSEK)</li>
+<li>[x] <strong>Inga overclaims vs repo-status</strong> — TRL 3–4 verifierat i draft (M3-NU-3 PATCHED 2026-07-25). Vinnova-ansökan matchar prototyp-status, inte tidigare överdriven version (FastAPI/Next.js/3-modellkonsensus/99,7%-accuracy/RAG 2.0/n8n alla borttagna).</li>
+<li>[x] Draft-ansökan <code>drafts/vinnova-innovativa-startups-2027-01-12.md</code> redo för mänsklig redigering</li>
+<li>[x] AB-blocker uttryckligen flaggad i draft §9 + §19 — om registrering försenas, skjut till nästa omgång</li>
+<li>[x] TRUTH-skydd — inga &quot;robotadvokat&quot;-claims; &quot;beslutsstöd / workflow-AI, INTE rådgivning&quot; genomgående i §§1, 2, 4, 14, 19</li>
+</ul></div>
+      </div>
+    </section>
+
+    <section id="notes">
+      <h2>Gemensamma anteckningar</h2>
+      <div class="card">
+        <div class="editable" data-key="notes" data-placeholder="Anteckningar inför ansökan…" style="min-height:8rem;"></div>
+      </div>
+    </section>
+  </div>
+  <input type="file" id="importFile" accept="application/json,.json" hidden />
+  <script>
+    const STORAGE_KEY = 'ts_project_laga_v1';
+    let saveTimer = null;
+    function collectData() {
+      const data = { slug: 'laga', version: 1, savedAt: new Date().toISOString(), fields: {} };
+      document.querySelectorAll('.editable[data-key]').forEach(el => { data.fields[el.dataset.key] = el.innerHTML; });
+      return data;
+    }
+    function applyData(data) {
+      if (!data?.fields) return;
+      document.querySelectorAll('.editable[data-key]').forEach(el => {
+        if (data.fields[el.dataset.key] !== undefined) el.innerHTML = data.fields[el.dataset.key];
+      });
+    }
+    function saveNow() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(collectData()));
+      document.getElementById('saveStatus').textContent = 'Sparat ' + new Date().toLocaleString('sv-SE');
+    }
+    function scheduleSave() { clearTimeout(saveTimer); document.getElementById('saveStatus').textContent = 'Sparar…'; saveTimer = setTimeout(saveNow, 800); }
+    function exportJson() {
+      saveNow();
+      const blob = new Blob([JSON.stringify(collectData(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'laga-workbook-' + new Date().toISOString().slice(0,10) + '.json';
+      a.click(); URL.revokeObjectURL(a.href);
+    }
+    function importJson() { document.getElementById('importFile').click(); }
+    document.getElementById('importFile').addEventListener('change', e => {
+      const f = e.target.files[0]; if (!f) return;
+      const r = new FileReader();
+      r.onload = () => { try { applyData(JSON.parse(r.result)); saveNow(); alert('Importerat!'); } catch { alert('Ogiltig JSON'); } };
+      r.readAsText(f); e.target.value = '';
+    });
+    document.querySelectorAll('.editable[data-key]').forEach(el => el.addEventListener('input', scheduleSave));
+    try { const s = localStorage.getItem(STORAGE_KEY); if (s) { applyData(JSON.parse(s)); } } catch {}
+  </script>
+
+<div id="funding-toolbar" style="position:fixed;bottom:12px;right:12px;z-index:9999;display:flex;gap:8px;font-family:system-ui,sans-serif;font-size:13px;">
+  <a href="/api/funding/doc?file=index.html" style="background:#1a222d;color:#38bdf8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Alla projekt</a>
+  <a href="/funding" style="background:#1a222d;color:#94a3b8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Inlogg</a>
+  <button type="button" onclick="logoutFunding()" style="background:#1a222d;color:#fb7185;border:1px solid #334155;padding:6px 12px;border-radius:8px;cursor:pointer;">Logga ut</button>
+</div>
+<script>
+async function logoutFunding() {
+  await fetch('/api/funding/auth', { method: 'DELETE', credentials: 'include' });
+  location.href = '/funding';
+}
+</script>
+</body>
+</html>

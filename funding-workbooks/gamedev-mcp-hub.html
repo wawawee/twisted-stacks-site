@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GameDev MCP Hub — Projektunderlag</title>
+  <style>
+    :root {
+      --bg: #0f1419; --surface: #1a222d; --surface2: #243040; --border: #334155;
+      --text: #e8edf4; --muted: #94a3b8; --accent: #38bdf8; --investor: #34d399;
+      --grant: #fbbf24; --warn: #fb7185; --radius: 12px;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.55; }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+    .topbar { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; position: sticky; top: 0; z-index: 5;
+      background: linear-gradient(var(--bg) 75%, transparent); padding: .5rem 0 1rem; }
+    button { border: 1px solid var(--border); background: var(--surface2); color: var(--text); border-radius: 8px;
+      padding: .45rem .8rem; font-size: .85rem; cursor: pointer; font-family: inherit; }
+    button:hover { border-color: var(--accent); }
+    button.primary { background: #0ea5e9; border-color: #0ea5e9; color: #041018; font-weight: 600; }
+    .status { margin-left: auto; font-size: .78rem; color: var(--muted); align-self: center; }
+    h1 { font-size: 1.55rem; margin: 0 0 .25rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.25rem; font-size: .82rem; }
+    .badge { background: var(--surface2); border: 1px solid var(--border); padding: .2rem .55rem; border-radius: 999px; }
+    .badge.p0 { border-color: #7f1d1d; color: #fecaca; }
+    .badge.p1 { border-color: #78350f; color: #fde68a; }
+    .badge.p2 { border-color: #1e3a5f; color: #bae6fd; }
+    nav.jump { display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: 1.5rem; }
+    nav.jump a { color: var(--muted); text-decoration: none; font-size: .82rem; padding: .3rem .55rem;
+      border: 1px solid var(--border); border-radius: 8px; }
+    nav.jump a:hover { color: var(--accent); border-color: var(--accent); }
+    section { margin-bottom: 2rem; scroll-margin-top: 5rem; }
+    section > h2 { font-size: 1.2rem; margin: 0 0 .75rem; padding-bottom: .4rem; border-bottom: 2px solid var(--surface2); }
+    .hint { font-size: .82rem; color: var(--muted); background: var(--surface2); border-left: 3px solid var(--accent);
+      padding: .6rem .85rem; border-radius: 0 8px 8px 0; margin-bottom: .75rem; }
+    .hint.inv { border-left-color: var(--investor); }
+    .hint.grt { border-left-color: var(--grant); }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; }
+    .editable { min-height: 2rem; outline: none; border: 1px dashed transparent; border-radius: 8px; padding: .5rem .65rem;
+      transition: border-color .15s, background .15s; }
+    .editable:hover { border-color: #475569; background: rgba(56,189,248,.04); }
+    .editable:focus { border-color: var(--accent); background: rgba(56,189,248,.07); }
+    .editable[data-placeholder]:empty::before { content: attr(data-placeholder); color: #64748b; }
+    .md-content h1,.md-content h2,.md-content h3,.md-content h4 { margin-top: 1rem; }
+    .md-content table { width: 100%; border-collapse: collapse; font-size: .85rem; margin: .75rem 0; }
+    .md-content th,.md-content td { border: 1px solid var(--border); padding: .45rem .55rem; vertical-align: top; }
+    .md-content th { background: var(--surface2); }
+    .md-content blockquote { margin: .5rem 0; padding-left: .75rem; border-left: 3px solid var(--border); color: var(--muted); }
+    .md-content code { font-family: ui-monospace, monospace; font-size: .85em; background: var(--surface2); padding: .1rem .3rem; border-radius: 4px; }
+    .md-content a { color: var(--accent); }
+    .back { font-size: .85rem; margin-bottom: 1rem; }
+    .back a { color: var(--accent); }
+    @media print { .topbar, nav.jump, .back { display: none !important; } body { background: #fff; color: #111; }
+      .card { break-inside: avoid; } .editable { border: none !important; padding: 0; } }
+    @media (max-width: 600px) { .status { margin-left: 0; width: 100%; } }
+  </style>
+</head>
+<body data-slug="gamedev-mcp-hub">
+  <div class="wrap">
+    <p class="back"><a href="/api/funding/doc?file=index.html">← Alla projekt</a> · <a href="/api/funding/doc?file=studio-workbook.html">Studio-arbetsbok</a></p>
+
+    <h1>GameDev MCP Hub</h1>
+    <div class="meta">
+      <span class="badge p2">P2 lab</span>
+      
+      
+      
+    </div>
+
+    <div class="topbar">
+      <button class="primary" type="button" onclick="saveNow()">💾 Spara</button>
+      <button type="button" onclick="exportJson()">⬇ Exportera</button>
+      <button type="button" onclick="importJson()">⬆ Importera</button>
+      <button type="button" onclick="window.print()">🖨 PDF / Skriv ut</button>
+      <span class="status" id="saveStatus">Redigera genom att klicka i texterna</span>
+    </div>
+
+    <nav class="jump">
+      <a href="#investor">Investerare</a>
+      <a href="#grant">Bidrag</a>
+      <a href="#dossier">Dossier</a>
+      <a href="#funding">Finansieringsplan</a>
+      <a href="#notes">Anteckningar</a>
+    </nav>
+
+    <section id="investor">
+      <h2>Investerare — vad framhäva</h2>
+      <div class="hint inv">Fokus: marknad, traction, unit economics, moat — inte bidragsspråk.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="investor_pitch" data-placeholder="Skriv investerarpitch för detta projekt…">
+          <p><em>Fyll i: problem → lösning → traction → ask → varför nu. Se dossier §1–3 nedan som källa.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="grant">
+      <h2>Bidrag & stöd — vad framhäva</h2>
+      <div class="hint grt">Fokus: innovation, samhällsnytta, regional nytta, budget, TRL — en vertikal i taget.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="grant_pitch" data-placeholder="Skriv grant-vinkel för detta projekt…">
+          <p><em>Fyll i: innovationshöjd, samhällsnytta Gävleborg, budgetposter, sökande (AB vs Per). Se finansieringsplan nedan.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="dossier">
+      <h2>Dossier (från dossier.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="dossier"><h1>GameDev Hub — Dossier</h1>
+<p><strong>Slug:</strong> gamedev-mcp-hub · <strong>Path:</strong> <code>/Users/perbrinell/Documents/gamedev-mcp-hub</code></p>
+<p><strong>Arbetsnamn:</strong> <strong>GameDev Hub</strong> (MCP = Blender-koppling/protokoll, inte produktnamn)</p>
+<p><strong>Sökande:</strong> TWISTEDSTACKS AB · <strong>Prio:</strong> <strong>P2 lab</strong> (portföljbredd) · <strong>Status:</strong> COMPLETE (dokumentation) · <strong>2026-07-25</strong></p>
+<blockquote><strong>Ärlig skede:</strong> ~1 dag lab — testat generera konst i Blender. I Anslag för <strong>TWISTEDSTACKS-bredd</strong>, inte för att säljas eller ansökas om nu. Se <a href="STATUS.md" target="_blank"><code>STATUS.md</code></a>.</blockquote>
+<h2>Meta</h2>
+<table>
+<tr><th>Fält</th><th>Värde</th></tr>
+<tr><td>Sektor</td><td>Game tech / creative tools / DCC-AI</td></tr>
+<tr><td>TRL / mognad</td><td><strong>Lab</strong> — Blender-konstexperiment; repo har hub 0.1.0 men produkt ≠ det som testats i praktik</td></tr>
+<tr><td>Intäkt</td><td>Ingen — framtida modell TBD efter vision-lab</td></tr>
+<tr><td>Anslag-roll</td><td>Portföljbredd; <strong>HOLD</strong> funding/LOI tills medveten eskalering</td></tr>
+<tr><td>Känslighet</td><td>OSS-vänlig; respektera upstream-licenser</td></tr>
+</table>
+<h2>USP / differentiering (kärna)</h2>
+<p><strong>En mening:</strong> Ett agentlag som genererar och redigerar <strong>direkt i Blender och Unity</strong> (plus tillhörande plugins/addons/paket) via en MCP-hub — inte chat som spottar ut assets någon annanstans.</p>
+<table>
+<tr><th>Lager</th><th>Vad det betyder</th></tr>
+<tr><td><strong>Agentlag</strong></td><td>Multi-agent / orkestrering (smart router, A2A-bus, jobköer med human-in-the-loop) — flera specialiserade agenter som samarbetar, inte en ensam &quot;AI-knapp&quot;</td></tr>
+<tr><td><strong>DCC-in-the-loop</strong></td><td>Författar/redigerar <strong>inne i</strong> Blender (bpy via addon/MCP) och Unity (editor/MCP-runner) — scen, mesh, material, prefabs, etc. i den verkliga pipelinen</td></tr>
+<tr><td><strong>MCP-hub</strong></td><td>Aggregerar gamedev-MCP-servrar bakom SSE multi-client + lokal GUI; tool-namespacing (<code>server__tool</code>); routing (<code>hub__route_task</code>)</td></tr>
+<tr><td><strong>Plugin-yta</strong></td><td>Blender-addon, Unity-paket/editor-tools, övriga connectors (Godot, GitHub, …) — hubben är orkestern, DCC är scenen</td></tr>
+</table>
+<p><strong>Inte samma sak som:</strong></p>
+<ul>
+<li>Generiska AI-art-verktyg (Midjourney, Meshy, Scenario) — asset utanför Blender/Unity</li>
+<li>LLM-kodassistenter (Cursor, Continue, Cline) — kod i IDE, inte DCC-scen</li>
+<li>Enstaka Blender-/Unity-AI-addons — oftast single-tool, ej agentlag + hub</li>
+<li>Asset Store-generatorer / traditionell outsource — manuell eller black-box pipeline utan agentorkestrering i DCC</li>
+</ul>
+<h3>Verifierat från repo (2026-07-25) vs antaganden</h3>
+<table>
+<tr><th>Påstående</th><th>Status</th></tr>
+<tr><td>SSE-hub + GUI + smart router + tool registry fungerar</td><td><strong>VERIFIED</strong> (README 0.1.0)</td></tr>
+<tr><td>Blender MCP (addon.py) konfigurerad / enabled</td><td><strong>VERIFIED</strong> (<code>config/mcp-servers.json</code>)</td></tr>
+<tr><td>Unity MCP-entries (nurture / codergamester) finns i config</td><td><strong>VERIFIED</strong> — ofta <code>enabled: false</code> tills paths sätts</td></tr>
+<tr><td>blender-jobs: autonom kö + approve-gate → Blender</td><td><strong>VERIFIED</strong> (docs + MERGE_PLAN från SPACEinSPACE)</td></tr>
+<tr><td>A2A-bus / agent-to-agent i hubben</td><td><strong>DELVIS</strong> — kod/plan finns; full agentlags-UX = <strong>ANTAGANDE / roadmap</strong></td></tr>
+<tr><td>Freemium → Pro seats → studio license</td><td><strong>ANTAGANDE</strong> (affärsmodell; ej Stripe i repo)</td></tr>
+<tr><td>&quot;Alla plugins&quot; som färdig produkt</td><td><strong>ANTAGANDE</strong> — ytan växer via MCP-servers; inventera per release</td></tr>
+</table>
+<blockquote>Deep research (G-GAMEDEV) ska fördjupa comps/ICP/funding kring denna USP — se luckor nedan.</blockquote>
+<h2>1. Beskrivning</h2>
+<p>MCP-hub + agentorkestrering för gamedev: agenter arbetar <strong>i</strong> Blender/Unity via MCP-servrar/addons, bakom ett gränssnitt för Claude/LM Studio/Cursor. Smart routing, SSE multi-client, lokal GUI, jobköer med approve-gate.</p>
+<h2>2. Potential</h2>
+<ul>
+<li>Gamedev är underserved för <strong>DCC-native</strong> agentlag (de flesta AI-verktyg stannar utanför Blender/Unity).</li>
+<li>B2D (tech artists, indie) snabb adoption; live-ops/studios senare.</li>
+<li>Synergi med SPACEinSPACE (multi-agent / blender-jobs) + TwistedStacks agentplattform.</li>
+</ul>
+<h2>3. ROI (antaganden)</h2>
+<table>
+<tr><th>Scenario</th><th>Invest 12 mån</th><th>Intäkt Y2</th><th>Kommentar</th></tr>
+<tr><td>Konservativ</td><td>400 k</td><td>100 k</td><td>Sponsring/support</td></tr>
+<tr><td>Bas</td><td>900 k</td><td>800 k–1,5 MSEK</td><td>Pro tier 15–30 USD/mån × 300–800 seats</td></tr>
+<tr><td>Optimistisk</td><td>1,5 MSEK</td><td>4 MSEK</td><td>Studio licenses</td></tr>
+</table>
+<h2>4. Konkurrenter</h2>
+<table>
+<tr><th>Aktör</th><th>Notering</th></tr>
+<tr><td>Midjourney / Meshy / Scenario</td><td>Asset-AI <strong>utanför</strong> DCC</td></tr>
+<tr><td>Continue / Cline / Cursor native</td><td>Kod-IDE, ej Blender/Unity-scen</td></tr>
+<tr><td>Blender AI addons</td><td>Oftast ensam tool, ej hub+agentlag</td></tr>
+<tr><td>Unity Muse / Unity AI</td><td>Closed ecosystem, ej motor-agnostisk hub</td></tr>
+<tr><td>Unity Asset Store generators</td><td>Plugin-isolerat, ej multi-agent MCP</td></tr>
+<tr><td>Officiella MCP servers (splittrade)</td><td>Fragmenterade</td></tr>
+<tr><td>Composio / generiska MCP-gateways</td><td>Generiskt, saknar gamedev-DCC-primitiver</td></tr>
+<tr><td>Traditionell outsource</td><td>Mänsklig pipeline, hög latens/kostnad</td></tr>
+</table>
+<h3>4.1 Namngivna konkurrenter med prismodell (M3-NU-2-tillägg 2026-07-25)</h3>
+<table>
+<tr><th>Produkt</th><th>Kategori</th><th>Prismodell</th><th>Specifikt pris (ALLA UNVERIFIED 2026-07-25)</th></tr>
+<tr><td><strong>Unity Pro</strong></td><td>Motor-licens</td><td>Per seat/år</td><td>~$2,310/år (~24 000 SEK)</td></tr>
+<tr><td><strong>Unreal Engine</strong></td><td>Motor-licens</td><td>Royalty/seat</td><td>Royalty-free upp till $1M intäkt; därefter 5% royalty eller ~$1,850/seat/år</td></tr>
+<tr><td><strong>NVIDIA AI Enterprise</strong></td><td>AI-infrastruktur</td><td>Per GPU/år</td><td>~$4,500/år (~46 000 SEK) eller ~$1/GPU-timme via cloud-provider</td></tr>
+<tr><td><strong>Meshy</strong></td><td>Asset-AI (3D)</td><td>Per månad-tier</td><td>~$20/mån (Pro, 1 000 credits)</td></tr>
+<tr><td><strong>Scenario</strong></td><td>Asset-AI (text→image)</td><td>Per månad-tier</td><td>~$15–45/mån</td></tr>
+<tr><td><strong>Composio</strong></td><td>MCP-gateway (generisk)</td><td>Freemium/usage</td><td>Gratis 20 000 anrop; därefter från ~$29/mån</td></tr>
+<tr><td><strong>Anthropic (MCP-host)</strong></td><td>Modellanvändning</td><td>Pay-as-you-go</td><td>Per token</td></tr>
+</table>
+<p><strong>Differentiering (uppdaterad USP-linje):</strong></p>
+<ol>
+<li><strong>Agentlag i DCC</strong> — genererar/redigerar direkt i Blender + Unity (+ plugins), inte bara exporterar mesh från web-UI.</li>
+<li><strong>Hub-orkestrering</strong> — MCP-aggregation + routing + HITL-köer; flera verktyg i en session.</li>
+<li><strong>Motor-/DCC-brygga</strong> — Blender ↔ Unity/Godot via standardiserat MCP (glTF-pipeline m.m.).</li>
+<li><strong>Governance</strong> — approve-gates / cost-control så junior-dev inte bränner token eller skriver trasiga scener obevakat.</li>
+</ol>
+<blockquote><strong>Lucka:</strong> §4.1 blandar motorlicenser och asset-AI; G-GAMEDEV ska leverera comps <strong>mot</strong> DCC-in-the-loop-USP (addons, Muse, Meshy-vs-in-Blender, etc.).</blockquote>
+<h2>5. Marknad</h2>
+<p>ICP: indie studios, technical artists / pipeline TAs, live-ops content teams, education (spelutbildningar). Sales: GitHub → Discord → Pro → studio license.</p>
+<h3>5.1 Första 3 design-partner studios att kontakta (M3-NU-2-tillägg 2026-07-25)</h3>
+<table>
+<tr><th>#</th><th>Studio (typnamn, ort, storlek, fokus)</th></tr>
+<tr><td>1</td><td>Sharkmob AB (Malmö, ~80 anställda, AAA action-spel Unity/Unreal)</td></tr>
+<tr><td>2</td><td>Thunderful Group (Göteborg + Stockholm, ~150 anställda, indie-utgivning + egen spelmotor, asset-pipelines)</td></tr>
+<tr><td>3</td><td>MindArk AB (Göteborg, ~50 anställda, Entropia Universe MMO — långlivad production-titel)</td></tr>
+</table>
+<blockquote>Mål: första 10 studios design-partner senast 2026-Q3. Tre förstahandsval motiveras i <code>drafts/loi-studio-partner.md</code>.</blockquote>
+<h2>6. Budget 12 mån (bas 900 k)</h2>
+<p>Eng 500k · infra 80k · connector bounties 120k · docs/community 100k · legal OSS 50k · market 50k.</p>
+<h2>7. Tidsplan</h2>
+<p>Stabilisera SSE → Blender/Unity connector-pack → agentlags-UX (A2A/jobs) → Pro auth/billing → studio pilot.</p>
+<h2>8. Skalbarhet</h2>
+<p>Multi-client hub; risk: MCP-spec churn, security of tool bridge, DCC-versionfragmentering (Blender/Unity).</p>
+<h3>Finansiering topp</h3>
+<p>Vinnova Innovativa Startups (<strong>game tech / AI productivity for creative tools</strong>), Internetstiftelsen (öppen MCP-infrastruktur för skapare), Almi mikrostöd (säkerhet/tool-bridge), EU OSS-program (senare). <strong>Ej</strong> generisk SaaS-framing.</p>
+<h3>Luckor som kräver deep research (G-GAMEDEV)</h3>
+<table>
+<tr><th>Gap</th><th>Varför</th></tr>
+<tr><td>Namngivna Blender/Unity AI-addons + Muse vs vår USP</td><td>Nuvarande comps är ytliga / fel kategori</td></tr>
+<tr><td>ICP-köpbeteende &quot;agenter i DCC&quot; (TA, live-ops, edu)</td><td>Saknas djup signal utöver studio-namn</td></tr>
+<tr><td>Prisbenchmark Pro seats vs studio license</td><td>UNVERIFIED</td></tr>
+<tr><td>Funding-angles copy (creative industries / game tech)</td><td>Draft angle i funding-plan behöver USP-omskrivning efter research</td></tr>
+<tr><td>LOI-praxis för design-partner</td><td>Mall finns; marknadsvalidering av villkor saknas</td></tr>
+</table>
+<p><strong>Output-path:</strong> <code>projects/gamedev-mcp-hub/research/</code> ← klistra Gemini/Kimi här.</p>
+<h3>Next</h3>
+<ol>
+<li>Kör <strong>uppdaterad G-GAMEDEV</strong> (eller K-GAMEDEV) → paste till <code>research/</code>. 2. 10 design-partner studios. 3. Rank funding vs OSS grants med DCC-USP.</li>
+</ol></div>
+      </div>
+    </section>
+
+    <section id="funding">
+      <h2>Finansieringsplan (från funding-plan.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="funding"><h1>GameDev Hub — Finansieringsplan (inventering — HOLD)</h1>
+<p><strong>Sökande:</strong> TWISTEDSTACKS AB · <strong>2026-07-25</strong> · <strong>ej Hyper</strong> (Cursor toppup)</p>
+<p><strong>Status:</strong> <strong>HOLD — sök inte i lab-skede.</strong> Planen finns för portföljöversikt och framtida eskalering. Se <a href="STATUS.md" target="_blank"><code>STATUS.md</code></a>.</p>
+<blockquote>Projektet är ~1 dag gammalt (Blender-konstexperiment). <strong>HOLD produktsälj/demo</strong> — men idé-stage funding <em>kan</em> vara relevant när NotebookLM-byggd vision är djup nog. Se <a href="STATUS.md" target="_blank"><code>STATUS.md</code></a>.</blockquote>
+<p><strong>Deadlines:</strong> <strong>VERIFY LIVE</strong> om/ när eskalering beslutas.</p>
+<table>
+<tr><th>#</th><th>Källa</th><th>Max</th><th>Deadline</th><th>Ver</th><th>Fit</th><th>Vinkel</th></tr>
+<tr><td>1</td><td>Vinnova Innovativa Startups</td><td>500 k</td><td>2027-01-12</td><td>VERIFIED:2026-07-25</td><td>4</td><td>Kundvalidering Pro-hub för studios</td></tr>
+<tr><td>2</td><td>Internetstiftelsen</td><td>varierar</td><td>löpande</td><td>UNVERIFIED (ingen öppen utlysning funnen 2026-07-25)</td><td>4</td><td>Öppen MCP-infrastruktur för skapare</td></tr>
+<tr><td>3</td><td>Almi verifiering</td><td>75 kSEK (inom tak 100 kSEK VERIFIERAT 2026-07-25)</td><td>löpande</td><td>VERIFIED:2026-07-25</td><td>3</td><td>Säkerhetstest av tool-bridge</td></tr>
+<tr><td>4</td><td>Movexum</td><td>in-kind</td><td>löpande</td><td>VERIFIED:2026-07-25</td><td>3</td><td>Regional AI-devtools</td></tr>
+<tr><td>5</td><td>GitHub Sponsors / OSS funds</td><td>varierar</td><td>löpande</td><td>UNVERIFIED</td><td>3</td><td>Community</td></tr>
+<tr><td>6</td><td>Eurostars Call 11</td><td>stort</td><td>2026-09-10</td><td>VERIFIED:2026-07-25</td><td>2</td><td>Kräver partner</td></tr>
+</table>
+<p><strong>USP (kort):</strong> Agentlag som genererar/redigerar <strong>direkt i Blender + Unity</strong> (+ plugins) via MCP-hub — DCC-in-the-loop, inte generisk AI-chat eller asset-SaaS.</p>
+<p><strong>Draft angle:</strong> &quot;Svensk game-tech: ett agentlag som författar och redigerar direkt i Blender och Unity via öppen MCP-hub — lokal-first, plugin-yta, human-in-the-loop — AI-produktivitet för creative industries, inte generisk SaaS-gateway.&quot;</p>
+<p><strong>Funding-fit (prioritera):</strong> tools for creative industries / game tech / AI productivity for DCC. Undvik framing som &quot;ännu en MCP-marketplace&quot; eller generisk B2B-SaaS.</p>
+<p><strong>Verifiering 2026-07-25 per almi.se/lan-finansiering/verifieringsmedel/:</strong></p>
+<ul>
+<li>Almi verifieringsmedel: max <strong>100 kSEK</strong> per projekt (vår 75 kSEK är inom tak).</li>
+<li>Process: <strong>KRÄVS dialog med Almi-rådgivare FÖRST</strong> (ingen öppen e-tjänstansökan).</li>
+<li>Sökande: startups/etablerade små AB (även EF med svenskt personnummer i vissa fall).</li>
+<li>Användningsrestriktioner: tillåtet = marknadsanalys, kundbehovsanalys, konkurrentanalys, MVP-utveckling (enkel), juridisk analys. <strong>Ej tillåtet</strong>: resor, patent, marknadsföring, utbildning, löpande drift.</li>
+<li>De minimis-tak: 300 000 € rullande treårsperiod — viktigt vid flera-parallella Almi-stöd.</li>
+</ul>
+<p><strong>Gap kvar — uppdaterad 2026-07-25 (USP-fix):</strong></p>
+<table>
+<tr><th>Gap</th><th>Status 2026-07-25</th><th>Plats</th></tr>
+<tr><td>Namngiven competitor pricing (motor/asset)</td><td>✅ Partiellt — 7 comps (Unity Pro, Unreal, NVIDIA, Meshy, Scenario, Composio, Anthropic) UNVERIFIED</td><td>dossier §4.1</td></tr>
+<tr><td><strong>DCC-in-the-loop comps vs USP</strong> (Blender/Unity AI addons, Muse, agentlag)</td><td>❌ SAKNAS — kör uppdaterad <strong>G-GAMEDEV</strong></td><td><code>research/</code> (tom)</td></tr>
+<tr><td>ICP &quot;agenter i DCC&quot; (indie, TA, live-ops, edu)</td><td>❌ SAKNAS deep</td><td>G-GAMEDEV punkt 3</td></tr>
+<tr><td>Funding-copy creative industries / game tech</td><td>🟡 Draft angle omskriven; behöver research-backning</td><td>denna fil + G-GAMEDEV punkt 5</td></tr>
+<tr><td>3 design-partner studios</td><td>✅ KLART — Sharkmob, Thunderful, MindArk</td><td>dossier §5.1 + drafts/loi-studio-partner.md</td></tr>
+<tr><td>LOI-mall</td><td>✅ KLART</td><td>drafts/loi-studio-partner.md §2</td></tr>
+</table>
+<p><strong>Verifikation inför ansökan:</strong> UNVERIFIED-priser i §4.1 — samla in offerter / webb-bekräftelser. Klistra G-GAMEDEV-output till <code>projects/gamedev-mcp-hub/research/</code> innan Vinnova-utkast.</p></div>
+      </div>
+    </section>
+
+    <section id="notes">
+      <h2>Gemensamma anteckningar</h2>
+      <div class="card">
+        <div class="editable" data-key="notes" data-placeholder="Anteckningar inför ansökan…" style="min-height:8rem;"></div>
+      </div>
+    </section>
+  </div>
+  <input type="file" id="importFile" accept="application/json,.json" hidden />
+  <script>
+    const STORAGE_KEY = 'ts_project_gamedev-mcp-hub_v1';
+    let saveTimer = null;
+    function collectData() {
+      const data = { slug: 'gamedev-mcp-hub', version: 1, savedAt: new Date().toISOString(), fields: {} };
+      document.querySelectorAll('.editable[data-key]').forEach(el => { data.fields[el.dataset.key] = el.innerHTML; });
+      return data;
+    }
+    function applyData(data) {
+      if (!data?.fields) return;
+      document.querySelectorAll('.editable[data-key]').forEach(el => {
+        if (data.fields[el.dataset.key] !== undefined) el.innerHTML = data.fields[el.dataset.key];
+      });
+    }
+    function saveNow() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(collectData()));
+      document.getElementById('saveStatus').textContent = 'Sparat ' + new Date().toLocaleString('sv-SE');
+    }
+    function scheduleSave() { clearTimeout(saveTimer); document.getElementById('saveStatus').textContent = 'Sparar…'; saveTimer = setTimeout(saveNow, 800); }
+    function exportJson() {
+      saveNow();
+      const blob = new Blob([JSON.stringify(collectData(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'gamedev-mcp-hub-workbook-' + new Date().toISOString().slice(0,10) + '.json';
+      a.click(); URL.revokeObjectURL(a.href);
+    }
+    function importJson() { document.getElementById('importFile').click(); }
+    document.getElementById('importFile').addEventListener('change', e => {
+      const f = e.target.files[0]; if (!f) return;
+      const r = new FileReader();
+      r.onload = () => { try { applyData(JSON.parse(r.result)); saveNow(); alert('Importerat!'); } catch { alert('Ogiltig JSON'); } };
+      r.readAsText(f); e.target.value = '';
+    });
+    document.querySelectorAll('.editable[data-key]').forEach(el => el.addEventListener('input', scheduleSave));
+    try { const s = localStorage.getItem(STORAGE_KEY); if (s) { applyData(JSON.parse(s)); } } catch {}
+  </script>
+
+<div id="funding-toolbar" style="position:fixed;bottom:12px;right:12px;z-index:9999;display:flex;gap:8px;font-family:system-ui,sans-serif;font-size:13px;">
+  <a href="/api/funding/doc?file=index.html" style="background:#1a222d;color:#38bdf8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Alla projekt</a>
+  <a href="/funding" style="background:#1a222d;color:#94a3b8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Inlogg</a>
+  <button type="button" onclick="logoutFunding()" style="background:#1a222d;color:#fb7185;border:1px solid #334155;padding:6px 12px;border-radius:8px;cursor:pointer;">Logga ut</button>
+</div>
+<script>
+async function logoutFunding() {
+  await fetch('/api/funding/auth', { method: 'DELETE', credentials: 'include' });
+  location.href = '/funding';
+}
+</script>
+</body>
+</html>

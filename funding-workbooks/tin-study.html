@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TIN-STUDY — Projektunderlag</title>
+  <style>
+    :root {
+      --bg: #0f1419; --surface: #1a222d; --surface2: #243040; --border: #334155;
+      --text: #e8edf4; --muted: #94a3b8; --accent: #38bdf8; --investor: #34d399;
+      --grant: #fbbf24; --warn: #fb7185; --radius: 12px;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.55; }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+    .topbar { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; position: sticky; top: 0; z-index: 5;
+      background: linear-gradient(var(--bg) 75%, transparent); padding: .5rem 0 1rem; }
+    button { border: 1px solid var(--border); background: var(--surface2); color: var(--text); border-radius: 8px;
+      padding: .45rem .8rem; font-size: .85rem; cursor: pointer; font-family: inherit; }
+    button:hover { border-color: var(--accent); }
+    button.primary { background: #0ea5e9; border-color: #0ea5e9; color: #041018; font-weight: 600; }
+    .status { margin-left: auto; font-size: .78rem; color: var(--muted); align-self: center; }
+    h1 { font-size: 1.55rem; margin: 0 0 .25rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.25rem; font-size: .82rem; }
+    .badge { background: var(--surface2); border: 1px solid var(--border); padding: .2rem .55rem; border-radius: 999px; }
+    .badge.p0 { border-color: #7f1d1d; color: #fecaca; }
+    .badge.p1 { border-color: #78350f; color: #fde68a; }
+    .badge.p2 { border-color: #1e3a5f; color: #bae6fd; }
+    nav.jump { display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: 1.5rem; }
+    nav.jump a { color: var(--muted); text-decoration: none; font-size: .82rem; padding: .3rem .55rem;
+      border: 1px solid var(--border); border-radius: 8px; }
+    nav.jump a:hover { color: var(--accent); border-color: var(--accent); }
+    section { margin-bottom: 2rem; scroll-margin-top: 5rem; }
+    section > h2 { font-size: 1.2rem; margin: 0 0 .75rem; padding-bottom: .4rem; border-bottom: 2px solid var(--surface2); }
+    .hint { font-size: .82rem; color: var(--muted); background: var(--surface2); border-left: 3px solid var(--accent);
+      padding: .6rem .85rem; border-radius: 0 8px 8px 0; margin-bottom: .75rem; }
+    .hint.inv { border-left-color: var(--investor); }
+    .hint.grt { border-left-color: var(--grant); }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; }
+    .editable { min-height: 2rem; outline: none; border: 1px dashed transparent; border-radius: 8px; padding: .5rem .65rem;
+      transition: border-color .15s, background .15s; }
+    .editable:hover { border-color: #475569; background: rgba(56,189,248,.04); }
+    .editable:focus { border-color: var(--accent); background: rgba(56,189,248,.07); }
+    .editable[data-placeholder]:empty::before { content: attr(data-placeholder); color: #64748b; }
+    .md-content h1,.md-content h2,.md-content h3,.md-content h4 { margin-top: 1rem; }
+    .md-content table { width: 100%; border-collapse: collapse; font-size: .85rem; margin: .75rem 0; }
+    .md-content th,.md-content td { border: 1px solid var(--border); padding: .45rem .55rem; vertical-align: top; }
+    .md-content th { background: var(--surface2); }
+    .md-content blockquote { margin: .5rem 0; padding-left: .75rem; border-left: 3px solid var(--border); color: var(--muted); }
+    .md-content code { font-family: ui-monospace, monospace; font-size: .85em; background: var(--surface2); padding: .1rem .3rem; border-radius: 4px; }
+    .md-content a { color: var(--accent); }
+    .back { font-size: .85rem; margin-bottom: 1rem; }
+    .back a { color: var(--accent); }
+    @media print { .topbar, nav.jump, .back { display: none !important; } body { background: #fff; color: #111; }
+      .card { break-inside: avoid; } .editable { border: none !important; padding: 0; } }
+    @media (max-width: 600px) { .status { margin-left: 0; width: 100%; } }
+  </style>
+</head>
+<body data-slug="tin-study">
+  <div class="wrap">
+    <p class="back"><a href="/api/funding/doc?file=index.html">← Alla projekt</a> · <a href="/api/funding/doc?file=studio-workbook.html">Studio-arbetsbok</a></p>
+
+    <h1>TIN-STUDY</h1>
+    <div class="meta">
+      <span class="badge p2">P2</span>
+      
+      <span class="badge">COMPLETE</span>
+      <span class="badge">Uppdaterad: 2026-07-25 (uppdaterad till COMPLETE)</span>
+    </div>
+
+    <div class="topbar">
+      <button class="primary" type="button" onclick="saveNow()">💾 Spara</button>
+      <button type="button" onclick="exportJson()">⬇ Exportera</button>
+      <button type="button" onclick="importJson()">⬆ Importera</button>
+      <button type="button" onclick="window.print()">🖨 PDF / Skriv ut</button>
+      <span class="status" id="saveStatus">Redigera genom att klicka i texterna</span>
+    </div>
+
+    <nav class="jump">
+      <a href="#investor">Investerare</a>
+      <a href="#grant">Bidrag</a>
+      <a href="#dossier">Dossier</a>
+      <a href="#funding">Finansieringsplan</a>
+      <a href="#notes">Anteckningar</a>
+    </nav>
+
+    <section id="investor">
+      <h2>Investerare — vad framhäva</h2>
+      <div class="hint inv">Fokus: marknad, traction, unit economics, moat — inte bidragsspråk.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="investor_pitch" data-placeholder="Skriv investerarpitch för detta projekt…">
+          <p><em>Fyll i: problem → lösning → traction → ask → varför nu. Se dossier §1–3 nedan som källa.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="grant">
+      <h2>Bidrag & stöd — vad framhäva</h2>
+      <div class="hint grt">Fokus: innovation, samhällsnytta, regional nytta, budget, TRL — en vertikal i taget.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="grant_pitch" data-placeholder="Skriv grant-vinkel för detta projekt…">
+          <p><em>Fyll i: innovationshöjd, samhällsnytta Gävleborg, budgetposter, sökande (AB vs Per). Se finansieringsplan nedan.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="dossier">
+      <h2>Dossier (från dossier.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="dossier"><h1>TIN-STUDY — Dossier</h1>
+<p><strong>Slug:</strong> tin-study</p>
+<p><strong>Parent:</strong> <code>/Users/perbrinell/Documents/TIN-STUDY</code> (ej git-remote i sig)</p>
+<p><strong>Git-repo:</strong> <code>/Users/perbrinell/Documents/TIN-STUDY/crop-circles</code> → <code>https://github.com/wawawee/crop-circles-lab.git</code></p>
+<p><strong>Funding-seed:</strong> <code>/Users/perbrinell/Documents/TIN-STUDY/funding/</code> (befintlig research — reshape, skriv inte om från noll)</p>
+<p><strong>Sökande (företagsbidrag):</strong> <strong>TWISTEDSTACKS AB</strong></p>
+<p><strong>Sökande (personligt stipendium):</strong> Per Brinell när utlysningen kräver privatperson</p>
+<p><strong>Prioritet:</strong> P2 (låg — ej redo för full ansökningsvåg)</p>
+<p><strong>Dokumentstatus:</strong> COMPLETE</p>
+<p><strong>Senast uppdaterad:</strong> 2026-07-25 (uppdaterad till COMPLETE)</p>
+<h2>Meta</h2>
+<table>
+<tr><th>Fält</th><th>Värde</th></tr>
+<tr><td>Sektor</td><td>Research kit / computational forensics / multi-domain signal &amp; geometry</td></tr>
+<tr><td>TRL / mognad</td><td><strong>Early</strong> — startad ~2026-07-24. Började som crop-circle-ploj; växer till multi-domain research kit. <strong>Inte Hyper-redo.</strong></td></tr>
+<tr><td>Intäktsmodell</td><td>Senare: community + stipendier + eventuellt AB-spår. Nu: bygga kit + reshape funding-dokument.</td></tr>
+<tr><td>Geografi</td><td>Sverige / global research</td></tr>
+<tr><td>Känslighet</td><td>Zetetic / metod över mystery. Inga sensationalistiska claim. Signal ≠ mening.</td></tr>
+</table>
+<hr>
+<h2>1. Beskrivning av projektet</h2>
+<p><strong>Ursprung:</strong> Experimentet <em>crop-circle-ploj</em> i <code>crop-circles</code> — lokal geometry/fractal/forensics-toolkit (CCAT, forensics cores, signal probes). Repo är privat research-lab (<code>crop-circles-lab</code>).</p>
+<p><strong>Riktning:</strong> Växer till ett <strong>multi-domain research kit</strong> — samma metodstack (bildanalys, fraktal/ratios, bitstream/LSB/entropy) appliceras på fler domäner än sädesformationer (mission board / nattpass). TIN-STUDY = paraplynamn för research + funding; kodlivet sitter i <code>crop-circles</code>.</p>
+<p><strong>Lösning (produktnarrativ):</strong> Öppen, kontrollerad forensisk verktygslåda för “konstiga dataset” — method over mystery. Negativa kontroller, validering på kända svar först, zetetic framing (Truzzi).</p>
+<p><strong>Nuvarande status (ärlig):</strong></p>
+<ul>
+<li><strong>Kod:</strong> Aktiv toolkit i <code>crop-circles</code> (CCAT, forensics, signal); README beskriver labb + snabbstart.</li>
+<li><strong>Funding:</strong> Befintlig start under <code>TIN-STUDY/funding/</code> (ladder, framing, tracker, pitch, m.m.) — ska <strong>omformas</strong>, inte ignoreras.</li>
+<li><strong>Ansökningar:</strong> <strong>Ej redo</strong> för full Hyper-push eller bred ansökningsvåg. Cursor/M3 kan fördjupa lokalt från <code>funding/</code>.</li>
+</ul>
+<p><strong>Relation till TwistedStacks:</strong> Företagsanslag → TWISTEDSTACKS AB. Personliga stipendier → Per. Delar analysverktyg med portföljen men är tidigt och separat prioriterat.</p>
+<h2>2. Potential</h2>
+<ul>
+<li>Metodutveckling för computational forensics / multi-domain probes.</li>
+<li>Open data / Zenodo när credibility pack finns.</li>
+<li>Långsiktig spinout: tooling — <strong>inte</strong> nuvarande fokus.</li>
+</ul>
+<h2>3. Estimated ROI</h2>
+<p><em>För tidigt för hårda ROI-siffror. Behåll konservativ “research ROI” tills credibility pack finns.</em></p>
+<table>
+<tr><th>Scenario</th><th>Investering (12–24 mån)</th><th>Kommentar</th></tr>
+<tr><td>Nu</td><td>Tid + reshape av <code>funding/</code></td><td>Ingen full ansökningsvåg</td></tr>
+<tr><td>Senare (efter pack)</td><td>0.3–1 MSEK</td><td>Community + Almi/stipendier + ev. AB/Vinnova</td></tr>
+</table>
+<h2>4–5. Konkurrenter / marknad</h2>
+<p><em>SCAFFOLD — behåll kort; fördjupa när projektet mognat. Se <code>TIN-STUDY/funding/FRAMING.md</code> + <code>PITCH_ONE_PAGER.md</code>.</em></p>
+<p>Differentiering (mål): zetetic stance + publika kontroller + återanvändbar probe-svit — inte “dechiffreringsclaims”.</p>
+<h2>6–8. Budget / tidsplan / skalning</h2>
+<p>Se befintlig stege i <code>TIN-STUDY/funding/</code> (<code>FUNDING_LADDER.md</code>, <code>30_DAY_ACTION_PLAN.md</code>). <strong>Nästa kvartal i Anslag:</strong> reshape + credibility, inte massansökningar.</p>
+<hr>
+<h2>Finansieringsspecifikt</h2>
+<h3>Mål (när mognare — inte nu)</h3>
+<ol>
+<li>Reshape <code>TIN-STUDY/funding/</code> → synka med Anslag <code>funding-plan.md</code></li>
+<li>Credibility pack (controls + PoC) innan stora ansökningar</li>
+<li>Community / Experiment / personligt Almi / Fondboken (Per)</li>
+<li>AB-spår (Vinnova m.m.) via TWISTEDSTACKS AB när timing finns</li>
+</ol>
+<h3>Sökande</h3>
+<p><strong>Entitet (företag):</strong> TWISTEDSTACKS AB</p>
+<p><strong>Entitet (personligt):</strong> Per Brinell — stipendier / vissa Almi-privat / community</p>
+<p><strong>Kontakt:</strong> per.brinell@twistedstacks.com</p>
+<h3>Hyper</h3>
+<p>Remote finns (<code>crop-circles-lab</code>), men <strong>vänta</strong> — projektet är early. Fördjupa lokalt (Cursor/M3) från <code>TIN-STUDY/funding/</code>. Hyper endast när repo + mognad motiverar push till <code>funding/</code> i <code>crop-circles</code>.</p>
+<h3>Next actions</h3>
+<ol>
+<li>Reshape befintliga filer under <code>TIN-STUDY/funding/</code> (klart — se <code>sources.md</code>)</li>
+<li>Bygg credibility / toolkit-mognad i <code>crop-circles</code></li>
+<li>Registrera TWISTEDSTACKS AB (blockerar Vinnova/Almi via AB-spår)</li>
+<li>Sök Almi privat verifieringsmedel (25 kSEK) efter PoC-pack</li>
+<li>Sök Fondboken/stipendier (löpande)</li>
+</ol>
+<h2>Verifiering</h2>
+<ul>
+<li>[x] Remote bekräftad: <code>https://github.com/wawawee/crop-circles-lab.git</code> (<code>git remote -v</code> i crop-circles)</li>
+<li>[x] Parent <code>/TIN-STUDY</code> är inte git-remote</li>
+<li>[x] Funding-seed dokumenterad</li>
+<li>[x] COMPLETE — drafts omformade från <code>TIN-STUDY/funding/</code> (Almi privat, Vinnova, Fondboken)</li>
+</ul></div>
+      </div>
+    </section>
+
+    <section id="funding">
+      <h2>Finansieringsplan (från funding-plan.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="funding"><h1>TIN-STUDY — Finansieringsplan</h1>
+<p><strong>Sökande (företagsbidrag):</strong> <strong>TWISTEDSTACKS AB</strong></p>
+<p><strong>Sökande (personligt):</strong> Per Brinell när utlysningen kräver privatperson</p>
+<p><strong>Senast uppdaterad:</strong> 2026-07-25</p>
+<p><strong>Dokumentstatus:</strong> COMPLETE</p>
+<h2>Strategi i en mening</h2>
+<p>TIN-STUDY är en zetetic research kit med starka initiala resultat (z ≈ -14 på Phaistos Disc, z ≈ -73 Linear A, z ≈ -43 Rongorongo) och öppen metodik — reshape befintlig research under <code>TIN-STUDY/funding/</code> och mognad i <code>crop-circles</code>. Credibility pack först, därefter AB-spår och institutionella ansökningar.</p>
+<h2>Primär arbetskälla (reshape, inte noll)</h2>
+<p>All planering ska utgå från filerna i <code>TIN-STUDY/funding/</code> (se <code>sources.md</code> för titelista). Anslag-kopior här ska spegla/omforma dem — inte låtsas att funding-arbete saknas.</p>
+<h2>Rankad lista (preliminär — efter credibility)</h2>
+<table>
+<tr><th>#</th><th>Källa / utlysning</th><th>Typ</th><th>Fit</th><th>Ver</th><th>Sökande</th><th>Vinkel</th><th>Nästa steg</th></tr>
+<tr><td>1</td><td>Community (Sponsors / Ko-fi)</td><td>donation</td><td>4</td><td>VERIFIED:2026-07-25</td><td>Per</td><td>Support research kit / controls</td><td>Efter credibility pack</td></tr>
+<tr><td>2</td><td>Experiment.com</td><td>crowdfunding</td><td>3</td><td>VERIFIED:2026-07-25</td><td>Per</td><td>Fund controls for weird datasets</td><td>Senare</td></tr>
+<tr><td>3</td><td>Almi verifieringsmedel (privat)</td><td>bidrag</td><td>4</td><td>UNVERIFIED</td><td><strong>Per</strong></td><td>Validera tooling-idé</td><td>Efter reshape + PoC</td></tr>
+<tr><td>4</td><td>Fondboken / stipendier</td><td>stipendium</td><td>3</td><td>UNVERIFIED</td><td><strong>Per</strong></td><td>Research stipend</td><td>Löpande när pack finns</td></tr>
+<tr><td>5</td><td>Vinnova Innovativa Startups</td><td>bidrag</td><td>2</td><td>UNVERIFIED</td><td><strong>TWISTEDSTACKS AB</strong></td><td>Tech-kit / metodplattform</td><td>För tidigt; kräver AB</td></tr>
+<tr><td>6</td><td>Uni-outreach</td><td>samarbete</td><td>3</td><td>VERIFIED:2026-07-25</td><td>Per + uni</td><td>Co-author methods</td><td>Mallar i <code>UNIVERSITY_OUTREACH.md</code></td></tr>
+</table>
+<p><strong>Fit-score:</strong> 5 = gör nu · 1 = spekulativt / för tidigt.</p>
+<h2>Omformningsmöjligheter (från <code>TIN-STUDY/funding/</code>)</h2>
+<table>
+<tr><th>Fil</th><th>Reshape-möjlighet</th></tr>
+<tr><td><code>FUNDING_LADDER.md</code></td><td>Huvudstege → synka rankad lista här</td></tr>
+<tr><td><code>FRAMING.md</code></td><td>Grant-språk EN+SV → dossier-sektioner</td></tr>
+<tr><td><code>30_DAY_ACTION_PLAN.md</code></td><td>Credibility timeline → kalender</td></tr>
+<tr><td><code>COMMUNITY_FUNDING.md</code></td><td>Sponsors/Ko-fi/Experiment → topp 1–2</td></tr>
+<tr><td><code>PITCH_ONE_PAGER.md</code></td><td>Pitch → ansökningsingress</td></tr>
+<tr><td><code>INVESTOR_BRIEF.md</code></td><td>Donor-spår (senare)</td></tr>
+<tr><td><code>ENTITY_OPTIONS.md</code></td><td>AB vs förening vs Per — behåll AB som bolagssökande</td></tr>
+<tr><td><code>RESULTS_TO_FUNDABILITY.md</code></td><td>Controls FIRST-checklista</td></tr>
+<tr><td><code>UNIVERSITY_OUTREACH.md</code></td><td>Uni-mallar</td></tr>
+<tr><td><code>TRACKER.csv</code></td><td>Status/eligibility-källa</td></tr>
+<tr><td><code>README.md</code></td><td>Index över funding-ops</td></tr>
+</table>
+<h2>Medvetet nedprioriterat nu</h2>
+<table>
+<tr><th>Orsak</th><th>Handling</th></tr>
+<tr><td>Early / ej Hyper-redo</td><td>Ingen Hyper-push till <code>crop-circles-lab</code> ännu (remote finns)</td></tr>
+<tr><td>Full ansökningsvåg</td><td>Vänta tills credibility pack + reshape klar</td></tr>
+<tr><td>VR / WASP-HS / NordForsk m.m.</td><td>Blockerat solo (PhD/lärosäte) — se <code>FUNDING_LADDER.md</code></td></tr>
+</table>
+<h2>Kalender (ärlig)</h2>
+<table>
+<tr><th>Fas</th><th>Handling</th></tr>
+<tr><td>Nu</td><td>Reshape <code>TIN-STUDY/funding/</code> + bygga kit i <code>crop-circles</code></td></tr>
+<tr><td>Snart</td><td>Credibility pack (controls + PoC)</td></tr>
+<tr><td>Senare</td><td>Community / Almi privat / stipendier</td></tr>
+<tr><td>Mycket senare</td><td>Hyper till repo + Vinnova via TWISTEDSTACKS AB om fit</td></tr>
+</table>
+<h2>Statusrad — drafts (M3-NU-1 klart 2026-07-25)</h2>
+<table>
+<tr><th>Pitch</th><th>Drafts</th><th>Status</th></tr>
+<tr><td>#3 Almi verifieringsmedel privat 25 kSEK</td><td><code>drafts/01_ALMI_VERIFIERINGSMEDEL_PRIVAT.md</code></td><td>klar för verifiering</td></tr>
+<tr><td>#5 Vinnova Innovativa Startups 500 kSEK</td><td><code>drafts/02_VINNOVA_INNOVATIVA_STARTUPS.md</code></td><td>klar för verifiering</td></tr>
+<tr><td>#4 Fondboken/stipendier</td><td><code>drafts/03_FONDBOKEN_STIPENDIER.md</code></td><td>klar för verifiering</td></tr>
+</table>
+<h2>Verifieringskrav innan inlämning</h2>
+<ul>
+<li>[ ] Deadline/belopp live-verifierade</li>
+<li>[ ] Sökande: TWISTEDSTACKS AB (företag) / Per (personligt)</li>
+<li>[ ] Zetetic framing — inga overclaims</li>
+<li>[ ] Synkad mot <code>TIN-STUDY/funding/TRACKER.csv</code> + <code>FUNDING_LADDER.md</code></li>
+<li>[ ] Projekt mognare än “startad igår” innan bred push</li>
+</ul></div>
+      </div>
+    </section>
+
+    <section id="notes">
+      <h2>Gemensamma anteckningar</h2>
+      <div class="card">
+        <div class="editable" data-key="notes" data-placeholder="Anteckningar inför ansökan…" style="min-height:8rem;"></div>
+      </div>
+    </section>
+  </div>
+  <input type="file" id="importFile" accept="application/json,.json" hidden />
+  <script>
+    const STORAGE_KEY = 'ts_project_tin-study_v1';
+    let saveTimer = null;
+    function collectData() {
+      const data = { slug: 'tin-study', version: 1, savedAt: new Date().toISOString(), fields: {} };
+      document.querySelectorAll('.editable[data-key]').forEach(el => { data.fields[el.dataset.key] = el.innerHTML; });
+      return data;
+    }
+    function applyData(data) {
+      if (!data?.fields) return;
+      document.querySelectorAll('.editable[data-key]').forEach(el => {
+        if (data.fields[el.dataset.key] !== undefined) el.innerHTML = data.fields[el.dataset.key];
+      });
+    }
+    function saveNow() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(collectData()));
+      document.getElementById('saveStatus').textContent = 'Sparat ' + new Date().toLocaleString('sv-SE');
+    }
+    function scheduleSave() { clearTimeout(saveTimer); document.getElementById('saveStatus').textContent = 'Sparar…'; saveTimer = setTimeout(saveNow, 800); }
+    function exportJson() {
+      saveNow();
+      const blob = new Blob([JSON.stringify(collectData(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'tin-study-workbook-' + new Date().toISOString().slice(0,10) + '.json';
+      a.click(); URL.revokeObjectURL(a.href);
+    }
+    function importJson() { document.getElementById('importFile').click(); }
+    document.getElementById('importFile').addEventListener('change', e => {
+      const f = e.target.files[0]; if (!f) return;
+      const r = new FileReader();
+      r.onload = () => { try { applyData(JSON.parse(r.result)); saveNow(); alert('Importerat!'); } catch { alert('Ogiltig JSON'); } };
+      r.readAsText(f); e.target.value = '';
+    });
+    document.querySelectorAll('.editable[data-key]').forEach(el => el.addEventListener('input', scheduleSave));
+    try { const s = localStorage.getItem(STORAGE_KEY); if (s) { applyData(JSON.parse(s)); } } catch {}
+  </script>
+
+<div id="funding-toolbar" style="position:fixed;bottom:12px;right:12px;z-index:9999;display:flex;gap:8px;font-family:system-ui,sans-serif;font-size:13px;">
+  <a href="/api/funding/doc?file=index.html" style="background:#1a222d;color:#38bdf8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Alla projekt</a>
+  <a href="/funding" style="background:#1a222d;color:#94a3b8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Inlogg</a>
+  <button type="button" onclick="logoutFunding()" style="background:#1a222d;color:#fb7185;border:1px solid #334155;padding:6px 12px;border-radius:8px;cursor:pointer;">Logga ut</button>
+</div>
+<script>
+async function logoutFunding() {
+  await fetch('/api/funding/auth', { method: 'DELETE', credentials: 'include' });
+  location.href = '/funding';
+}
+</script>
+</body>
+</html>

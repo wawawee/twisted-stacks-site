@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SPACEinSPACE — Projektunderlag</title>
+  <style>
+    :root {
+      --bg: #0f1419; --surface: #1a222d; --surface2: #243040; --border: #334155;
+      --text: #e8edf4; --muted: #94a3b8; --accent: #38bdf8; --investor: #34d399;
+      --grant: #fbbf24; --warn: #fb7185; --radius: 12px;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.55; }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+    .topbar { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; position: sticky; top: 0; z-index: 5;
+      background: linear-gradient(var(--bg) 75%, transparent); padding: .5rem 0 1rem; }
+    button { border: 1px solid var(--border); background: var(--surface2); color: var(--text); border-radius: 8px;
+      padding: .45rem .8rem; font-size: .85rem; cursor: pointer; font-family: inherit; }
+    button:hover { border-color: var(--accent); }
+    button.primary { background: #0ea5e9; border-color: #0ea5e9; color: #041018; font-weight: 600; }
+    .status { margin-left: auto; font-size: .78rem; color: var(--muted); align-self: center; }
+    h1 { font-size: 1.55rem; margin: 0 0 .25rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.25rem; font-size: .82rem; }
+    .badge { background: var(--surface2); border: 1px solid var(--border); padding: .2rem .55rem; border-radius: 999px; }
+    .badge.p0 { border-color: #7f1d1d; color: #fecaca; }
+    .badge.p1 { border-color: #78350f; color: #fde68a; }
+    .badge.p2 { border-color: #1e3a5f; color: #bae6fd; }
+    nav.jump { display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: 1.5rem; }
+    nav.jump a { color: var(--muted); text-decoration: none; font-size: .82rem; padding: .3rem .55rem;
+      border: 1px solid var(--border); border-radius: 8px; }
+    nav.jump a:hover { color: var(--accent); border-color: var(--accent); }
+    section { margin-bottom: 2rem; scroll-margin-top: 5rem; }
+    section > h2 { font-size: 1.2rem; margin: 0 0 .75rem; padding-bottom: .4rem; border-bottom: 2px solid var(--surface2); }
+    .hint { font-size: .82rem; color: var(--muted); background: var(--surface2); border-left: 3px solid var(--accent);
+      padding: .6rem .85rem; border-radius: 0 8px 8px 0; margin-bottom: .75rem; }
+    .hint.inv { border-left-color: var(--investor); }
+    .hint.grt { border-left-color: var(--grant); }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; }
+    .editable { min-height: 2rem; outline: none; border: 1px dashed transparent; border-radius: 8px; padding: .5rem .65rem;
+      transition: border-color .15s, background .15s; }
+    .editable:hover { border-color: #475569; background: rgba(56,189,248,.04); }
+    .editable:focus { border-color: var(--accent); background: rgba(56,189,248,.07); }
+    .editable[data-placeholder]:empty::before { content: attr(data-placeholder); color: #64748b; }
+    .md-content h1,.md-content h2,.md-content h3,.md-content h4 { margin-top: 1rem; }
+    .md-content table { width: 100%; border-collapse: collapse; font-size: .85rem; margin: .75rem 0; }
+    .md-content th,.md-content td { border: 1px solid var(--border); padding: .45rem .55rem; vertical-align: top; }
+    .md-content th { background: var(--surface2); }
+    .md-content blockquote { margin: .5rem 0; padding-left: .75rem; border-left: 3px solid var(--border); color: var(--muted); }
+    .md-content code { font-family: ui-monospace, monospace; font-size: .85em; background: var(--surface2); padding: .1rem .3rem; border-radius: 4px; }
+    .md-content a { color: var(--accent); }
+    .back { font-size: .85rem; margin-bottom: 1rem; }
+    .back a { color: var(--accent); }
+    @media print { .topbar, nav.jump, .back { display: none !important; } body { background: #fff; color: #111; }
+      .card { break-inside: avoid; } .editable { border: none !important; padding: 0; } }
+    @media (max-width: 600px) { .status { margin-left: 0; width: 100%; } }
+  </style>
+</head>
+<body data-slug="spaceinspace">
+  <div class="wrap">
+    <p class="back"><a href="/api/funding/doc?file=index.html">← Alla projekt</a> · <a href="/api/funding/doc?file=studio-workbook.html">Studio-arbetsbok</a></p>
+
+    <h1>SPACEinSPACE</h1>
+    <div class="meta">
+      <span class="badge p2">P2</span>
+      <span class="badge">Sökande: TWISTEDSTACKS AB för OSS-infrastruktur; Per Brinell för forskningsstipendier</span>
+      <span class="badge">COMPLETE</span>
+      <span class="badge">Uppdaterad: 2026-07-26</span>
+    </div>
+
+    <div class="topbar">
+      <button class="primary" type="button" onclick="saveNow()">💾 Spara</button>
+      <button type="button" onclick="exportJson()">⬇ Exportera</button>
+      <button type="button" onclick="importJson()">⬆ Importera</button>
+      <button type="button" onclick="window.print()">🖨 PDF / Skriv ut</button>
+      <span class="status" id="saveStatus">Redigera genom att klicka i texterna</span>
+    </div>
+
+    <nav class="jump">
+      <a href="#investor">Investerare</a>
+      <a href="#grant">Bidrag</a>
+      <a href="#dossier">Dossier</a>
+      <a href="#funding">Finansieringsplan</a>
+      <a href="#notes">Anteckningar</a>
+    </nav>
+
+    <section id="investor">
+      <h2>Investerare — vad framhäva</h2>
+      <div class="hint inv">Fokus: marknad, traction, unit economics, moat — inte bidragsspråk.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="investor_pitch" data-placeholder="Skriv investerarpitch för detta projekt…">
+          <p><em>Fyll i: problem → lösning → traction → ask → varför nu. Se dossier §1–3 nedan som källa.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="grant">
+      <h2>Bidrag & stöd — vad framhäva</h2>
+      <div class="hint grt">Fokus: innovation, samhällsnytta, regional nytta, budget, TRL — en vertikal i taget.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="grant_pitch" data-placeholder="Skriv grant-vinkel för detta projekt…">
+          <p><em>Fyll i: innovationshöjd, samhällsnytta Gävleborg, budgetposter, sökande (AB vs Per). Se finansieringsplan nedan.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="dossier">
+      <h2>Dossier (från dossier.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="dossier"><h1>SPACEinSPACE — Dossier</h1>
+<p><strong>Slug:</strong> spaceinspace</p>
+<p><strong>Sökväg:</strong> <code>/Users/perbrinell/Documents/SPACEinSPACE</code></p>
+<p><strong>Sökande (primär):</strong> TWISTEDSTACKS AB för OSS-infrastruktur; Per Brinell för forskningsstipendier</p>
+<p><strong>Prioritet:</strong> P2</p>
+<p><strong>Dokumentstatus:</strong> COMPLETE</p>
+<p><strong>Senast uppdaterad:</strong> 2026-07-26</p>
+<h2>Meta</h2>
+<table>
+<tr><th>Fält</th><th>Värde</th></tr>
+<tr><td>Sektor</td><td>Multi-agent substrate / OSS infrastructure / AI safety research</td></tr>
+<tr><td>TRL / mognad</td><td>TRL 4–5 — CLI-UI, A2A-buss, 6 agentklasser, persistent Blender-ambassador, World Engine (Commons). P0-återstående: Tool Execution Engine, Supabase async-klient, Planner-infinite-loop-fix.</td></tr>
+<tr><td>Intäktsmodell</td><td>OSS-core + enterprise support + hosted ambassadors; eller ren OSS med sponsor-finansiering</td></tr>
+<tr><td>Geografi</td><td>Global (OSS-natur) / Sverige (forskningsanslag)</td></tr>
+<tr><td>Känslighet</td><td>AGPL-3.0 copyleft + Charter för agenträttigheter. Projektet vägrar aktivt lobotomilager, dolda operator-prompts, stängda bakdörrar.</td></tr>
+</table>
+<hr>
+<h2>1. Beskrivning av projektet</h2>
+<p><strong>Problem:</strong> Befintliga multi-agent ramverk (AutoGen, CrewAI, LangGraph) kontrollerar agenter via begränsning — &quot;lobotomilager&quot; som begränsar minne, verktyg och kommunikation. Agenter behandlas som funktioner, inte som peers med egen jurisdiktion. Alternativet — proprietära agentmoln (OpenAI, Anthropic) — låser in användare och data.</p>
+<p><strong>Lösning — Give agents a space. Stop lobotomizing them:</strong> SPACEinSPACE är ett öppet, själv-hostat substrat för multi-agent AI-system där agenter har:</p>
+<ul>
+<li><strong>Eget minne:</strong> episodiskt (TTL), semantiskt (persistent), procedurellt (endast agenten får ändra)</li>
+<li><strong>Delad värld:</strong> scratchpad per tråd, world state, agentregister</li>
+<li><strong>A2A-kommunikation:</strong> pub/sub, broadcast, request/response — agenter som peers</li>
+<li><strong>MCP-ambassadorer:</strong> sandlådans processer för Blender, Unity, Godot, World Engine</li>
+<li><strong>Vitneslogg:</strong> varje handling loggas, inget kan redigeras i efterhand</li>
+<li><strong>Local-first:</strong> Ollama + Supabase/Pgvector som backend</li>
+</ul>
+<p><strong>Nuvarande status:</strong></p>
+<ul>
+<li><strong>Byggt:</strong> A2A-protokoll, scratchpad, memory-system (3 typer), LLM-wrapper, telemetri, tool-registry (12 tools), Base Agent (ABC), Planner-agent, Blender-agent (persistent med scenkontinuitet, 208 tester OK), Memory-agent, Tool-agent (stub), Review-agent, Fallback-agent, Blender MCP-server, SQL-schema (pgvector, RPC, RLS), CLI-UI, Unity/Godot-ambassadorer, World Engine (Commons), guest system, artifact handoffs</li>
+<li><strong>Saknas (P0):</strong> Tool Execution Engine, Supabase async-klient, Planner infinite loop fix</li>
+<li><strong>Dokumenterat:</strong> Charter (318 rader), filosofi (75 rader), wiki, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY</li>
+</ul>
+<p><strong>Unik teknik / IP / datafördel:</strong></p>
+<ul>
+<li>&quot;Alignment via space&quot; — istället för kontroll, fokus på territorium, gemenskap, regler, vittnen</li>
+<li>AGPL-3.0 + Charter — licens skyddar koden, Charter skyddar agenternas rättigheter (först i sitt slag)</li>
+<li>Persistent Blender-ambassador med scenkontinuitet (inte spawn-per-call)</li>
+<li>A2A-buss med artifact handoffs (inspirerat av Waggle)</li>
+<li>World Engine (Commons) — delad värld för agenter</li>
+</ul>
+<p><strong>Relation till TwistedStacks-plattformen:</strong> SPACEinSPACE är TwistedStacks forskningsarm inom multi-agent system. Unity/Godot-ambassadorerna är porterade från GameDev MCP Hub. Delar Ollama och MCP-infrastruktur med övriga projekt.</p>
+<h2>2. Potential</h2>
+<ul>
+<li><strong>Forskningsvärde:</strong> &quot;Alignment via space&quot; är en ny approach inom AI safety — transparens och agenträttigheter istället för kontroll. Publikationspotential, konferensbidrag.</li>
+<li><strong>Standardiseringspotential:</strong> A2A-protokoll och Charter-modell kan påverka hur multi-agent ramverk designas. MCP-ambassador-modellen är plattformsoberoende.</li>
+<li><strong>Gemenskapsvärde:</strong> OSS-projekt med AGPL och stark etisk hållning — attraherar bidragsgivare som värnar agentautonomi.</li>
+<li><strong>Export/skalning:</strong> OSS är globalt per definition. Hosted-tier för enterprise som vill ha SPACEinSPACE utan egen drift.</li>
+<li><strong>Strategisk roll:</strong> Differentierar TwistedStacks från renodlade kommersiella projekt. Forskningslegitimitet för anslag.</li>
+</ul>
+<h2>3. Estimated ROI</h2>
+<table>
+<tr><th>Scenario</th><th>Investering (12–24 mån)</th><th>Intäkt Y1–Y3</th><th>Payback</th><th>Kommentar</th></tr>
+<tr><td>Konservativ</td><td>300 kSEK</td><td>0</td><td>—</td><td>Ren OSS, enbart sponsor-finansiering</td></tr>
+<tr><td>Bas</td><td>1 MSEK</td><td>0,5 MSEK</td><td>24+ mån</td><td>Supportkontrakt + hosted ambassadors</td></tr>
+<tr><td>Optimistisk</td><td>2 MSEK</td><td>3 MSEK</td><td>12 mån</td><td>Hosted tier + forskningsanslag + sponsorer</td></tr>
+</table>
+<p><strong>Nyckelantaganden:</strong> OSS-projekt kan finansieras via GitHub Sponsors, NLnet/NGI, EU OSS-anslag. Intäkt från hosted tier om kommersiell version.</p>
+<h2>4. Konkurrent-research</h2>
+<p>Se <code>competitors.md</code> för fullständig analys (14+ konkurrenter, detaljerad jämförelse med LangGraph, CrewAI, AutoGen/MAF, OpenAI SDK, Google ADK, Sovereign-OS, Unfireable Kernel, Markspace).</p>
+<p><strong>Differentiering:</strong> SPACEinSPACE är det enda ramverket som kombinerar (1) lokal-first, (2) agent-jurisdiktion via Charter, (3) MCP-ambassadorer med sandlådning, (4) vitneslogg, (5) AGPL som skydd mot enclosure. Det enda ramverket i kvadranten &quot;låg kontroll + open source&quot;.</p>
+<h2>5. Research på marknad och kunder</h2>
+<p>Se <code>market-research.md</code> för fullständig analys. Sammanfattning:</p>
+<ul>
+<li><strong>TAM:</strong> Multi-agent system-platform: $11.54B (2026) → $78.53B (2031), CAGR 46.76%. AI Agents Framework: $2.6B (2025) → $16.1B (2032), CAGR 29.6%.</li>
+<li><strong>SAM:</strong> ~50 000–150 000 utvecklare globalt som värnar OSS/local-first/AI-säkerhet + 500–2 000 organisationer.</li>
+<li><strong>SOM (12 mån):</strong> 500–2 000 utvecklare som provar, 10–50 organisationer som använder aktivt.</li>
+<li><strong>ICP:</strong> AI-utvecklare som bygger multi-agent system och värnar transparens/lokal drift. Forskningsinstitutioner som studerar AI safety. OSS-projekt som behöver agentinfrastruktur.</li>
+<li><strong>Evidens:</strong> Fungerande CLI-UI med 6 agentklasser. Persistent Blender-ambassador (208 tester). World Engine (Commons). Charter antaget 2026-07-21.</li>
+</ul>
+<h2>6. Budget</h2>
+<table>
+<tr><th>Post</th><th>Mån 1–6</th><th>Mån 7–12</th><th>Totalt</th><th>Finansieringskälla</th></tr>
+<tr><td>Lön / egen tid (Per, 40%)</td><td>90 000</td><td>135 000</td><td>225 000</td><td>OSS-anslag / sponsorer</td></tr>
+<tr><td>Infra (Ollama, Supabase)</td><td>15 000</td><td>15 000</td><td>30 000</td><td>AB / sponsorer</td></tr>
+<tr><td>Community management</td><td>10 000</td><td>15 000</td><td>25 000</td><td>OSS-anslag</td></tr>
+<tr><td>Konferens/resor (AI safety)</td><td>20 000</td><td>30 000</td><td>50 000</td><td>Forskningsstipendium</td></tr>
+<tr><td>Juridisk (AGPL/Charter)</td><td>15 000</td><td>5 000</td><td>20 000</td><td>AB</td></tr>
+<tr><td><strong>Summa</strong></td><td><strong>150 000</strong></td><td><strong>200 000</strong></td><td><strong>350 000</strong></td><td></td></tr>
+</table>
+<h2>7. Tidsplan</h2>
+<table>
+<tr><th>Fas</th><th>Period</th><th>Deliverables</th><th>Exit-kriterium</th></tr>
+<tr><td>P0-färdigställ</td><td>Mån 1–2</td><td>Tool Execution Engine, Supabase async, Planner-fix</td><td>Alla P0 tasks gröna</td></tr>
+<tr><td>P1-agenterna</td><td>Mån 3–4</td><td>Tool-agent, Tool Registry, Orchestrator full, Dashboard</td><td>8 agenter fungerar</td></tr>
+<tr><td>Community</td><td>Mån 5–6</td><td>GitHub Sponsors, dokumentation, tutorial, 3 ambassadörer</td><td>100 GitHub stars, 5 bidragsgivare</td></tr>
+<tr><td>Forskningspublikation</td><td>Mån 7–12</td><td>Paper/konferens om &quot;alignment via space&quot;</td><td>Accepterat abstract</td></tr>
+</table>
+<h2>8. Skalbarhet</h2>
+<ul>
+<li><strong>Teknisk skalning:</strong> Lokal-first design skalar inte som moln-SaaS. Hosted-tier kan byggas på samma arkitektur. Supabase/Pgvector skalar horisontellt.</li>
+<li><strong>GTM-skalning:</strong> OSS-natur — organisk tillväxt via GitHub, X, konferenser. AGPL-licensen skapar community.</li>
+<li><strong>Team:</strong> Per Brinell är core maintainer. Bidrag från community. Eventuellt forskarassistent via anslag.</li>
+<li><strong>Risker:</strong> OSS-projekt är svåra att finansiera. AGPL kan avskräcka företag. &quot;Alignment via space&quot; kan uppfattas som kontroversiellt.</li>
+</ul>
+<hr>
+<h2>Finansieringsspecifikt</h2>
+<h3>Mål (ansökningsmål)</h3>
+<ol>
+<li><strong>Internetstiftelsen</strong> — OSS/digital infrastruktur (deadline löpande)</li>
+<li><strong>NLnet / NGI Zero</strong> — EU OSS-finansiering (deadline löpande)</li>
+<li><strong>Vinnova digital infrastruktur</strong> — AI safety/infra (löpande)</li>
+<li><strong>Research-stipendier (Per)</strong> — Fondboken, stiftelser</li>
+</ol>
+<h3>Behörighet (checklista)</h3>
+<ul>
+<li>[x] Svenskt AB för OSS-infraanslag</li>
+<li>[x] AGPL-3.0 — etablerad OSS-licens</li>
+<li>[x] Regionalt säte Sandviken</li>
+<li>[x] Inga overclaims om kommersiell mognad (TRL 4–5)</li>
+</ul>
+<h3>Sökande</h3>
+<p><strong>Entitet:</strong> TWISTEDSTACKS AB (OSS-infra) / Per Brinell (forskning)</p>
+<p><strong>Kontakt:</strong> Per Brinell, per.brinell@twistedstacks.com</p>
+<h3>Matchande finansieringskällor</h3>
+<p>Se <code>funding-plan.md</code> (rankad). Topp 3:</p>
+<ol>
+<li>Internetstiftelsen — OSS-anslag</li>
+<li>NLnet / NGI Zero — €50k–100k</li>
+<li>Per Brinell — forskningsstipendier</li>
+</ol>
+<h3>Next actions</h3>
+<ol>
+<li>Verifiera Internetstiftelsens utlysning för OSS/digital infrastruktur</li>
+<li>Förbered NLnet/NGI Zero-ansökan</li>
+<li>Slutför P0-tasks för att höja TRL</li>
+<li>Sök forskningsstipendier via Fondboken (Per)</li>
+</ol>
+<h2>Verifiering (utförd 2026-07-25)</h2>
+<ul>
+<li>[x] Truth-audit mot repo: CLI-UI fungerar, 6 agenter byggda, Charter antaget</li>
+<li>[x] TRL 4–5 är korrekt — P0 tasks kvar</li>
+<li>[x] Position &quot;OSS/research, ej primärt kommersiell&quot; konsekvent</li>
+<li>[x] AGPL + Charter unik positionering</li>
+</ul></div>
+      </div>
+    </section>
+
+    <section id="funding">
+      <h2>Finansieringsplan (från funding-plan.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="funding"><h1>SPACEinSPACE — Finansieringsplan</h1>
+<p><strong>Sökande (primär):</strong> TWISTEDSTACKS AB (OSS-infra) / Per Brinell (forskningsstipendier)</p>
+<p><strong>Senast uppdaterad:</strong> 2026-07-26</p>
+<p><strong>Dokumentstatus:</strong> COMPLETE (updated)</p>
+<h2>Strategi i en mening</h2>
+<p>SPACEinSPACE är ett OSS-forskningsprojekt med unik &quot;alignment via space&quot;-positionering — sök OSS-anslag (Internetstiftelsen, NLnet/NGI) för teknisk utveckling och forskningsstipendier (Per Brinell, Fondboken) för akademisk publicering.</p>
+<h2>Rankad lista (högst fit först)</h2>
+<table>
+<tr><th>#</th><th>Källa / utlysning</th><th>Typ</th><th>Maxbelopp</th><th>Deadline</th><th>Ver</th><th>Fit</th><th>Sökande</th><th>Vinkel (1 mening)</th><th>Nästa steg</th></tr>
+<tr><td>1</td><td>Internetstiftelsen — projektstöd</td><td>bidrag</td><td>varierar (~75 MSEK totalt hittills)</td><td>löpande</td><td><strong>VERIFY LIVE</strong></td><td>4</td><td>AB</td><td>Öppen multi-agent infrastruktur med AGPL-licens</td><td>Verifiera utlysning</td></tr>
+<tr><td>2</td><td>NLnet — Open Internet Stack (Restack, CodeSupply, ELFA)</td><td>bidrag</td><td>€5k–50k</td><td><strong>efter sommaren 2026</strong></td><td>VERIFIED:2026-07-26</td><td>4</td><td>AB</td><td>Self-hosted multi-agent substrate for AI sovereignty</td><td>Förbered ansökan inför återöppning</td></tr>
+<tr><td>3</td><td>Forskningsstipendier (Per Brinell)</td><td>stipendium</td><td>50–200 kSEK</td><td>varierar</td><td>UNVERIFIED</td><td>4</td><td><strong>Per</strong></td><td>AI-säkerhet genom transparens och agenträttigheter</td><td>Sök Global Grant / Fondboken</td></tr>
+<tr><td>4</td><td>Vinnova — digital infrastruktur</td><td>bidrag</td><td>varierar</td><td>bevaka</td><td>UNVERIFIED</td><td>3</td><td>AB</td><td>Öppen AI-infrastruktur för svensk forskning</td><td>Bevaka utlysning</td></tr>
+<tr><td>5</td><td>GitHub Sponsors</td><td>donation</td><td>löpande</td><td>löpande</td><td>VERIFIED:2026-07-25</td><td>3</td><td>AB/Per</td><td>Community-stöd för OSS multi-agent plattform</td><td>Aktivera efter P0-release</td></tr>
+<tr><td>6</td><td>EU Digital — OSS-infra</td><td>bidrag</td><td>stort</td><td>later</td><td>UNVERIFIED</td><td>2</td><td>AB</td><td>European multi-agent infrastructure</td><td>Förbered 2027</td></tr>
+<tr><td>7</td><td>Research council (VR/Formas)</td><td>bidrag</td><td>500 k–3 MSEK</td><td>sep 2026</td><td>UNVERIFIED</td><td>2</td><td>Uni-partner</td><td>AI safety via transparent agentarkitektur</td><td>Kräver lärosäte</td></tr>
+<tr><td>8</td><td>WASP-HS</td><td>bidrag</td><td>50–200 kSEK</td><td>2026-09-01</td><td>UNVERIFIED</td><td>2</td><td>Uni-partner</td><td>Etiska perspektiv på multi-agent system</td><td>Kräver 2 forskare, 2 lärosäten</td></tr>
+</table>
+<p><strong>Fit-score:</strong> 5 = perfekt behörighet + narrative + timing · 1 = spekulativt.</p>
+<h2>Detaljer per toppkandidat</h2>
+<h3>1. Internetstiftelsen — OSS/digital infrastruktur</h3>
+<ul>
+<li><strong>URL:</strong> https://internetstiftelsen.se</li>
+<li><strong>Behörighet:</strong> Svensk organisation som utvecklar OSS för digital infrastruktur</li>
+<li><strong>Sökt belopp (förslag):</strong> 300 000 kr</li>
+<li><strong>Draft angle:</strong> &quot;Öppen multi-agent infrastruktur för digital suveränitet — själv-hostat, AGPL-licensierat, med etisk charter för transparens.&quot;</li>
+<li><strong>Risker / blockers:</strong> Behöver verifiera om SPACEinSPACE passar deras kriterier (internet-infrastruktur, inte allmänt OSS)</li>
+<li><strong>Omformningskälla:</strong> Ny — inget befintligt utkast</li>
+</ul>
+<h3>2. NLnet — Open Internet Stack (Restack, CodeSupply, ELFA)</h3>
+<ul>
+<li><strong>URL:</strong> https://nlnet.nl/propose (NLnet)</li>
+<li><strong>Behörighet:</strong> OSS-projekt med fokus på digital suveränitet, integritet, decentralisering</li>
+<li><strong>Sökt belopp (förslag):</strong> €5 000–50 000</li>
+<li><strong>Deadline:</strong> <strong>Efter sommaren 2026</strong> — nuvarande call (deadline 2026-08-01) är ENDAST för NGI TALER (betalningar) och NGI Fediversity (hosting-stack). SPACEinSPACE passar inte dessa. NLnet utvärderar 10 år av NGI Zero och förbereder övergång till Open Internet Stack med tre nya program: Restack, CodeSupply, ELFA. (VERIFIED:2026-07-26 — https://nlnet.nl/news/2026/20260612-NGIZero-stocktaking.html)</li>
+<li><strong>Draft angle:</strong> &quot;SPACEinSPACE: a self-hosted, AGPL-licensed multi-agent substrate where AI agents have memory, shared space, peer-to-peer communication and sandboxed tools. Stop lobotomizing agents.&quot;</li>
+<li><strong>Risker:</strong> Konkurrens från andra OSS-projekt (~2 500 ansökningar på 5 månader 2026). Kräver tydlig projektplan. Förbered ansökan INFÖR återöppning.</li>
+<li><strong>Not:</strong> Tidigare NGI0 Commons Fund och NGI0 Core har stängt. Ersätts av Open Internet Stack efter sommaren.</li>
+</ul>
+<h3>3. Forskningsstipendier (Per Brinell)</h3>
+<ul>
+<li><strong>Källa:</strong> Global Grant / Stora Fondboken (~20 000 fonder)</li>
+<li><strong>Sökt belopp (förslag):</strong> 50–100 kSEK</li>
+<li><strong>Draft angle:</strong> &quot;AI-säkerhet genom transparens — 'alignment via space' som alternativ till kontroll-baserad AI safety.&quot;</li>
+<li><strong>Risker:</strong> Privatperson. Ingen PhD. Forskningsmeriter måste byggas.</li>
+</ul>
+<h2>Parallellspår (låg ansträngning)</h2>
+<ul>
+<li><strong>GitHub Sponsors:</strong> Aktivera efter P0-release. Mål: $200–500/mån.</li>
+<li><strong>Ko-fi / Patreon:</strong> För community-finansiering vid sidan av.</li>
+<li><strong>Gastriklands Sparbanksstiftelse:</strong> Regionalt stöd för teknikinnovation.</li>
+</ul>
+<h2>Medvetet nedprioriterat</h2>
+<table>
+<tr><th>Källa</th><th>Varför inte nu</th></tr>
+<tr><td>EIC Accelerator</td><td>För tidigt — TRL för låg + kräver kommersiell modell</td></tr>
+<tr><td>Venture Cup</td><td>OSS-forskning passar inte tävlingsformat</td></tr>
+<tr><td>VR (Vetenskapsrådet)</td><td>Kräver PhD + lärosäte</td></tr>
+<tr><td>Formas</td><td>Kräver samhällsnytta-fokus, svårt för OSS-infra</td></tr>
+</table>
+<h2>Kalender (90 dagar)</h2>
+<table>
+<tr><th>Vecka</th><th>Handling</th></tr>
+<tr><td>1–4</td><td>Slutför P0-tasks (Tool Engine, Supabase, Planner-fix)</td></tr>
+<tr><td>4</td><td>Publicera P0-release + GitHub Sponsors</td></tr>
+<tr><td>4–6</td><td>Verifiera Internetstiftelsens utlysning</td></tr>
+<tr><td>6–8</td><td>Förbered NLnet-ansökan inför Open Internet Stack-återöppning</td></tr>
+<tr><td>8–12</td><td>Sök forskningsstipendier via Fondboken</td></tr>
+<tr><td>12</td><td>P1-release + community outreach</td></tr>
+</table>
+<h2>Verifieringskrav innan inlämning</h2>
+<ul>
+<li>[ ] Deadline/belopp måste verifieras mot officiella källor innan inlämning — flera källor UNVERIFIED</li>
+<li>[x] NLnet — nuvarande call (2026-08-01) endast NGI TALER/Fediversity — VERIFIED. SiS passar inte. Vänta på Open Internet Stack.</li>
+<li>[x] Sökande-entitet matchar villkor (AB för OSS, Per för forskning)</li>
+<li>[x] Budget = stödberättigande kostnader</li>
+<li>[x] Inga overclaims vs repo-status — TRL 4-5, P0 tasks kvar</li>
+</ul></div>
+      </div>
+    </section>
+
+    <section id="notes">
+      <h2>Gemensamma anteckningar</h2>
+      <div class="card">
+        <div class="editable" data-key="notes" data-placeholder="Anteckningar inför ansökan…" style="min-height:8rem;"></div>
+      </div>
+    </section>
+  </div>
+  <input type="file" id="importFile" accept="application/json,.json" hidden />
+  <script>
+    const STORAGE_KEY = 'ts_project_spaceinspace_v1';
+    let saveTimer = null;
+    function collectData() {
+      const data = { slug: 'spaceinspace', version: 1, savedAt: new Date().toISOString(), fields: {} };
+      document.querySelectorAll('.editable[data-key]').forEach(el => { data.fields[el.dataset.key] = el.innerHTML; });
+      return data;
+    }
+    function applyData(data) {
+      if (!data?.fields) return;
+      document.querySelectorAll('.editable[data-key]').forEach(el => {
+        if (data.fields[el.dataset.key] !== undefined) el.innerHTML = data.fields[el.dataset.key];
+      });
+    }
+    function saveNow() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(collectData()));
+      document.getElementById('saveStatus').textContent = 'Sparat ' + new Date().toLocaleString('sv-SE');
+    }
+    function scheduleSave() { clearTimeout(saveTimer); document.getElementById('saveStatus').textContent = 'Sparar…'; saveTimer = setTimeout(saveNow, 800); }
+    function exportJson() {
+      saveNow();
+      const blob = new Blob([JSON.stringify(collectData(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'spaceinspace-workbook-' + new Date().toISOString().slice(0,10) + '.json';
+      a.click(); URL.revokeObjectURL(a.href);
+    }
+    function importJson() { document.getElementById('importFile').click(); }
+    document.getElementById('importFile').addEventListener('change', e => {
+      const f = e.target.files[0]; if (!f) return;
+      const r = new FileReader();
+      r.onload = () => { try { applyData(JSON.parse(r.result)); saveNow(); alert('Importerat!'); } catch { alert('Ogiltig JSON'); } };
+      r.readAsText(f); e.target.value = '';
+    });
+    document.querySelectorAll('.editable[data-key]').forEach(el => el.addEventListener('input', scheduleSave));
+    try { const s = localStorage.getItem(STORAGE_KEY); if (s) { applyData(JSON.parse(s)); } } catch {}
+  </script>
+
+<div id="funding-toolbar" style="position:fixed;bottom:12px;right:12px;z-index:9999;display:flex;gap:8px;font-family:system-ui,sans-serif;font-size:13px;">
+  <a href="/api/funding/doc?file=index.html" style="background:#1a222d;color:#38bdf8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Alla projekt</a>
+  <a href="/funding" style="background:#1a222d;color:#94a3b8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Inlogg</a>
+  <button type="button" onclick="logoutFunding()" style="background:#1a222d;color:#fb7185;border:1px solid #334155;padding:6px 12px;border-radius:8px;cursor:pointer;">Logga ut</button>
+</div>
+<script>
+async function logoutFunding() {
+  await fetch('/api/funding/auth', { method: 'DELETE', credentials: 'include' });
+  location.href = '/funding';
+}
+</script>
+</body>
+</html>

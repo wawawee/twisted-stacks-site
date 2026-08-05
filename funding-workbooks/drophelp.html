@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DROPHELP / TANGLE — Projektunderlag</title>
+  <style>
+    :root {
+      --bg: #0f1419; --surface: #1a222d; --surface2: #243040; --border: #334155;
+      --text: #e8edf4; --muted: #94a3b8; --accent: #38bdf8; --investor: #34d399;
+      --grant: #fbbf24; --warn: #fb7185; --radius: 12px;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.55; }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+    .topbar { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; position: sticky; top: 0; z-index: 5;
+      background: linear-gradient(var(--bg) 75%, transparent); padding: .5rem 0 1rem; }
+    button { border: 1px solid var(--border); background: var(--surface2); color: var(--text); border-radius: 8px;
+      padding: .45rem .8rem; font-size: .85rem; cursor: pointer; font-family: inherit; }
+    button:hover { border-color: var(--accent); }
+    button.primary { background: #0ea5e9; border-color: #0ea5e9; color: #041018; font-weight: 600; }
+    .status { margin-left: auto; font-size: .78rem; color: var(--muted); align-self: center; }
+    h1 { font-size: 1.55rem; margin: 0 0 .25rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.25rem; font-size: .82rem; }
+    .badge { background: var(--surface2); border: 1px solid var(--border); padding: .2rem .55rem; border-radius: 999px; }
+    .badge.p0 { border-color: #7f1d1d; color: #fecaca; }
+    .badge.p1 { border-color: #78350f; color: #fde68a; }
+    .badge.p2 { border-color: #1e3a5f; color: #bae6fd; }
+    nav.jump { display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: 1.5rem; }
+    nav.jump a { color: var(--muted); text-decoration: none; font-size: .82rem; padding: .3rem .55rem;
+      border: 1px solid var(--border); border-radius: 8px; }
+    nav.jump a:hover { color: var(--accent); border-color: var(--accent); }
+    section { margin-bottom: 2rem; scroll-margin-top: 5rem; }
+    section > h2 { font-size: 1.2rem; margin: 0 0 .75rem; padding-bottom: .4rem; border-bottom: 2px solid var(--surface2); }
+    .hint { font-size: .82rem; color: var(--muted); background: var(--surface2); border-left: 3px solid var(--accent);
+      padding: .6rem .85rem; border-radius: 0 8px 8px 0; margin-bottom: .75rem; }
+    .hint.inv { border-left-color: var(--investor); }
+    .hint.grt { border-left-color: var(--grant); }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; }
+    .editable { min-height: 2rem; outline: none; border: 1px dashed transparent; border-radius: 8px; padding: .5rem .65rem;
+      transition: border-color .15s, background .15s; }
+    .editable:hover { border-color: #475569; background: rgba(56,189,248,.04); }
+    .editable:focus { border-color: var(--accent); background: rgba(56,189,248,.07); }
+    .editable[data-placeholder]:empty::before { content: attr(data-placeholder); color: #64748b; }
+    .md-content h1,.md-content h2,.md-content h3,.md-content h4 { margin-top: 1rem; }
+    .md-content table { width: 100%; border-collapse: collapse; font-size: .85rem; margin: .75rem 0; }
+    .md-content th,.md-content td { border: 1px solid var(--border); padding: .45rem .55rem; vertical-align: top; }
+    .md-content th { background: var(--surface2); }
+    .md-content blockquote { margin: .5rem 0; padding-left: .75rem; border-left: 3px solid var(--border); color: var(--muted); }
+    .md-content code { font-family: ui-monospace, monospace; font-size: .85em; background: var(--surface2); padding: .1rem .3rem; border-radius: 4px; }
+    .md-content a { color: var(--accent); }
+    .back { font-size: .85rem; margin-bottom: 1rem; }
+    .back a { color: var(--accent); }
+    @media print { .topbar, nav.jump, .back { display: none !important; } body { background: #fff; color: #111; }
+      .card { break-inside: avoid; } .editable { border: none !important; padding: 0; } }
+    @media (max-width: 600px) { .status { margin-left: 0; width: 100%; } }
+  </style>
+</head>
+<body data-slug="drophelp">
+  <div class="wrap">
+    <p class="back"><a href="/api/funding/doc?file=index.html">← Alla projekt</a> · <a href="/api/funding/doc?file=studio-workbook.html">Studio-arbetsbok</a></p>
+
+    <h1>DROPHELP / TANGLE</h1>
+    <div class="meta">
+      <span class="badge p1">P1</span>
+      
+      
+      
+    </div>
+
+    <div class="topbar">
+      <button class="primary" type="button" onclick="saveNow()">💾 Spara</button>
+      <button type="button" onclick="exportJson()">⬇ Exportera</button>
+      <button type="button" onclick="importJson()">⬆ Importera</button>
+      <button type="button" onclick="window.print()">🖨 PDF / Skriv ut</button>
+      <span class="status" id="saveStatus">Redigera genom att klicka i texterna</span>
+    </div>
+
+    <nav class="jump">
+      <a href="#investor">Investerare</a>
+      <a href="#grant">Bidrag</a>
+      <a href="#dossier">Dossier</a>
+      <a href="#funding">Finansieringsplan</a>
+      <a href="#notes">Anteckningar</a>
+    </nav>
+
+    <section id="investor">
+      <h2>Investerare — vad framhäva</h2>
+      <div class="hint inv">Fokus: marknad, traction, unit economics, moat — inte bidragsspråk.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="investor_pitch" data-placeholder="Skriv investerarpitch för detta projekt…">
+          <p><em>Fyll i: problem → lösning → traction → ask → varför nu. Se dossier §1–3 nedan som källa.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="grant">
+      <h2>Bidrag & stöd — vad framhäva</h2>
+      <div class="hint grt">Fokus: innovation, samhällsnytta, regional nytta, budget, TRL — en vertikal i taget.</div>
+      <div class="card">
+        <div class="editable md-content" data-key="grant_pitch" data-placeholder="Skriv grant-vinkel för detta projekt…">
+          <p><em>Fyll i: innovationshöjd, samhällsnytta Gävleborg, budgetposter, sökande (AB vs Per). Se finansieringsplan nedan.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="dossier">
+      <h2>Dossier (från dossier.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="dossier"><h1>DROPHELP / TANGLE — Dossier</h1>
+<p><strong>Slug:</strong> drophelp · <strong>Path:</strong> <code>/Users/perbrinell/Documents/DROPHELP</code></p>
+<p><strong>Sökande:</strong> TWISTEDSTACKS AB · <strong>P1</strong> · <strong>COMPLETE</strong> · <strong>2026-07-25</strong></p>
+<h2>Meta</h2>
+<table>
+<tr><th>Fält</th><th>Värde</th></tr>
+<tr><td>Sektor</td><td>AI assistance / knowledge synthesis / social innovation</td></tr>
+<tr><td>Produkt</td><td><strong>TANGLE / DROPHELP</strong> — droppa fil → <strong>entity-wiki</strong> + <strong>hjälprapporter</strong></td></tr>
+<tr><td>TRL</td><td>Phase 0 skeleton — E2E: drop → parse → vectorize → agent → report → wiki</td></tr>
+<tr><td>Intäkt</td><td>B2B seats (ideella org, senare kommuner/care) + freemium</td></tr>
+<tr><td>Känslighet</td><td>Integritet vid persondata; <strong>anti-övervakningsframing</strong></td></tr>
+<tr><td>Primär ICP</td><td><strong>Ideell social omsorg</strong> (deep research 2026-07) — <em>sekundär:</em> mid-size B2B regulated (Kimi)</td></tr>
+</table>
+<h2>1. Beskrivning</h2>
+<p>TANGLE: droppa fil, namnge entitet (person, djur, bolag, team) — systemet bygger wiki och konkret hjälprapport. Dubbel nytta: operativ kunskapsbank + underlag till bidrags-/effektrapportering.</p>
+<h2>2. Potential</h2>
+<p>Stark samhällsnytta (digital hjälp, inkludering). Koppling THE-AI-BUTTON/Relay-narrativ i befintliga Anslag-utkast — <strong>mappa inte 1:1</strong> (Relay ≠ TANGLE).</p>
+<h2>3. ROI</h2>
+<table>
+<tr><th>Scenario</th><th>Invest 12 mån</th><th>Intäkt Y2</th></tr>
+<tr><td>Konservativ</td><td>600 k</td><td>150 k</td></tr>
+<tr><td>Bas</td><td>1,2 MSEK</td><td>1 MSEK</td></tr>
+<tr><td>Optimistisk</td><td>2 MSEK</td><td>3 MSEK</td></tr>
+</table>
+<h2>4. Konkurrenter</h2>
+<p>Notion AI · ChatGPT projects · custom RAG consultancies · social case-management systems · wiki generators (Mem/Reflect) — TANGLE differentierar <strong>entity-help mission</strong> + radiating wiki + anti-surveillance design.</p>
+<h2>5. Marknad</h2>
+<h3>Från deep research (2026-07-25)</h3>
+<p><strong>Primär ICP:</strong> ideell social omsorg (civilsamhällets idéburna stöd) — inte kommun först, inte small care teams, inte project offices.</p>
+<h3>ICP-spänning (2026-07-25)</h3>
+<table>
+<tr><th>Källa</th><th>Fil</th><th>ICP</th><th>Roll</th></tr>
+<tr><td>Gemini deep</td><td><code>research/icp-pilots-2026-07.md</code></td><td><strong>Ideell social omsorg</strong></td><td><strong>Primär</strong> (kanon tills användaren byter)</td></tr>
+<tr><td>Kimi quick</td><td><code>research/icp-kimi-quick-2026-07.md</code></td><td>Mid-size B2B regulated services <strong>50–500</strong> (redovisning, fastighet, vård-admin, juridik, tech-konsult)</td><td><strong>Sekundär kommersiell</strong></td></tr>
+</table>
+<p><strong>Regel:</strong> behåll båda filerna. Överskriv <strong>inte</strong> ideell ICP tyst. Flip kräver explicit användarbeslut.</p>
+<p><strong>Jämförelse (highlights):</strong></p>
+<table>
+<tr><th>ICP</th><th>Inköp/LOU</th><th>Pilotmognad</th><th>Datasyntes-behov</th><th>Funding-fit</th></tr>
+<tr><td><strong>Ideell (vald)</strong></td><td>Låg–medel</td><td>Mycket hög</td><td>Extremt hög</td><td>Extremt hög</td></tr>
+<tr><td>Kommun</td><td>Extremt hög (LOU)</td><td>Låg</td><td>Hög</td><td>Medel</td></tr>
+<tr><td>Small care</td><td>Extremt hög (PDL/IVO)</td><td>Medel</td><td>Medel</td><td>Låg</td></tr>
+<tr><td>Project offices</td><td>Låg</td><td>Hög</td><td>Medel</td><td>Låg–medel</td></tr>
+</table>
+<p><strong>Varför ideell:</strong> ostrukturerade anteckningar + rapporteringstryck till finansiärer + lägre LOU-barriärer + anti-övervakningskultur som matchar produkten.</p>
+<p><strong>Piloter Gävleborg (10 org, kontakt UNVERIFIED):</strong></p>
+<p>Vändpunkten · Ria Hela Människan · BOJ · Fontänhuset · Maskrosbarn · Röda Korset · Mind · Stadsmission · Anhörigstöd Gävle <em>(gränsyta kommun)</em> · FUB.</p>
+<p>Primära startkandidater: <strong>Vändpunkten</strong> + <strong>Ria</strong> (Sandviken).</p>
+<p><strong>Anti-surveillance framing:</strong> ingen prestationsmätning; teamägd kunskapsbank; RBAC; PII-maskering + zero-retention råfiler. Full DPIA-checklista: <code>research/icp-pilots-2026-07.md</code> §5.</p>
+<p><strong>Produktentitet:</strong> TANGLE/DROPHELP = entity-wiki + help reports. Sökande i ansökningar = <strong>TWISTEDSTACKS AB</strong>.</p>
+<blockquote>Äldre M3-NU-2 (<code>drafts/icp-one-pager.md</code>) valde kommun Gävleborg. Deep research <strong>omprioriterar</strong> till ideell för pilot; kommun = sekundär skalväg efter referenser.</blockquote>
+<h3>Finansiering (uppdaterad med research)</h3>
+<ul>
+<li><strong>Internetstiftelsen</strong> — AB OK (projekt / ev. equity).</li>
+<li><strong>Arvsfonden</strong> — ideell huvudsökande; AB underleverantör (partner-modell).</li>
+<li><strong>Vinnova</strong> social innovation Steg 1/2 + De Minimis/GBER; även Innovativa Startups.</li>
+<li>Region Gävleborg · Almi verifiering · stipendier (<strong>Per</strong>) för tidig prototyp.</li>
+</ul>
+<p>Detaljer: <code>funding-plan.md</code> · <code>research/icp-pilots-2026-07.md</code>.</p>
+<h3>Verksamhetspaket</h3>
+<ul>
+<li>Research ICP/piloter: <code>research/icp-pilots-2026-07.md</code> (<strong>kanon för ICP 2026-07</strong>).</li>
+<li>Kimi secondary ICP: <code>research/icp-kimi-quick-2026-07.md</code> (B2B mid-size — <strong>ICP-spänning</strong>).</li>
+<li>ICP-onepager: <code>drafts/icp-one-pager.md</code> (äldre kommun — uppdatera vid behov).</li>
+<li>GDPR-pilot: <code>drafts/gdpr-pilot-onepager.md</code> + DPIA i research §5.</li>
+</ul>
+<h2>6. Budget bas 1,2 MSEK</h2>
+<p>Backend/frontend 600k · LLM/infra 150k · UX research 150k · GDPR/juridik 100k · pilots 150k · buffer 50k.</p>
+<h2>7–8. Tid &amp; skal</h2>
+<p><strong>Roadmap 2026 (justerad):</strong> Fas 1 (jan–mar) och Fas 2 (apr–jun) är <strong>kalendermässigt passerade</strong> → <strong>adjust/VERIFY</strong> (gör om partnerskap/DPIA + funding parallellt med Fas 3). Fas 3 (jul–sep) = aktuell teknisk pilot. Fas 4 (okt–dec) = effekt + skal till fler idéburna; kommunmoduler senare.</p>
+<p>Skal: multi-tenant ideell → kommun; risk: PII.</p>
+<h3>Next</h3>
+<ol>
+<li>Fas 1-lite: 2–3 ideella LOI + PUBA/DPIA (Vändpunkten, Ria).</li>
+<li>VERIFY LIVE: Internetstiftelsen / Vinnova Steg 1 / Arvsfonden-partner.</li>
+<li>Uppdatera <code>drafts/icp-one-pager.md</code> till ideell ICP (valfritt).</li>
+</ol>
+<p><strong>ej Hyper</strong> — Cursor lokal.</p></div>
+      </div>
+    </section>
+
+    <section id="funding">
+      <h2>Finansieringsplan (från funding-plan.md)</h2>
+      <div class="card">
+        <div class="editable md-content" data-key="funding"><h1>TANGLE / DROPHELP — Finansieringsplan</h1>
+<p><strong>Sökande:</strong> <strong>TWISTEDSTACKS AB</strong> (företag; produktnamn TANGLE/DROPHELP) · <strong>Per Brinell</strong> (små stipendier / Almi privat ~25k) · COMPLETE · 2026-07-25</p>
+<p><strong>ICP (primär):</strong> ideell social omsorg — se <code>research/icp-pilots-2026-07.md</code></p>
+<p><strong>ICP (sekundär/Kimi):</strong> mid-size B2B regulated 50–500 — se <code>research/icp-kimi-quick-2026-07.md</code> · <strong>ICP-spänning</strong> i dossier</p>
+<table>
+<tr><th>#</th><th>Källa</th><th>Fit</th><th>Sökande</th><th>Vinkel</th><th>Ver</th></tr>
+<tr><td>1</td><td><strong>Internetstiftelsen</strong> (projekt + ev. minoritetsinvestering)</td><td>5</td><td><strong>AB</strong></td><td>Integritetsbevarande AI, digital delaktighet, entity-wiki för sårbara grupper</td><td><strong>VERIFY LIVE</strong> (K-DEADLINES: no active 2026 call — UNVERIFIED)</td></tr>
+<tr><td>2</td><td><strong>Vinnova social innovation</strong> Steg 1 (~300 kSEK, upp till 100 %) → Steg 2 (~1–3 MSEK)</td><td>5</td><td><strong>AB</strong> (+ ideell partner)</td><td>De Minimis (tidigt) / GBER (större); samverkan civilsamhälle Gävleborg</td><td><strong>VERIFY LIVE</strong> belopp/fönster</td></tr>
+<tr><td>3</td><td><strong>Vinnova Innovativa Startups</strong></td><td>4</td><td><strong>AB</strong></td><td>Org-seats / betalningsvilja efter pilot (ideell <em>eller</em> B2B-sekundär)</td><td><strong>VERIFIED</strong> öppnar <strong>2026-10-12</strong> → stänger <strong>2027-01-12</strong> (K-DEADLINES)</td></tr>
+<tr><td>4</td><td><strong>Vinnova Test &amp; Demo SMF 2026</strong></td><td>3</td><td><strong>AB</strong></td><td>Extern testmiljö (UX/integritet) om extern leverantör</td><td><strong>VERIFIED</strong> stänger <strong>2026-09-08 14:00</strong> — Kimi-pekare</td></tr>
+<tr><td>5</td><td><strong>Arvsfonden</strong> (partner-modell)</td><td>4</td><td><strong>Ideell huvudsökande</strong> + AB underleverantör</td><td>1–3 år; TWISTEDSTACKS = teknisk SaaS/utveckling i projektbudget</td><td>Löpande mottagning · <strong>VERIFY LIVE</strong></td></tr>
+<tr><td>6</td><td>Region Gävleborg</td><td>3</td><td>AB</td><td>Lokal pilotförankring</td><td>Löpande · <strong>VERIFIED</strong></td></tr>
+<tr><td>7</td><td>Almi verifiering</td><td>3</td><td><strong>AB</strong> / <strong>Per</strong> (~25k privat)</td><td>Användartester / verifiering</td><td>Löpande · <strong>VERIFIED</strong> K-DEADLINES</td></tr>
+<tr><td>8</td><td>Fondboken stipendier</td><td>3</td><td><strong>Per</strong></td><td>Tidig prototyp</td><td>—</td></tr>
+</table>
+<h3>Partner-modell (Arvsfonden) — kort</h3>
+<ol>
+<li>Ideell ICP (t.ex. Vändpunkten, BOJ, Maskrosbarn) = <strong>huvudsökande</strong>.</li>
+<li>TWISTEDSTACKS AB = upphandlad teknisk underleverantör (ej direktsökande).</li>
+<li>Konsortie-/samverkansavtal + marknadsmässig ersättning.</li>
+</ol>
+<h3>Statsstöd (Vinnova)</h3>
+<ul>
+<li><strong>De Minimis:</strong> tidiga steg, hög stödgrad möjlig; tak ~300 kEUR / 3 år <em>(UNVERIFIED)</em>.</li>
+<li><strong>GBER:</strong> Steg 2-större projekt; medfinansiering; typiskt ~50–80 % för SMF <em>(UNVERIFIED)</em>.</li>
+</ul>
+<h3>Roadmap-koppling (justerad 2026-07-25)</h3>
+<table>
+<tr><th>Fas</th><th>Originalperiod</th><th>Status</th><th>Funding-aktion</th></tr>
+<tr><td>1</td><td>jan–mar 2026</td><td><strong>PASSERAD → adjust/VERIFY</strong></td><td>PUBA/DPIA + 2–3 pilot-LOI (ideell) — gör om parallellt med Fas 3</td></tr>
+<tr><td>2</td><td>apr–jun 2026</td><td><strong>PASSERAD → adjust/VERIFY</strong></td><td>Internetstiftelsen-dialog; Vinnova Steg 1; Arvsfonden-utkast med ideell — <strong>VERIFY LIVE</strong> öppna fönster</td></tr>
+<tr><td>3</td><td>jul–sep 2026</td><td><strong>Aktuell</strong></td><td>Teknisk pilot (kräver Fas 1-lite); ev. Test &amp; Demo om extern testmiljö</td></tr>
+<tr><td>4</td><td>okt–dec 2026</td><td>Kommande</td><td>Innovativa Startups (öppnar 12 okt) · Effektrapport → Steg 2 / skal</td></tr>
+</table>
+<p><strong>Omformning:</strong> <code>04_THE_AI_BUTTON_VINNOVA_INTERNETSTIFTELSEN.md</code> → anpassa till TANGLE entity-help (Relay ≠ TANGLE).</p>
+<p><strong>Djup:</strong> <code>research/icp-pilots-2026-07.md</code> §4–6 · <strong>Kimi quick:</strong> <code>research/icp-kimi-quick-2026-07.md</code> · <strong>Deadlines:</strong> <code>00-MASTER/INVENTORY/kimi-deadlines-2026-07.md</code>.</p></div>
+      </div>
+    </section>
+
+    <section id="notes">
+      <h2>Gemensamma anteckningar</h2>
+      <div class="card">
+        <div class="editable" data-key="notes" data-placeholder="Anteckningar inför ansökan…" style="min-height:8rem;"></div>
+      </div>
+    </section>
+  </div>
+  <input type="file" id="importFile" accept="application/json,.json" hidden />
+  <script>
+    const STORAGE_KEY = 'ts_project_drophelp_v1';
+    let saveTimer = null;
+    function collectData() {
+      const data = { slug: 'drophelp', version: 1, savedAt: new Date().toISOString(), fields: {} };
+      document.querySelectorAll('.editable[data-key]').forEach(el => { data.fields[el.dataset.key] = el.innerHTML; });
+      return data;
+    }
+    function applyData(data) {
+      if (!data?.fields) return;
+      document.querySelectorAll('.editable[data-key]').forEach(el => {
+        if (data.fields[el.dataset.key] !== undefined) el.innerHTML = data.fields[el.dataset.key];
+      });
+    }
+    function saveNow() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(collectData()));
+      document.getElementById('saveStatus').textContent = 'Sparat ' + new Date().toLocaleString('sv-SE');
+    }
+    function scheduleSave() { clearTimeout(saveTimer); document.getElementById('saveStatus').textContent = 'Sparar…'; saveTimer = setTimeout(saveNow, 800); }
+    function exportJson() {
+      saveNow();
+      const blob = new Blob([JSON.stringify(collectData(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'drophelp-workbook-' + new Date().toISOString().slice(0,10) + '.json';
+      a.click(); URL.revokeObjectURL(a.href);
+    }
+    function importJson() { document.getElementById('importFile').click(); }
+    document.getElementById('importFile').addEventListener('change', e => {
+      const f = e.target.files[0]; if (!f) return;
+      const r = new FileReader();
+      r.onload = () => { try { applyData(JSON.parse(r.result)); saveNow(); alert('Importerat!'); } catch { alert('Ogiltig JSON'); } };
+      r.readAsText(f); e.target.value = '';
+    });
+    document.querySelectorAll('.editable[data-key]').forEach(el => el.addEventListener('input', scheduleSave));
+    try { const s = localStorage.getItem(STORAGE_KEY); if (s) { applyData(JSON.parse(s)); } } catch {}
+  </script>
+
+<div id="funding-toolbar" style="position:fixed;bottom:12px;right:12px;z-index:9999;display:flex;gap:8px;font-family:system-ui,sans-serif;font-size:13px;">
+  <a href="/api/funding/doc?file=index.html" style="background:#1a222d;color:#38bdf8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Alla projekt</a>
+  <a href="/funding" style="background:#1a222d;color:#94a3b8;border:1px solid #334155;padding:6px 12px;border-radius:8px;text-decoration:none;">Inlogg</a>
+  <button type="button" onclick="logoutFunding()" style="background:#1a222d;color:#fb7185;border:1px solid #334155;padding:6px 12px;border-radius:8px;cursor:pointer;">Logga ut</button>
+</div>
+<script>
+async function logoutFunding() {
+  await fetch('/api/funding/auth', { method: 'DELETE', credentials: 'include' });
+  location.href = '/funding';
+}
+</script>
+</body>
+</html>
