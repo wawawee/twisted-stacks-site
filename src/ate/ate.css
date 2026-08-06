@@ -623,9 +623,21 @@
 .ate-hitl-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
+  justify-content: flex-start;
+  gap: 0.45rem;
+  flex-wrap: wrap;
   margin-bottom: 0.5rem;
+}
+
+.ate-hitl-waiting {
+  border-color: #c45c26;
+  color: #c45c26;
+}
+
+.ate-hitl-warming {
+  border-color: var(--muted, #888);
+  color: var(--muted, #888);
+  opacity: 0.85;
 }
 
 .ate-hitl-head h3 {
@@ -635,7 +647,7 @@
 
 .ate-hitl-summary {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(5.5rem, 1fr));
   gap: 0.35rem;
   margin: 0.75rem 0;
   font-size: 0.72rem;

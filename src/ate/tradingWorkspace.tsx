@@ -65,6 +65,7 @@ interface TradingContextValue {
   hitlStatus: string;
   setHitlStatus: (s: string) => void;
   workflowId: string | null;
+  inHitlWait: boolean | null;
 }
 
 function fmtTelemetryTime(d: Date) {
@@ -182,6 +183,7 @@ export function TradingWorkspaceProvider({
   const [requiresHitl, setRequiresHitl] = useState(false);
   const [hitlStatus, setHitlStatus] = useState("");
   const [workflowId, setWorkflowId] = useState<string | null>(null);
+  const [inHitlWait, setInHitlWait] = useState<boolean | null>(null);
 
   const loadMacro = useCallback(async () => {
     setMacroLoading(true);
@@ -260,6 +262,7 @@ export function TradingWorkspaceProvider({
           ? data.workflow_id.trim()
           : null;
       setWorkflowId(wid);
+      setInHitlWait(null);
       if (needsHitl) {
         setHitlDecision("pending");
         const wfStatus =
@@ -272,6 +275,8 @@ export function TradingWorkspaceProvider({
               : "No Temporal workflow — approve/reject is log-only",
         );
         setHitlOpen(true);
+      } else {
+        setInHitlWait(null);
       }
       setLastScan({
         symbol: data.symbol || symbol,
@@ -297,6 +302,55 @@ export function TradingWorkspaceProvider({
     loadMarket().then(() => runScan());
     loadMacro();
   }, [symbol, timeframe]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Poll Temporal in_hitl_wait while HITL modal is open and we have a workflow id.
+  useEffect(() => {
+    if (!hitlOpen || !workflowId || hitlDecision !== "pending") {
+      return;
+    }
+    let cancelled = false;
+    const poll = async () => {
+      try {
+        const res = await fetch(
+          `${API}/paper-status?workflow_id=${encodeURIComponent(workflowId)}`,
+        );
+        const data = (await res.json()) as {
+          in_hitl_wait?: boolean;
+          awaiting_signal?: boolean;
+          status?: string;
+          source?: string;
+          ok?: boolean;
+        };
+        if (cancelled) return;
+        if (typeof data.in_hitl_wait === "boolean") {
+          setInHitlWait(data.in_hitl_wait);
+          if (data.in_hitl_wait) {
+            setHitlStatus((prev) =>
+              prev.includes("in_hitl_wait")
+                ? prev
+                : `${prev ? `${prev} · ` : ""}Temporal: in_hitl_wait`,
+            );
+          } else if (data.source === "bridge" && data.ok) {
+            setHitlStatus((prev) =>
+              prev.includes("waiting for tick")
+                ? prev
+                : `${prev ? `${prev} · ` : ""}Temporal: waiting for tick…`,
+            );
+          }
+        } else if (data.status && data.status !== "ok") {
+          setInHitlWait(null);
+        }
+      } catch {
+        if (!cancelled) setInHitlWait(null);
+      }
+    };
+    void poll();
+    const id = window.setInterval(poll, 2500);
+    return () => {
+      cancelled = true;
+      window.clearInterval(id);
+    };
+  }, [hitlOpen, workflowId, hitlDecision]);
 
   const topSignal = signals[0] ?? null;
 
@@ -339,6 +393,7 @@ export function TradingWorkspaceProvider({
       hitlStatus,
       setHitlStatus,
       workflowId,
+      inHitlWait,
     }),
     [
       symbol,
@@ -372,6 +427,7 @@ export function TradingWorkspaceProvider({
       requiresHitl,
       hitlStatus,
       workflowId,
+      inHitlWait,
     ],
   );
 
@@ -391,6 +447,7 @@ function HitlModalStub() {
     setHitlStatus,
     hitlStatus,
     workflowId,
+    inHitlWait,
   } = useTradingWorkspace();
   const [submitting, setSubmitting] = useState(false);
 
@@ -451,10 +508,20 @@ function HitlModalStub() {
         <header className="ate-hitl-head">
           <h3 id="ate-hitl-title">Human-in-the-loop</h3>
           <span className="ate-trading-badge ate-telemetry-paper">PAPER</span>
+          {inHitlWait === true ? (
+            <span className="ate-trading-badge ate-hitl-waiting blink" aria-live="polite">
+              WAITING
+            </span>
+          ) : inHitlWait === false && workflowId ? (
+            <span className="ate-trading-badge ate-hitl-warming">TICK…</span>
+          ) : null}
         </header>
         <p className="ate-trading-muted">
           Risk gate review for <strong>{symbol}</strong> — decision posts to <code>/api/ate/hitl</code> (Temporal
           signals when worker is live).
+          {inHitlWait === true
+            ? " Workflow is paused in HITL wait — approve or reject to resume."
+            : null}
         </p>
         <dl className="ate-hitl-summary mono">
           <div>
@@ -472,6 +539,12 @@ function HitlModalStub() {
           <div>
             <dt>Workflow</dt>
             <dd>{workflowId ?? "—"}</dd>
+          </div>
+          <div>
+            <dt>in_hitl_wait</dt>
+            <dd>
+              {inHitlWait === true ? "true" : inHitlWait === false ? "false" : "—"}
+            </dd>
           </div>
         </dl>
         {hitlDecision !== "pending" ? (
@@ -532,6 +605,7 @@ export function TradingToolbar({ compact }: { compact?: boolean }) {
     setHitlOpen,
     hitlDecision,
     requiresHitl,
+    inHitlWait,
   } = useTradingWorkspace();
 
   const showHitl = requiresHitl;
@@ -588,10 +662,18 @@ export function TradingToolbar({ compact }: { compact?: boolean }) {
         {showHitl ? (
           <button
             type="button"
-            className={`room-btn ate-hitl-trigger${hitlDecision === "pending" ? " blink" : ""}`}
+            className={`room-btn ate-hitl-trigger${
+              hitlDecision === "pending" || inHitlWait === true ? " blink" : ""
+            }`}
             onClick={() => setHitlOpen(true)}
           >
-            {isMobile ? "HITL" : "Review gate"}
+            {inHitlWait === true
+              ? isMobile
+                ? "WAIT"
+                : "HITL waiting"
+              : isMobile
+                ? "HITL"
+                : "Review gate"}
           </button>
         ) : null}
         <span className="ate-trading-badge">PAPER</span>
