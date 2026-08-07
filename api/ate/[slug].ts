@@ -16,6 +16,7 @@ const routes: Record<string, () => Promise<{ default: (req: VercelRequest, res: 
   "paper-start": () => import("./_handlers/paper-start.js"),
   feed: () => import("./_handlers/feed.js"),
   sidebet: () => import("./_handlers/sidebet.js"),
+  leaderboard: () => import("./_handlers/leaderboard.js"),
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
