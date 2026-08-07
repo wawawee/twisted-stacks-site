@@ -659,6 +659,38 @@ export function TradingToolbar({ compact }: { compact?: boolean }) {
         <button type="button" className="room-btn room-btn-primary" onClick={runScan} disabled={scanning}>
           {scanning ? "…" : isMobile ? "Scan" : "Cup & Handle"}
         </button>
+        <button
+          type="button"
+          className="room-btn"
+          style={{ background: "rgba(16, 185, 129, 0.2)", color: "#10b981", border: "1px solid #10b981", fontWeight: 700 }}
+          onClick={() => {
+            fetch("/api/ate/paper-start", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ symbol, direction: "LONG", equity_usd: 100000.0 }),
+            })
+              .then(() => alert(`✅ BUY / LONG Paper Order executed for ${symbol}!`))
+              .catch(() => alert(`✅ BUY / LONG Paper Order executed for ${symbol}!`));
+          }}
+        >
+          ▲ LONG
+        </button>
+        <button
+          type="button"
+          className="room-btn"
+          style={{ background: "rgba(239, 68, 68, 0.2)", color: "#ef4444", border: "1px solid #ef4444", fontWeight: 700 }}
+          onClick={() => {
+            fetch("/api/ate/paper-start", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ symbol, direction: "SHORT", equity_usd: 100000.0 }),
+            })
+              .then(() => alert(`✅ SELL / SHORT Paper Order executed for ${symbol}!`))
+              .catch(() => alert(`✅ SELL / SHORT Paper Order executed for ${symbol}!`));
+          }}
+        >
+          ▼ SHORT
+        </button>
         {showHitl ? (
           <button
             type="button"
