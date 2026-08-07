@@ -30,8 +30,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!requireSession(req, res)) return;
 
   const target = bridgeUrl("/paper/start");
+  const bodyObj = (req.body && typeof req.body === "object") ? (req.body as Record<string, unknown>) : {};
   if (!target) {
-    const symbol = String(req.body?.symbol || "SPY").toUpperCase();
+    const symbol = String(bodyObj.symbol || "SPY").toUpperCase();
     res.status(200).json({
       ok: true,
       started: true,
