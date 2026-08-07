@@ -13,6 +13,9 @@ const routes: Record<string, () => Promise<{ default: (req: VercelRequest, res: 
   "geo-intel": () => import("./_handlers/geo-intel.js"),
   hitl: () => import("./_handlers/hitl.js"),
   "paper-status": () => import("./_handlers/paper-status.js"),
+  "paper-start": () => import("./_handlers/paper-start.js"),
+  feed: () => import("./_handlers/feed.js"),
+  sidebet: () => import("./_handlers/sidebet.js"),
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
