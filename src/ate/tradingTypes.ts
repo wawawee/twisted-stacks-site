@@ -115,6 +115,14 @@ export interface GeoIntelPayload {
 export const WATCHLIST = [
   { symbol: "SPY", label: "S&P 500 ETF" },
   { symbol: "QQQ", label: "Nasdaq 100" },
+  { symbol: "IWM", label: "Russell 2000" },
+  { symbol: "DIA", label: "Dow Jones ETF" },
+  { symbol: "NVDA", label: "NVIDIA Corp" },
+  { symbol: "AAPL", label: "Apple Inc" },
+  { symbol: "MSFT", label: "Microsoft Corp" },
+  { symbol: "TSLA", label: "Tesla Inc" },
   { symbol: "BTC-USD", label: "Bitcoin" },
   { symbol: "ETH-USD", label: "Ethereum" },
+  { symbol: "SOL-USD", label: "Solana" },
+  { symbol: "GLD", label: "SPDR Gold Shares" },
 ] as const;
