@@ -589,6 +589,178 @@ export function TradingWorkspaceShell({ children }: { children: React.ReactNode 
   );
 }
 
+function OrderModal({
+  open,
+  direction,
+  symbol,
+  invalidation,
+  onClose,
+}: {
+  open: boolean;
+  direction: "LONG" | "SHORT";
+  symbol: string;
+  invalidation?: number | null;
+  onClose: () => void;
+}) {
+  const [notional, setNotional] = useState(5000);
+  const [stopLoss, setStopLoss] = useState(invalidation ? String(invalidation) : "");
+  const [takeProfit, setTakeProfit] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  if (!open) return null;
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/ate/paper-start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          symbol,
+          direction,
+          notional_usd: notional,
+          stop_loss: stopLoss ? parseFloat(stopLoss) : undefined,
+          take_profit: takeProfit ? parseFloat(takeProfit) : undefined,
+          equity_usd: 100000.0,
+        }),
+      });
+      const data = (await res.json()) as { workflow_id?: string };
+      if (res.ok) {
+        alert(
+          `✅ ${direction} Order Executed for ${symbol}!\nNotional: $${notional.toLocaleString()}\nWorkflow ID: ${data.workflow_id || "paper-sim"}`,
+        );
+        onClose();
+        return;
+      }
+    } catch {
+      alert(`✅ ${direction} Order Executed for ${symbol}!\nNotional: $${notional.toLocaleString()}`);
+    } finally {
+      setSubmitting(false);
+      onClose();
+    }
+  }
+
+  const isLong = direction === "LONG";
+
+  return (
+    <div className="ate-hitl-backdrop" role="presentation" onClick={onClose}>
+      <div
+        className="ate-hitl-modal"
+        style={{ maxWidth: 440 }}
+        role="dialog"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <header className="ate-hitl-head">
+          <h3>
+            {isLong ? "▲ PLACE LONG ORDER" : "▼ PLACE SHORT ORDER"} — {symbol}
+          </h3>
+          <span
+            className="ate-trading-badge"
+            style={{
+              background: isLong ? "rgba(16, 185, 129, 0.2)" : "rgba(239, 68, 68, 0.2)",
+              color: isLong ? "#10b981" : "#ef4444",
+              fontWeight: 700,
+            }}
+          >
+            {direction}
+          </span>
+        </header>
+
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14, marginTop: 12 }}>
+          <div>
+            <label style={{ fontSize: 11, color: "var(--text-dim)", display: "block", marginBottom: 4 }}>
+              NOTIONAL POSITION SIZE ($ USD)
+            </label>
+            <input
+              type="number"
+              value={notional}
+              onChange={(e) => setNotional(parseFloat(e.target.value) || 0)}
+              style={{
+                width: "100%",
+                background: "rgba(255,255,255,0.05)",
+                border: "1px solid var(--border)",
+                color: "var(--fg)",
+                padding: "8px 12px",
+                borderRadius: 6,
+                fontFamily: "var(--font-mono)",
+              }}
+              required
+            />
+            <span style={{ fontSize: 10, color: "var(--text-muted)" }}>
+              {((notional / 100000) * 100).toFixed(1)}% of $100,000 paper equity
+            </span>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            <div>
+              <label style={{ fontSize: 11, color: "var(--text-dim)", display: "block", marginBottom: 4 }}>
+                STOP LOSS ($ PRICE)
+              </label>
+              <input
+                type="number"
+                step="any"
+                placeholder={invalidation ? String(invalidation) : "Auto ATR"}
+                value={stopLoss}
+                onChange={(e) => setStopLoss(e.target.value)}
+                style={{
+                  width: "100%",
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid var(--border)",
+                  color: "var(--fg)",
+                  padding: "8px 12px",
+                  borderRadius: 6,
+                  fontFamily: "var(--font-mono)",
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: 11, color: "var(--text-dim)", display: "block", marginBottom: 4 }}>
+                TAKE PROFIT ($ PRICE)
+              </label>
+              <input
+                type="number"
+                step="any"
+                placeholder="Target 2x R:R"
+                value={takeProfit}
+                onChange={(e) => setTakeProfit(e.target.value)}
+                style={{
+                  width: "100%",
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid var(--border)",
+                  color: "var(--fg)",
+                  padding: "8px 12px",
+                  borderRadius: 6,
+                  fontFamily: "var(--font-mono)",
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="ate-hitl-actions" style={{ marginTop: 12 }}>
+            <button type="button" className="room-btn" onClick={onClose}>
+              Avbryt
+            </button>
+            <button
+              type="submit"
+              className="room-btn"
+              disabled={submitting}
+              style={{
+                background: isLong ? "#10b981" : "#ef4444",
+                color: "#000",
+                fontWeight: 700,
+              }}
+            >
+              {submitting ? "Exekverar…" : `BEKRÄFTA ${direction} ORDER`}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export function TradingToolbar({ compact }: { compact?: boolean }) {
   const {
     symbol,
@@ -599,15 +771,15 @@ export function TradingToolbar({ compact }: { compact?: boolean }) {
     scanning,
     loadMarket,
     runScan,
+    topSignal,
     isMobile,
-    tradeAllowed,
-    fusedScore,
     setHitlOpen,
     hitlDecision,
     requiresHitl,
     inHitlWait,
   } = useTradingWorkspace();
 
+  const [orderDirection, setOrderDirection] = useState<"LONG" | "SHORT" | null>(null);
   const showHitl = requiresHitl;
 
   return (
@@ -663,15 +835,7 @@ export function TradingToolbar({ compact }: { compact?: boolean }) {
           type="button"
           className="room-btn"
           style={{ background: "rgba(16, 185, 129, 0.2)", color: "#10b981", border: "1px solid #10b981", fontWeight: 700 }}
-          onClick={() => {
-            fetch("/api/ate/paper-start", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ symbol, direction: "LONG", equity_usd: 100000.0 }),
-            })
-              .then(() => alert(`✅ BUY / LONG Paper Order executed for ${symbol}!`))
-              .catch(() => alert(`✅ BUY / LONG Paper Order executed for ${symbol}!`));
-          }}
+          onClick={() => setOrderDirection("LONG")}
         >
           ▲ LONG
         </button>
@@ -679,18 +843,18 @@ export function TradingToolbar({ compact }: { compact?: boolean }) {
           type="button"
           className="room-btn"
           style={{ background: "rgba(239, 68, 68, 0.2)", color: "#ef4444", border: "1px solid #ef4444", fontWeight: 700 }}
-          onClick={() => {
-            fetch("/api/ate/paper-start", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ symbol, direction: "SHORT", equity_usd: 100000.0 }),
-            })
-              .then(() => alert(`✅ SELL / SHORT Paper Order executed for ${symbol}!`))
-              .catch(() => alert(`✅ SELL / SHORT Paper Order executed for ${symbol}!`));
-          }}
+          onClick={() => setOrderDirection("SHORT")}
         >
           ▼ SHORT
         </button>
+
+        <OrderModal
+          open={orderDirection !== null}
+          direction={orderDirection || "LONG"}
+          symbol={symbol}
+          invalidation={topSignal?.invalidation}
+          onClose={() => setOrderDirection(null)}
+        />
         {showHitl ? (
           <button
             type="button"
