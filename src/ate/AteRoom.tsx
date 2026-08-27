@@ -49,7 +49,7 @@ function LoginPanel({ onSuccess }: { onSuccess: (member: string) => void }) {
       const res = await fetch(`${API}/auth`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password, member }),
+        body: JSON.stringify({ password, member: "operator" }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -69,20 +69,9 @@ function LoginPanel({ onSuccess }: { onSuccess: (member: string) => void }) {
       <div className="room-login">
         <form className="room-login-card" onSubmit={submit}>
           <h1 className="room-brand-title">ATE</h1>
-          <p className="room-login-lede">Agentic Trading Engine — investor & dev colab.</p>
+          <p className="room-login-lede">Autonomous Trading Engine — Live Cockpit & Colab Space.</p>
           <div className="room-login-field">
-            <label htmlFor="ate-member">Vem är du?</label>
-            <select id="ate-member" value={member} onChange={(e) => setMember(e.target.value)} required>
-              <option value="">Välj namn…</option>
-              {MEMBERS.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="room-login-field">
-            <label htmlFor="ate-password">Lösenord</label>
+            <label htmlFor="ate-password">Behörighetskod</label>
             <input
               id="ate-password"
               type="password"

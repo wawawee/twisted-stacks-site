@@ -75,15 +75,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const password = String(body.password ?? "");
-    const member = normalizeMember(body.member);
+    const member = body.member ? String(body.member).trim() : "operator";
 
     if (!password || password !== getRoomPassword()) {
       res.status(401).json({ error: "Fel lösenord" });
-      return;
-    }
-
-    if (!member) {
-      res.status(400).json({ error: "Välj vem du är" });
       return;
     }
 
