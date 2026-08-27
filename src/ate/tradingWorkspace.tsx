@@ -828,9 +828,7 @@ export function TradingToolbar({ compact }: { compact?: boolean }) {
         <button type="button" className="room-btn ate-trading-refresh" onClick={loadMarket} disabled={loading}>
           {loading ? "…" : isMobile ? "↻" : "Uppdatera"}
         </button>
-        <button type="button" className="room-btn room-btn-primary" onClick={runScan} disabled={scanning}>
-          {scanning ? "…" : isMobile ? "Scan" : "Cup & Handle"}
-        </button>
+
         <button
           type="button"
           className="room-btn"
@@ -1083,7 +1081,7 @@ export function TradingSideContent() {
       <section className="ate-trading-section">
         <h3>Signaler</h3>
         {signals.length === 0 ? (
-          <p className="ate-trading-muted">Inga cup-and-handle kandidater över tröskel.</p>
+          <p className="ate-trading-muted">Inga aktiva swarm-signaler över tröskel.</p>
         ) : (
           <ul className="ate-signal-list">
             {signals.slice(0, 8).map((s, i) => (
