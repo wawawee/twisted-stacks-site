@@ -1,0 +1,246 @@
+{
+  "syncedAt": "2026-08-27T09:28:10.899Z",
+  "source": "github:finasteos/SPACEinSPACE",
+  "currentFocus": "",
+  "stats": {
+    "total": 0,
+    "done": 0,
+    "p0Open": 0,
+    "p1Open": 0,
+    "phaseProgress": {
+      "phasesTotal": 0,
+      "phasesComplete": 0,
+      "activePhaseNum": "2",
+      "activePhaseName": "Fas 2",
+      "activePhaseDone": 0,
+      "activePhaseTotal": 0,
+      "activePhasePct": 0,
+      "heroPhaseNum": "1",
+      "heroPhaseName": "Research",
+      "heroPhaseDone": 0,
+      "heroPhaseTotal": 0,
+      "heroPhasePct": 0,
+      "heroDelivered": false,
+      "phaseSnapshots": []
+    }
+  },
+  "pages": [
+    {
+      "id": "ideas",
+      "slug": "ideas",
+      "title": "Idéer & förslag",
+      "description": "Drop zone — nya idéer och förslag",
+      "path": "IDEAS.md",
+      "category": "ideas",
+      "icon": "◈"
+    },
+    {
+      "id": "collab-chat",
+      "slug": "collab-chat",
+      "title": "Colab chat (logg)",
+      "description": "Teamchat synkad från colab-rummet",
+      "path": "COLLAB-CHAT.md",
+      "category": "progress",
+      "icon": "◈"
+    },
+    {
+      "id": "architecture",
+      "slug": "architecture",
+      "title": "Architecture",
+      "description": "",
+      "path": "by-topic/architecture.md",
+      "category": "topic",
+      "icon": "◈"
+    },
+    {
+      "id": "blender",
+      "slug": "blender",
+      "title": "Blender ambassador",
+      "description": "",
+      "path": "by-topic/blender.md",
+      "category": "topic",
+      "icon": "◈"
+    },
+    {
+      "id": "charter",
+      "slug": "charter",
+      "title": "Charter & guest rights",
+      "description": "",
+      "path": "by-topic/charter.md",
+      "category": "topic",
+      "icon": "◈"
+    },
+    {
+      "id": "commons",
+      "slug": "commons",
+      "title": "Commons & avatars",
+      "description": "",
+      "path": "by-topic/commons.md",
+      "category": "topic",
+      "icon": "◈"
+    },
+    {
+      "id": "sessions",
+      "slug": "sessions",
+      "title": "Sessions & signup",
+      "description": "",
+      "path": "by-topic/sessions.md",
+      "category": "topic",
+      "icon": "◈"
+    },
+    {
+      "id": "unity",
+      "slug": "unity",
+      "title": "Unity & Godot",
+      "description": "",
+      "path": "by-topic/unity.md",
+      "category": "topic",
+      "icon": "◈"
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "core",
+        "kind": "core",
+        "label": "SUPARAYS",
+        "sublabel": "Live project map",
+        "slug": null
+      },
+      {
+        "id": "focus",
+        "kind": "focus",
+        "label": "Nuvarande fokus",
+        "sublabel": "",
+        "slug": "tasklist-focus"
+      },
+      {
+        "id": "tasklist",
+        "kind": "hub",
+        "label": "TASKLIST",
+        "sublabel": "0/0 klara · 0 P0 öppna",
+        "slug": "tasklist"
+      },
+      {
+        "id": "history",
+        "kind": "hub",
+        "label": "Historik",
+        "sublabel": "3 milstolpar",
+        "slug": "history"
+      },
+      {
+        "id": "progress",
+        "kind": "hub",
+        "label": "Senaste aktivitet",
+        "sublabel": "0 händelser",
+        "slug": "activity"
+      },
+      {
+        "id": "wiki-ideas",
+        "kind": "ideas",
+        "label": "Idéer & förslag",
+        "sublabel": "Förslag & idéer",
+        "slug": "ideas"
+      },
+      {
+        "id": "wiki-collab-chat",
+        "kind": "topic",
+        "label": "Colab chat (logg)",
+        "sublabel": "Wiki-tema",
+        "slug": "collab-chat"
+      },
+      {
+        "id": "wiki-architecture",
+        "kind": "topic",
+        "label": "Architecture",
+        "sublabel": "Wiki-tema",
+        "slug": "architecture"
+      },
+      {
+        "id": "wiki-blender",
+        "kind": "topic",
+        "label": "Blender ambassador",
+        "sublabel": "Wiki-tema",
+        "slug": "blender"
+      },
+      {
+        "id": "wiki-charter",
+        "kind": "topic",
+        "label": "Charter & guest rights",
+        "sublabel": "Wiki-tema",
+        "slug": "charter"
+      },
+      {
+        "id": "wiki-commons",
+        "kind": "topic",
+        "label": "Commons & avatars",
+        "sublabel": "Wiki-tema",
+        "slug": "commons"
+      },
+      {
+        "id": "wiki-sessions",
+        "kind": "topic",
+        "label": "Sessions & signup",
+        "sublabel": "Wiki-tema",
+        "slug": "sessions"
+      },
+      {
+        "id": "wiki-unity",
+        "kind": "topic",
+        "label": "Unity & Godot",
+        "sublabel": "Wiki-tema",
+        "slug": "unity"
+      }
+    ],
+    "edges": [
+      {
+        "from": "core",
+        "to": "focus"
+      },
+      {
+        "from": "core",
+        "to": "tasklist"
+      },
+      {
+        "from": "core",
+        "to": "history"
+      },
+      {
+        "from": "core",
+        "to": "progress"
+      },
+      {
+        "from": "core",
+        "to": "wiki-ideas"
+      },
+      {
+        "from": "core",
+        "to": "wiki-collab-chat"
+      },
+      {
+        "from": "core",
+        "to": "wiki-architecture"
+      },
+      {
+        "from": "core",
+        "to": "wiki-blender"
+      },
+      {
+        "from": "core",
+        "to": "wiki-charter"
+      },
+      {
+        "from": "core",
+        "to": "wiki-commons"
+      },
+      {
+        "from": "core",
+        "to": "wiki-sessions"
+      },
+      {
+        "from": "core",
+        "to": "wiki-unity"
+      }
+    ]
+  }
+}

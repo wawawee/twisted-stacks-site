@@ -1,0 +1,21 @@
+{
+  "lastUpdated": "2026-08-27T09:22:44.281Z",
+  "currentFocus": "Live Lab",
+  "nextActions": [],
+  "focusTasks": [],
+  "tasks": [],
+  "stats": {
+    "total": 0,
+    "done": 0,
+    "pct": 100,
+    "phaseProgress": {
+      "phasesTotal": 9,
+      "phasesComplete": 9,
+      "activePhaseNum": "8",
+      "activePhaseName": "Live Fleet",
+      "activePhaseDone": 126,
+      "activePhaseTotal": 126,
+      "activePhasePct": 100
+    }
+  }
+}

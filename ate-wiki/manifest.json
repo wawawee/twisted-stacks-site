@@ -1,0 +1,448 @@
+{
+  "syncedAt": "2026-08-27T09:27:53.514Z",
+  "source": "/Users/auepic/Documents/TRADE",
+  "currentFocus": "Alt-data — Keep null on-chain/sentiment stubs (Real Edge 1.1–1.4 no free go); paid revisit PAID_ALTERNATIVES.md",
+  "stats": {
+    "total": 255,
+    "done": 203,
+    "p0Open": 5,
+    "p1Open": 11,
+    "phaseProgress": {
+      "phasesTotal": 10,
+      "phasesComplete": 6,
+      "activePhaseNum": "8",
+      "activePhaseName": "Controlled Live & Paper Fleet",
+      "activePhaseDone": 145,
+      "activePhaseTotal": 174,
+      "activePhasePct": 83
+    }
+  },
+  "pages": [
+    {
+      "id": "ideas",
+      "slug": "ideas",
+      "title": "Idéer & förslag",
+      "description": "Drop zone",
+      "path": "IDEAS.md",
+      "category": "ideas",
+      "icon": "💡"
+    },
+    {
+      "id": "collab-chat",
+      "slug": "collab-chat",
+      "title": "Colab chat (logg)",
+      "description": "Teamchat logg",
+      "path": "COLLAB-CHAT.md",
+      "category": "progress",
+      "icon": "💬"
+    },
+    {
+      "id": "competitors",
+      "slug": "competitors",
+      "title": "Konkurrenter",
+      "description": "",
+      "path": "by-topic/competitors.md",
+      "category": "topic",
+      "icon": "◈"
+    },
+    {
+      "id": "consensus",
+      "slug": "consensus",
+      "title": "consensus",
+      "description": "",
+      "path": "by-topic/consensus.md",
+      "category": "topic",
+      "icon": "◈"
+    },
+    {
+      "id": "data",
+      "slug": "data",
+      "title": "Data & providers",
+      "description": "",
+      "path": "by-topic/data.md",
+      "category": "topic",
+      "icon": "◈"
+    },
+    {
+      "id": "funding",
+      "slug": "funding",
+      "title": "Finansiering",
+      "description": "",
+      "path": "by-topic/funding.md",
+      "category": "topic",
+      "icon": "◈"
+    },
+    {
+      "id": "macro-scout",
+      "slug": "macro-scout",
+      "title": "macro scout",
+      "description": "",
+      "path": "by-topic/macro-scout.md",
+      "category": "topic",
+      "icon": "◈"
+    },
+    {
+      "id": "real-edge",
+      "slug": "real-edge",
+      "title": "Real Edge · alt-data",
+      "description": "",
+      "path": "by-topic/real-edge.md",
+      "category": "topic",
+      "icon": "◈"
+    },
+    {
+      "id": "regime-gate",
+      "slug": "regime-gate",
+      "title": "regime gate",
+      "description": "",
+      "path": "by-topic/regime-gate.md",
+      "category": "topic",
+      "icon": "◈"
+    },
+    {
+      "id": "risk",
+      "slug": "risk",
+      "title": "Risk Officer",
+      "description": "",
+      "path": "by-topic/risk.md",
+      "category": "topic",
+      "icon": "◈"
+    },
+    {
+      "id": "strategy",
+      "slug": "strategy",
+      "title": "Strategi & thesis",
+      "description": "",
+      "path": "by-topic/strategy.md",
+      "category": "topic",
+      "icon": "◈"
+    },
+    {
+      "id": "telemetry",
+      "slug": "telemetry",
+      "title": "telemetry",
+      "description": "",
+      "path": "by-topic/telemetry.md",
+      "category": "topic",
+      "icon": "◈"
+    },
+    {
+      "id": "temporal-workflows",
+      "slug": "temporal-workflows",
+      "title": "temporal workflows",
+      "description": "",
+      "path": "by-topic/temporal-workflows.md",
+      "category": "topic",
+      "icon": "◈"
+    },
+    {
+      "id": "ui-design",
+      "slug": "ui-design",
+      "title": "ui design",
+      "description": "",
+      "path": "by-topic/ui-design.md",
+      "category": "topic",
+      "icon": "◈"
+    },
+    {
+      "id": "use-cases",
+      "slug": "use-cases",
+      "title": "Användningsfall",
+      "description": "",
+      "path": "by-topic/use-cases.md",
+      "category": "topic",
+      "icon": "◈"
+    },
+    {
+      "id": "vision-dataset",
+      "slug": "vision-dataset",
+      "title": "vision dataset",
+      "description": "",
+      "path": "by-topic/vision-dataset.md",
+      "category": "topic",
+      "icon": "◈"
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "core",
+        "kind": "core",
+        "label": "ATE",
+        "sublabel": "Agentic Trading Engine",
+        "slug": null
+      },
+      {
+        "id": "focus",
+        "kind": "focus",
+        "label": "Nuvarande fokus",
+        "sublabel": "Alt-data — Keep null on-chain/sentiment stubs (Real Edge 1.1–1.4 no free go); pa…",
+        "slug": "tasklist-focus"
+      },
+      {
+        "id": "tasklist",
+        "kind": "hub",
+        "label": "TASKLIST",
+        "sublabel": "203/255 klara · 5 P0 öppna",
+        "slug": "tasklist"
+      },
+      {
+        "id": "history",
+        "kind": "hub",
+        "label": "Historik",
+        "sublabel": "21 milstolpar",
+        "slug": "history"
+      },
+      {
+        "id": "wiki-ideas",
+        "kind": "ideas",
+        "label": "Idéer & förslag",
+        "sublabel": "Förslag & idéer",
+        "slug": "ideas"
+      },
+      {
+        "id": "wiki-collab-chat",
+        "kind": "topic",
+        "label": "Colab chat (logg)",
+        "sublabel": "Wiki-tema",
+        "slug": "collab-chat"
+      },
+      {
+        "id": "wiki-competitors",
+        "kind": "topic",
+        "label": "Konkurrenter",
+        "sublabel": "Wiki-tema",
+        "slug": "competitors"
+      },
+      {
+        "id": "wiki-consensus",
+        "kind": "topic",
+        "label": "consensus",
+        "sublabel": "Wiki-tema",
+        "slug": "consensus"
+      },
+      {
+        "id": "wiki-data",
+        "kind": "topic",
+        "label": "Data & providers",
+        "sublabel": "Wiki-tema",
+        "slug": "data"
+      },
+      {
+        "id": "wiki-funding",
+        "kind": "topic",
+        "label": "Finansiering",
+        "sublabel": "Wiki-tema",
+        "slug": "funding"
+      },
+      {
+        "id": "wiki-macro-scout",
+        "kind": "topic",
+        "label": "macro scout",
+        "sublabel": "Wiki-tema",
+        "slug": "macro-scout"
+      },
+      {
+        "id": "wiki-real-edge",
+        "kind": "topic",
+        "label": "Real Edge · alt-data",
+        "sublabel": "Wiki-tema",
+        "slug": "real-edge"
+      },
+      {
+        "id": "wiki-regime-gate",
+        "kind": "topic",
+        "label": "regime gate",
+        "sublabel": "Wiki-tema",
+        "slug": "regime-gate"
+      },
+      {
+        "id": "wiki-risk",
+        "kind": "topic",
+        "label": "Risk Officer",
+        "sublabel": "Wiki-tema",
+        "slug": "risk"
+      },
+      {
+        "id": "wiki-strategy",
+        "kind": "topic",
+        "label": "Strategi & thesis",
+        "sublabel": "Wiki-tema",
+        "slug": "strategy"
+      },
+      {
+        "id": "wiki-telemetry",
+        "kind": "topic",
+        "label": "telemetry",
+        "sublabel": "Wiki-tema",
+        "slug": "telemetry"
+      },
+      {
+        "id": "wiki-temporal-workflows",
+        "kind": "topic",
+        "label": "temporal workflows",
+        "sublabel": "Wiki-tema",
+        "slug": "temporal-workflows"
+      },
+      {
+        "id": "wiki-ui-design",
+        "kind": "topic",
+        "label": "ui design",
+        "sublabel": "Wiki-tema",
+        "slug": "ui-design"
+      },
+      {
+        "id": "wiki-use-cases",
+        "kind": "topic",
+        "label": "Användningsfall",
+        "sublabel": "Wiki-tema",
+        "slug": "use-cases"
+      },
+      {
+        "id": "wiki-vision-dataset",
+        "kind": "topic",
+        "label": "vision dataset",
+        "sublabel": "Wiki-tema",
+        "slug": "vision-dataset"
+      },
+      {
+        "id": "P0-7",
+        "kind": "task-p0",
+        "label": "P0-7",
+        "sublabel": "Dev stack: native default — `./scripts/dev-setup…",
+        "slug": "task-P0-7",
+        "taskId": "P0-7"
+      },
+      {
+        "id": "P0-8",
+        "kind": "task-p0",
+        "label": "P0-8",
+        "sublabel": "Install / enable Temporal Cursor plugin (`/add-p…",
+        "slug": "task-P0-8",
+        "taskId": "P0-8"
+      },
+      {
+        "id": "P1-7",
+        "kind": "task-p0",
+        "label": "P1-7",
+        "sublabel": "Evaluate `BennyThadikaran/stock-pattern` for VCP…",
+        "slug": "task-P1-7",
+        "taskId": "P1-7"
+      },
+      {
+        "id": "P1-8",
+        "kind": "task-p0",
+        "label": "P1-8",
+        "sublabel": "pandas-ta features: volume dry-up, MA stack, ATR…",
+        "slug": "task-P1-8",
+        "taskId": "P1-8"
+      },
+      {
+        "id": "P1-11",
+        "kind": "task-p0",
+        "label": "P1-11",
+        "sublabel": "Unit tests for pattern extrema edge cases (flat …",
+        "slug": "task-P1-11",
+        "taskId": "P1-11"
+      }
+    ],
+    "edges": [
+      {
+        "from": "core",
+        "to": "focus"
+      },
+      {
+        "from": "core",
+        "to": "tasklist"
+      },
+      {
+        "from": "core",
+        "to": "history"
+      },
+      {
+        "from": "core",
+        "to": "wiki-ideas"
+      },
+      {
+        "from": "core",
+        "to": "wiki-collab-chat"
+      },
+      {
+        "from": "core",
+        "to": "wiki-competitors"
+      },
+      {
+        "from": "core",
+        "to": "wiki-consensus"
+      },
+      {
+        "from": "core",
+        "to": "wiki-data"
+      },
+      {
+        "from": "core",
+        "to": "wiki-funding"
+      },
+      {
+        "from": "core",
+        "to": "wiki-macro-scout"
+      },
+      {
+        "from": "core",
+        "to": "wiki-real-edge"
+      },
+      {
+        "from": "core",
+        "to": "wiki-regime-gate"
+      },
+      {
+        "from": "core",
+        "to": "wiki-risk"
+      },
+      {
+        "from": "core",
+        "to": "wiki-strategy"
+      },
+      {
+        "from": "core",
+        "to": "wiki-telemetry"
+      },
+      {
+        "from": "core",
+        "to": "wiki-temporal-workflows"
+      },
+      {
+        "from": "core",
+        "to": "wiki-ui-design"
+      },
+      {
+        "from": "core",
+        "to": "wiki-use-cases"
+      },
+      {
+        "from": "core",
+        "to": "wiki-vision-dataset"
+      },
+      {
+        "from": "tasklist",
+        "to": "P0-7"
+      },
+      {
+        "from": "tasklist",
+        "to": "P0-8"
+      },
+      {
+        "from": "tasklist",
+        "to": "P1-7"
+      },
+      {
+        "from": "tasklist",
+        "to": "P1-8"
+      },
+      {
+        "from": "tasklist",
+        "to": "P1-11"
+      }
+    ]
+  }
+}

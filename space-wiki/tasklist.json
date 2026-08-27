@@ -1,0 +1,33 @@
+{
+  "lastUpdated": null,
+  "currentFocus": "",
+  "focusQueue": [],
+  "focusTasks": [],
+  "recentWins": [],
+  "tasks": [],
+  "gates": [],
+  "activity": [],
+  "completed": [],
+  "stats": {
+    "total": 0,
+    "done": 0,
+    "p0Open": 0,
+    "p1Open": 0,
+    "phaseProgress": {
+      "phasesTotal": 0,
+      "phasesComplete": 0,
+      "activePhaseNum": "2",
+      "activePhaseName": "Fas 2",
+      "activePhaseDone": 0,
+      "activePhaseTotal": 0,
+      "activePhasePct": 0,
+      "heroPhaseNum": "1",
+      "heroPhaseName": "Research",
+      "heroPhaseDone": 0,
+      "heroPhaseTotal": 0,
+      "heroPhasePct": 0,
+      "heroDelivered": false,
+      "phaseSnapshots": []
+    }
+  }
+}

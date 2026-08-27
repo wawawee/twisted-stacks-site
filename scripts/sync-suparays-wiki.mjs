@@ -174,7 +174,6 @@ function buildPages(copied) {
 }
 
 async function main() {
-  await fs.rm(OUT_DIR, { recursive: true, force: true });
   await fs.mkdir(OUT_DIR, { recursive: true });
 
   const repoRoot = localRepoRoot();

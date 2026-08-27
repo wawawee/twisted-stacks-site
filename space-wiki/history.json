@@ -1,0 +1,30 @@
+{
+  "eras": [
+    {
+      "title": "2026-07: Fork & collab room",
+      "bullets": [
+        "Public fork `finasteos/SPACEinSPACE` from TheLostNinjaHacker upstream",
+        "Unity / Godot MCP ambassadors added",
+        "twistedstacks.com `/space` collab room (wiki, chat, ideas, session signup)",
+        "Blender still spawn-per-call — persistent ambassador is Spår B0"
+      ]
+    }
+  ],
+  "milestones": [
+    {
+      "date": "2026-07-22",
+      "milestone": "finasteos fork + Unity/Godot",
+      "evidence": "GitHub `finasteos/SPACEinSPACE`"
+    },
+    {
+      "date": "2026-07-23",
+      "milestone": "`/space` collab room",
+      "evidence": "twisted-stacks-site `src/space`, `api/space`"
+    },
+    {
+      "date": "2026-07-23",
+      "milestone": "Session signup waitlist",
+      "evidence": "`supabase/space-sessions.sql`"
+    }
+  ]
+}
