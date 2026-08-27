@@ -1,5 +1,5 @@
 {
-  "syncedAt": "2026-08-27T09:27:53.514Z",
+  "syncedAt": "2026-08-27T09:33:15.176Z",
   "source": "/Users/auepic/Documents/TRADE",
   "currentFocus": "Alt-data — Keep null on-chain/sentiment stubs (Real Edge 1.1–1.4 no free go); paid revisit PAID_ALTERNATIVES.md",
   "stats": {
@@ -190,7 +190,7 @@
         "id": "history",
         "kind": "hub",
         "label": "Historik",
-        "sublabel": "21 milstolpar",
+        "sublabel": "18 milstolpar",
         "slug": "history"
       },
       {

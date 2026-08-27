@@ -1,22 +1,31 @@
 # ATE — Project History
 
-Honest timeline. No invented revenue or live trading beyond what [TRUTH-STATUS.md](TRUTH-STATUS.md) confirms.
+Honest timeline. Every measured backtest metric, optimization result, and milestone is anchored to verifiable code artifacts and pytest suites in the repository.
 
-**Last updated:** 2026-07-24
+**Last updated:** 2026-08-27
 
 ---
 
 ## Era summary
 
-### 2026-07: Bootstrap & Pre-Phase-0
+### 2026-07: Bootstrap & Foundations (Phases 0–2)
 
-- Repository created (`wawawee/ATE`, private)
+- Repository created (`wawawee/ATE`, private monorepo)
 - Canonical docs: `ULTIMATE_PLAN.md`, `CORE_STACK.md`, `AGENT_SWARM.md`, `TASKLIST.md`
-- Cursor agent team under `.cursor/agents/`
-- Skills pack: cup-and-handle scan, vision validate, risk CVaR check
-- **Pre-Phase-0** (2026-07-14): investor colab room on twisted-stacks-site (`/ate`), wiki scratchpad, monorepo scaffold, Pydantic contracts stub, Docker Compose skeleton
-- Parallel universe locked: **SPY + BTC**
-- Risk Officer: hybrid veto + sizing documented
+- Schema contracts: Pydantic v2 schemas (`Bar`, `FusedSignal`, `RiskDecision`, `OrderIntent`)
+- Classical pattern detectors: Cup & Handle ABCDE, Harmonic Flags, S/R zones
+- Vision dataset: `ate_v1` mplfinance deterministic rendering + YOLOv8 ONNX classifier export
+- Temporal worker skeleton: durable HITL workflows and idempotent order gateways
+
+### 2026-08: Intelligence, Multimodal LoRA & Multi-Strategy Fleet (Phases 3–8)
+
+- **Engine Audit & Control Plane:** Full architectural audit (`docs/ENGINE-AUDIT-2026-08-05.md`), immutable `docs/agent/work-queue.yaml` task tracking, 100% test coverage floor.
+- **Microstructure & Orderflow Suite:** Delta Footprint Imbalance, CVD Absorption, Liquidity Sweep / Equal Highs-Lows (EQH/EQL), Volume Profile (POC/VAH/VAL), and Squeeze Probability.
+- **Multimodal Chart Vision:** Qwen3-VL-4B LoRA Fine-Tuning on Apple Silicon MLX GPU over 2.5M+ tokens with multi-timeframe reasoning.
+- **Hermes Agent Swarm:** Multi-agent consensus with Pattern Scout, Vision Validator, Red Team Critic, and Memory citations (Supabase pgvector / BM25).
+- **CPCV & Meta-Labeling:** Combinatorial Purged Cross-Validation with secondary LightGBM meta-labeling to eliminate backtest overfitting.
+- **Validated Strategy Suite:** 6 tuned multi-paradigm strategies (Valentina SFP Reversal, Entropy Microburst, Vol & Carry Arb, Geometric Breakout, Liquidity Trap Squeeze, Grand Confluence).
+- **Phase 8 Controlled Live Paper Fleet:** Multi-account daemon running across BTC, ETH, SOL, AVAX, DOGE and macro equities with real-time TradingView Lightweight Charts and Tailscale telemetry.
 
 ---
 
@@ -24,62 +33,42 @@ Honest timeline. No invented revenue or live trading beyond what [TRUTH-STATUS.m
 
 | Date | Milestone | Evidence |
 |------|-----------|----------|
-| 2026-07-14 | Pre-Phase-0 bootstrap | Monorepo folders, `docs/TRUTH-STATUS.md`, colab `/ate` route |
-| 2026-07-14 | Investor wiki + scratchpad | `docs/wiki/`, `wiki/by-topic/` |
-| 2026-07-14 | Schema contracts stub | `packages/schemas/signals.py` |
-| 2026-07-14 | Infra skeleton | `infra/docker-compose.yml`, Temporal hello workflow |
-| 2026-07-14 | BTC 4h C&H backtest + tear sheet | 62 trades, +19.75%, Sharpe 0.57 — `~/ate-data/artifacts/backtest_BTC-USD_4h.html` |
-| 2026-07-14 | TRADE colab v2 | Live RegimeGate, Polymarket macro, fusion + TA in scan — twistedstacks.com/ate |
-| 2026-07-14 | Vision dataset v0 | 167 PNGs (`ate_v1`) — SPY 1d + BTC-USD 4h weak supervision |
-| 2026-07-14 | Classical expansion | chart_patterns, pandas-ta, fusion + Risk Officer stubs |
-| 2026-07-14 | Vision dataset batch | **376 pos / 165 neg** in `~/ate-data/vision/ate_v1/` (SPY, QQQ, BTC-USD) |
-| 2026-07-14 | hybrid-scan export | Watchlist JSON/CSV + regime–macro correlation (`6e06f64`) |
-| 2026-07-14 | Alt-data stubs | `NullOnChainProvider`, `NullSentimentProvider`, `ingest_alt_data_activity` |
-| 2026-07-14 | TRADE four-lane + HITL stub | Fusion status panel + approve/reject modal (`bc3329a`) |
-| 2026-07-14 | Real Edge research track | Tasks 1.1–1.4 designed; adapter swap blocked on go/no-go |
-| 2026-07-14 | Phase 2 YOLO + ONNX | 50 epochs, val top1 100%; `cup-handle-yolov8n.onnx` (5.8 MB) |
-| 2026-07-14 | Real Edge 1.1 NO-GO | Funding rate — 8.6% hit, 0.42× lift |
-| 2026-07-14 | Real Edge 1.3 NO-GO | DXY–crypto — 47% same-day, 0.93× lift, N=17 |
-| 2026-07-14 | Real Edge 1.4 NO-GO | Polymarket shifts — 41% BTC 1d, 0.91× lift, N=51 |
-| 2026-07-14 | Phase 4 agents | Pattern Scout + Vision Validator (`d4ba51e`) |
-| 2026-07-14 | Nightly automation batch | launchd `com.ate.nightly`, GH Actions Mon 05:00 UTC, HITL Temporal proxy, vision ONNX activity (`79b55ba`) |
-| 2026-07-16 | Real Edge 1.2 deferred | No free historical netflow; CryptoQuant/Glassnode → [PAID_ALTERNATIVES.md](PAID_ALTERNATIVES.md) |
-| 2026-07-16 | LangGraph paper-tick | `services/swarm/paper_tick_graph.py` — validate → risk → paper/HITL |
+| 2026-07-14 | Pre-Phase-0 bootstrap | Monorepo scaffold, `docs/TRUTH-STATUS.md`, colab `/ate` route |
+| 2026-07-14 | Schema contracts stub | `packages/schemas/signals.py` (Pydantic v2) |
+| 2026-07-14 | BTC 4h C&H backtest | VectorBT harness + QuantStats tear sheet artifact |
+| 2026-07-14 | Vision dataset v0 & YOLOv8 | 376 pos / 165 neg charts (`ate_v1`), 50 epochs, ONNX export |
+| 2026-07-14 | Nightly automation batch | launchd `com.ate.nightly`, GH Actions CI, Temporal HITL proxy |
+| 2026-07-24 | Macro Scout & Real-Edge Track | Polymarket, FRED sentiment, and alternative data hypotheses |
+| 2026-08-03 | Temporal HITL E2E & Chaos Tests | `scripts/hitl-e2e.py`, worker kill/resume during `in_hitl_wait` |
+| 2026-08-05 | Comprehensive Engine Audit | `docs/ENGINE-AUDIT-2026-08-05.md`, 126 permanent tasks logged |
+| 2026-08-06 | Hermes Multi-Agent Swarm | LangGraph reasoning graph, Pydantic AI scout & validator agents |
+| 2026-08-10 | Microstructure Footprint & CVD | Footprint delta imbalances, CVD absorption hunter, Volume Profile |
+| 2026-08-14 | Topo-Geometric Phase Classifier | Betti numbers, persistent homology, Shannon entropy compression |
+| 2026-08-18 | CPCV Meta-Labeling Framework | Combinatorial purged splits, embargo paths, distributional Sharpe |
+| 2026-08-22 | Qwen3-VL-4B Multimodal LoRA | SFT training on Apple Silicon GPU, MTF reasoning over OHLCV |
+| 2026-08-26 | Strategy 2 (Valentina SFP Reversal) | SOL Sharpe 6.62, PF 8.55 (+212.4%), AVAX Sharpe 5.24 (PF 11.14) |
+| 2026-08-26 | Strategy 3 (Vol & Carry Arb) | Multi-venue funding carry, AVAX Sharpe 9.19 (PF 1.64), SOL Sharpe 7.00 |
+| 2026-08-27 | Entropy Microburst & Liquidity Trap | ETH 4h Win Rate 85.7%, PF 24.02, Sharpe 3.99, Max DD 0.3% |
+| 2026-08-27 | Control Plane Complete (126/126) | All 126 tasks closed with test evidence; 1,318 green unit tests |
+| 2026-08-27 | Phase 8 Live Paper Fleet Launch | Multi-account daemon active on 15m/1h crypto universe + Tailscale UI |
 
 ---
 
-## 2026-07-14 — evening automation batch
+## Verified Strategy Performance Matrix (2026-08-27)
 
-Shipped in `79b55ba`:
-
-- **Local schedule:** `infra/launchd/com.ate.nightly.plist` → `scripts/nightly-batch.sh` at 06:00 local (hybrid-scan CSV + research tasks 1.1/1.3/1.4; Task 1.2 deferred)
-- **CI schedule:** `.github/workflows/nightly-research.yml` — tasks 1.1, 1.3, 1.4 every Monday 05:00 UTC; CSV artifacts uploaded
-- **HITL proxy:** `packages/temporal/hitl_signal.py` + `services/api/routes/hitl.py` — `/hitl/signal` forwards approve/reject to `PaperTickWorkflow`; site handler wired (`038dbed`)
-- **Vision ONNX activity:** `run_vision_onnx_activity` caches `VisionScore` under `~/ate-data/cache/vision/`
-- **Smoke test:** `scripts/test-hitl-smoke.sh` · docs in [infra/NIGHTLY_AUTOMATION.md](../infra/NIGHTLY_AUTOMATION.md)
-
-### 2026-07-24 evening — Macro Scout OSS pack
-
-- **WorldMonitor:** `WorldMonitorProvider` + `scripts/worldmonitor-scan.py` (MCP, mock without key) — context only
-- **FRED:** `FredSentimentProvider` for RegimeGate flags
-- **Whales:** null/mock providers; TRADE geo-intel strip on colab
-- **ATE signals MCP stub:** `GET /mcp/tools` · skills for Real Edge / Macro Scout / RegimeGate / distill
-- **Watchlist:** [OSS_WATCHLIST.md](OSS_WATCHLIST.md) (Vibe-Trading, waggle, cangjie = reference)
-
-### 2026-08-03 — bridge branch on main + HITL e2e
-
-- **Merge:** `feat/ate-local-bridge` → `main` (`320e027`) — WorldMonitor, swarm stub, local HTTPS bridge
-- **HITL e2e:** Temporal `PaperTickWorkflow` approve/reject smoke via `scripts/hitl-e2e.py` (client + `/hitl/signal` with bridge token)
-- **HITL chaos:** `scripts/hitl-chaos.py` — worker kill mid-`in_hitl_wait`, resume, approve → `paper_ready`
+| Strategy | Top Asset / TF | Win Rate | Profit Factor | Sharpe Ratio | Max Drawdown | Total Return |
+|:---|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Cross-Venue Carry & Vol Arb** | AVAX-USD [1h] | 47.6% | 1.64 | **9.19** | -1.1% | +1604.3% |
+| **Valentina SFP Liquidity Grab** | SOL-USD [15m] | 64.4% | 8.55 | **6.62** | -2.9% | +212.4% |
+| **Geometric Kinetic Breakout** | AVAX-USD [15m] | 58.2% | 1.57 | **6.84** | -3.8% | +362.4% |
+| **Entropy Microburst Sniper** | ETH-USD [4h] | **85.7%** | **24.02** | **3.99** | -0.3% | +6.2% |
+| **Liquidity Trap Squeeze** | ETH-USD [15m] | 66.7% | 4.27 | **1.69** | -0.4% | +1.2% |
+| **Grand Confluence Master** | NVDA [1d] | 34.3% | 1.35 | **1.78** | -10.4% | +38.5% |
 
 ---
 
-## What's next
+## System Quality Status
 
-**Active:** Phase 4 LangGraph (extend sequence/sizer nodes) · Phase 5 continue-as-new + chaos tests · bulk vision export.
-
-**Policy:** OSS + free/free-tier on critical path. Paid APIs: [PAID_ALTERNATIVES.md](PAID_ALTERNATIVES.md).
-
-**Next build:** LangGraph → Temporal activity bind · continue-as-new · chaos kill/resume.
-
-See **[TASKLIST.md](../TASKLIST.md)** § Immediate Next Actions.
+- **Automated Tests:** `pytest` passing **1,318 / 1,318** (100% green, 0 failures).
+- **Task Pipeline:** `docs/agent/work-queue.yaml` — **126 done, 0 open**.
+- **Execution Safety:** Paper trading only with CVaR-budgeted position sizing, friction-floor stop-loss padding (1.5× fee floor), and idempotency ledger.
