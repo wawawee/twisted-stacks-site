@@ -335,9 +335,9 @@ const CATALOG_PROJECTS: ShowroomProject[] = [
   {
     id: "system_ate",
     name: "ATE",
-    version: "Pre-Phase-0 / paper only",
-    status: "LAB / PAUSED",
-    tagline: "Typed agent swarm for classical + vision + fusion trading.",
+    version: "Phase 8 / Live Multi-Account Fleet",
+    status: "ACTIVE LAB",
+    tagline: "Hybrid classical + vision-LoRA + multi-paradigm agent swarm trading system.",
     description:
       "ATE (Agentic Trading Engine) is a hybrid classical + vision + sequence ML trading system on an open-source backbone — Hummingbot, NautilusTrader, VectorBT, OpenBB — with owned fusion, hybrid memory, Temporal HITL, and React Flow swarm UI. First lane: cup-and-handle on SPY + BTC. Paper only until Phase 8.",
     techStack: ["Pydantic AI", "LangGraph", "Temporal", "VectorBT"],
